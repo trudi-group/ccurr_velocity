@@ -1,0 +1,101 @@
+\input{Sections/pP}%-----put new packages here
+\input{Sections/pCmd}%---put new command definitions here
+\input{Sections/pAc}%----acronym definitions for acro package go here
+%
+\begin{document}%
+%\nocite{*}% Necessary for refcheck package and warnings
+% 
+% note: an additional paper just used bdd as velo: The drivers of Bitcoin demand: A short and long-run analysis
+% \title{In between speculation and medium-of-exchange: From the velocity of money to  measuring ``moneyness'' for cryptocurrencies}%
+% \title{Old and new measures of velocity for cryptocurrencies}%
+% \title{Cryptocurrencies and the velocity of money}%
+% \author{%
+%   Anonymous Authors
+%   % Ingolf G. A. Pernice, %
+%   % Hermann Elendner, %
+%   % Georg Gentzen\\%
+%   % Martin Florian,%
+%   % Björn Scheuermann%
+% }%
+% %
+
+
+%usenix style-------------------------------------------------------------------
+% make title bold and 14 pt font (Latex default is non-bold, 16 pt)
+\title{\Large \bf Cryptocurrencies and the Velocity of Money}
+
+%for single author (just remove % characters)
+\author{
+	{\rm Ingolf G. A. Pernice}\\
+	Weizenbaum Institute\\Humboldt-Universität zu Berlin
+%	Weizenbaum Institute\\for the Networked Society
+	\and
+	{\rm Georg Gentzen}\\
+	Weizenbaum Institute\\Humboldt-Universität zu Berlin
+%	Weizenbaum Institute\\for the Networked Society
+	\and
+	{\rm Hermann Elendner}\\
+        Independent
+	\mbox{}
+} % end author
+
+%IEEE style---------------------------------------------------------------------
+%IEEE style
+%\title{Cryptocurrencies and the velocity of money\\[.75ex] 
+%  {\normalfont\large 
+%    Ingolf G. A. Pernice\Mark{\dag}, Georg Gentzen\Mark{\dag}, Hermann Elendner%
+%  }\\[-1.5ex]
+%}
+%
+%\author{
+%    \IEEEauthorblockA{%
+%        \Mark{\dag}Weizenbaum Institute for the Networked Society 
+%    }
+%}
+\def \varInputTable {}
+\def \varInputFigs  {}
+\def \varInputAlgos {}
+
+\newcommand{\parRemain}[1]{#1} %Print all content of introduction.
+%\newcommand{\parRemain}[1]{}   %Only check first sentences of paragraphs of intro.
+
+%
+\maketitle % typeset the header of the contribution
+% 
+\input{Sections/00abs}% Abstract goes hier
+\input{Sections/01int}% Introdution
+\input{Sections/02rel}% Related work
+\input{Sections/03tcm}% Theoretic concepts of measures for the velocity of money
+\input{Sections/04ubc}% UTXO based cryptocurrencies
+\input{Sections/05stb}% State of the Art: Currently used estimation methodsmethods
+\input{Sections/06our}% Our contribution: Velocity on a segregated money supply
+\input{Sections/07seg}% Segregating the money supply for UTXO-based cryptocurrencies
+\input{Sections/08cir}% Velocity measu fanficres based on circulating money
+\input{Sections/09sta}% State of the Art: Currently used proxy methods
+\input{Sections/10res}% Data and Results
+\input{Sections/11mon}% Moneyness measurements
+\input{Sections/90con}% Conclusion
+% BibTeX users should specify bibliography style 'splncs04'.
+% References will then be sorted and formatted in the correct style.
+%
+%\clearpage 
+
+%usenix style
+\bibliographystyle{unsrt}%
+
+%IEEE Style
+%\bibliographystyle{plainnat}%
+
+\bibliography{references}%
+%
+\input{Sections/95apx}% Appendix goes here
+\end{document}%
+% 
+% LocalWords:  eflux illiquid Ingolf Pernice Hermann Elendner Georg
+% LocalWords:  Gentzen Florian Björn Scheuermann Blockchain efflux
+% LocalWords:  Bitcointalk conceptionally reflux disfunctional UTXO
+% LocalWords:  moneyness interpretable argumentations TBD UTXOs BTC
+% LocalWords:  indentities blockchain Satoshi Nakamoto pre QTM MSE
+% LocalWords:  unintuitive Bitcoins Litecoin Namecoin Kraken Humes
+% LocalWords:  Coinbase Bitfinex ByteCoin MoonShadow MV Ricardian
+% LocalWords:  BitMex Redux

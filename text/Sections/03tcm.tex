@@ -1,0 +1,141 @@
+%Fischer and Stuff
+\section{Theoretical concepts of measures for the velocity of money}
+\label{sec:concepts}
+
+% To facilitate an informed discussion of measures for the velocity of money,
+% we first clarify the use of technical terms for the theoretical concepts. %
+
+At its core, velocity of money refers to the average number of turnovers per
+monetary unit within a period of time. %
+This definition stems from the \emph{transaction form} of the quantity theory
+of money as formalized by \cite{fisher1911equation}.%
+\footnote{
+  % The concept of relating money flows to monetary flows of goods and services has %
+  % been put to writing first by \cite{humes1752ofmoney} but might have even older %
+  % roots~\cite{volckart1997early}. %
+  % Popularized by~\cite{fisher1911equation}, many different models arose. %
+  % These are are summarized under the term \textit{quantity equations of money} today. %
+  The transaction form highlights the use of money as a medium of exchange; %
+  other forms stress different characteristics.  All forms, however, relate %
+  money flows to real transactions. %
+  While the transaction form is an identity and thus by definition correct, %
+  it is nowadays mostly considered impractical for use in monetary %
+  policy-making \citep[cf.][]{friedman2017quantity}. %
+  General criticism was spurred by \cite{keynes2018general, tobin1989money, hansen1957american}, who reasoned that an unstable, %
+  endogenously forming velocity of money would render the equations useless %
+  for steering inflation. %
+  The relation of monetary aggregates and price levels is disputed until this day \citep[cf.][]{dwyer1988money, mccallum2001monetary, gali2002new, bachmeier2005predicting, favara2009reconsidering}. 
+  % As of definitional challenges to some of the theories %
+  % central variables, the theory might better be formulated using income
+  % transactions \cite{angell1936behavior} or focusing on the usefulness of
+%   money as an asset rather than the mechanical payment process \cite{tobin1958liquidity}. %
+}
+%
+The central equation of the theory equates the flows of real transactions,
+given by the scalar product $\langle\Pp,\Tp\rangle$ of prices $\Pp$ and
+transaction volumes $\Tp$, to total money flows, equal to the product of the
+money supply $\Mp$ and its velocity \(\Vp\), where \(\perd\) denotes the time
+period considered. %
+With $n\in\mathbb{N}$ this amounts to
+%
+\begin{align}%
+\label{eq:fisher}
+  \Mp \Vp=\langle\Pp,\Tp\rangle\ \text{with}\ \Mp, \Vp \in \mathbb{R},\ 
+  \text{and}\ \Pp,\Tp \in \mathbb{R}^{n}.%
+\end{align}
+The scalar product on the right-hand side is referred to as the \textit{price
+  sum}.  In this product, \( \Pp=( \Pp_{1},\Pp_{2}, \cdots , \Pp_{n} ) \)
+denotes a vector of prices $\Pp_t$ of transacted goods and services in
+transaction $t$ during period $\perd$.  Transaction volumes \( \Tp \) are
+given in units of goods and services. %
+They are conceptualized as the vector %
+\( \Tp=( \Tp_{1},\Tp_{2}, \cdots , \Tp_{n} ) \) %
+with volume $\Tp_t$ in transaction $t$ in period $\perd$.  On the left-hand
+side, $\Mp$ stands for the number of all units of money supply available in
+period $\perd$. %
+$\Vp$ denotes the velocity of money.%
+\footnote{\label{sheep-note} To see this equation less abstractly, imagine an
+  economy with only 2 gold coins, Alice, Bob and sheep Eve. %
+  Alice owns the 2 gold coins and Bob the sheep Eve. %
+  In $2020$, Alice buys Eve from Bob for 1 gold coin. %
+  Later in the year, Bob regrets his decision and buys Eve back for the same
+  price---Alice receives her coin back. %
+  The quantity equation states the following:\\%
+  %
+  $ \displaystyle
+  \begin{aligned}%
+    2\,\coins \, \cdot \, V_{\mathtt{2020}} = %
+    \langle\begin{pmatrix}%
+    	1\,\frac{\coins}{\sheep} \\%
+    	1\,\frac{\coins}{\sheep}%
+    \end{pmatrix}, % 
+    \begin{pmatrix}%
+    	1\,\sheep \\%
+    	1\,\sheep%
+    \end{pmatrix}\rangle %
+    = 2\,\coins.%
+  \end{aligned} %
+  $ \\%
+  Now the velocity $V_{\mathtt{2020}}$ of the economy's money can be backed out
+  as $1$.%
+} %
+%
+While \(\Tp\), \(\Vp\) and \(\Pp\) are measured over a time period, \(\Mp\) %
+is a point-in-time measure. %
+To simplify, we assume the money supply is fixed during period \(\perd\)
+and record it at the period's beginning \(\perd_\Start\). %
+
+To develop intuition for velocity \(\Vp\), it can be viewed as weighted
+average number of turnovers of all monetary units
+\citep[cf.][]{friedman2017quantity}. %
+The weights are derived from sorting the units into groups $g\in{}\Gp$ with
+respect to their number of turnovers $\vp_g$ during period $\perd$. %
+Velocity $\Vp$ then is%
+\begin{align}\label{eq:velo_concept}%
+  \Vp = \sum_{g\in\Gp}% 
+  \Bigl(%
+  \vp_g \cdot \frac{\Np_g}{\sum_{g\in\Gp} \Np_g}%
+  \Bigr)%
+  ,%
+\end{align}%
+with $\Np_g$ monetary units in group $g$ in period $\perd$. %
+Velocity thus is the sum of turnover numbers~$\vp_g$, weighted by their
+respective fractions.%
+\footnote{%
+  Returning to the example in footnote~\ref{sheep-note}, one coin was turned
+  over twice---and one not at all. %
+  Thus %
+  $V_{\mathtt{2020}}= 0 \cdot \frac{%
+    1\,\coins%
+  }{%
+    2\,\coins%
+  } + 2\,\cdot \frac{%
+    1\,\coins%
+  }{%
+    2\,\coins%
+  }$. %
+  This shows how the quantity equation is an identity and an implicit
+  definition of velocity (rather than a testable statement, compare
+  \cite{friedman2017quantity}).%
+} %
+While this definition is intuitive, it cannot be used to measure velocity in
+practice. %
+Turnover numbers per monetary unit are neither recorded for fiat currencies,
+nor can they be inferred unambiguously for UTXO-based cryptocurrencies
+% by counting transfers of coins
+(compare \refsec{concept_utxo}). %
+In practice, the velocity of money is thus backed out of \refequ{fisher}:
+$V_\perd = \langle\Pp,\Tp\rangle/\Mp$. %
+
+For cryptocurrencies, this appears a simple task, using on-chain transaction
+volume and total coin supply. %
+However, due to their technical implementation, transaction volumes recorded
+on-chain are distorted. %
+The next section therefore discusses the relevant subtleties of UTXO-based
+cryptocurrency systems. %
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

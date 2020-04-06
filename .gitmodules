@@ -1,0 +1,3 @@
+[submodule "presis/presi_boston/weizenbaum-latex-theme-for-slides"]
+	path = presis/presi_boston/weizenbaum-latex-theme-for-slides
+	url = git@gitlab.weizenbaum.net:gentzeng/weizenbaum-latex-theme-for-slides.git

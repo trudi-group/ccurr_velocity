@@ -1,0 +1,89 @@
+(TeX-add-style-hook
+ "velocitypaper_v0"
+ (lambda ()
+   (TeX-add-to-alist 'LaTeX-provided-class-options
+                     '(("llncs" "runningheads")))
+   (TeX-add-to-alist 'LaTeX-provided-package-options
+                     '(("inputenc" "utf8") ("algorithm2e" "linesnumbered" "ruled" "vlined") ("natbib" "round") ("hypcap" "all")))
+   (TeX-run-style-hooks
+    "latex2e"
+    "abstract"
+    "ts_tables/descriptives_app"
+    "ts_tables/descriptives_est"
+    "ts_tables/descriptives_other"
+    "ts_figs/desc_all_app_norm"
+    "ts_figs/desc_all_est_norm"
+    "ts_figs/desc_components"
+    "ts_figs/corrplot_all_number"
+    "ts_figs/corrplot_all_ellipse"
+    "ts_tables/mse_appVSest_norm"
+    "ts_tables/mae_appVSest_norm"
+    "llncs"
+    "llncs10"
+    "inputenc"
+    "csquotes"
+    "url"
+    "xspace"
+    "todonotes"
+    "amsmath"
+    "amssymb"
+    "eurosym"
+    "siunitx"
+    "pifont"
+    "tikz"
+    "graphicx"
+    "algorithm2e"
+    "subfig"
+    "natbib"
+    "hyperref"
+    "inconsolata"
+    "hypcap"
+    "mathtools"
+    "dcolumn")
+   (TeX-add-symbols
+    '("mycommfont" 1)
+    '("ttext" 1)
+    "eg"
+    "ie"
+    "xmark"
+    "cmark")
+   (LaTeX-add-labels
+    "sec:intro"
+    "sec:lit"
+    "sec:concept_utxo"
+    "fig:utxo_sys"
+    "sec:concepts"
+    "eq:velo_concept"
+    "sec:approx_crypto"
+    "sec:conc:sub:approx_crypto:subsub:prim"
+    "sec:conc:sub:approx_crypto:subsub:bdd"
+    "eq:bdd"
+    "sec:conc:sub:approx_crypto:subsub:dorm"
+    "sec:oldmeas"
+    "sec:oldmeas:sub:particularities_txvol"
+    "sec:oldmeas:sub:adjustment_txvol"
+    "sec:oldmeas:sub:naive"
+    "sec:oldmeas:sub:total"
+    "sec:newmeas"
+    "sec:newmeas:sub:segregation"
+    "sec:moneyness"
+    "sec:cc_money_seg"
+    "sec:cc_money_seg:sub:mcirc_concept"
+    "fig:mcirc_concept"
+    "sec:cc_money_seg:sub:mcirc_pract"
+    "eq:code_mcirc_wb"
+    "eq:code_mcirc_mc"
+    "sec:newest"
+    "sec:results"
+    "tbl:"
+    "fig:"
+    "sec:results:sub:comp"
+    "sec:results:sub:comp_contr"
+    "sec:results:sub:comp_hype"
+    "sec:results:sub:comp_moneyness"
+    "sec:results:sub:offchain"
+    "sec:conclusion")
+   (LaTeX-add-bibliographies
+    "references"))
+ :latex)
+

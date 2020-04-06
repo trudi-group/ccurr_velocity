@@ -1,0 +1,285 @@
+\documentclass[final,hyperref={pdfpagelabels=false}]{beamer}
+\mode<presentation> { \usetheme{hhucn} }
+
+%\usepackage[scaled=.90]{helvet}  % Alternative font for HHU font 'Celeste'
+\usepackage[scaled=1]{sourcesanspro}  % Alternative font for HHU font 'Celeste'
+\usepackage{grffile}  % to support file names with multiple dots in it.
+\usepackage[english]{babel}
+\usepackage{amsmath,amsthm, amssymb, latexsym}
+\usepackage{wrapfig}
+\usepackage{subfigure}
+\usepackage{array,booktabs,tabularx}
+\usepackage[orientation=portrait,size=a0,scale=1.4,debug]{beamerposter}
+\usepackage[nolist]{acronym}
+\usepackage{siunitx}
+\usepackage{tikz}
+
+% BibLaTeX package for citations
+\usepackage[%
+	style=authoryear-comp,%				format as used at the IEEE
+	backend=biber,%			suppress warning
+]{biblatex}
+\addbibresource{literature.bib}
+
+
+\usetikzlibrary{arrows,shapes,positioning,calc}
+
+% change list indention level
+% \setdefaultleftmargin{3em}{}{}{}{}{}
+\providecommand\thispdfpagelabel[1]{}
+
+\usepackage{xspace}
+\usepackage{setspace}
+\usepackage[none]{hyphenat}
+\setbeamertemplate{itemize/enumerate body begin}{\normalsize}
+
+
+\input{commands.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title, author, institute, and emails here.
+
+\title{\huge Cryptocurrencies and the Velocity of Money}
+\author{\underline{Ingolf G.A. Pernice}, Georg Gentzen, Hermann Elendner}
+\institute{Weizenbaum Institute / Humboldt-Universität zu Berlin\\[2ex]~}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Abstract
+\newcommand{\printabstract}{
+\begin{columns}[T]
+\column{0.3\textwidth}\parbox[t][][t]{\textwidth}{
+
+  \textbf{Velocity is employed in countless empiricial pricing studies for crypto- currencies.} 
+
+  \vspace{0.5em}
+  
+  \textbf{What are the proxy-variables used so far---and how is their quality?}
+
+  \vspace{0.5em}
+
+  \textbf{Can we improve the data quality for including velocity into pricing studies?}
+
+}
+\column{0.3\textwidth}\parbox[t][][t]{\textwidth}{
+\textbf{How is velocity defined?}
+
+\begin{align}%
+  \Vp=\frac{\langle\Pp,\Tp\rangle }{\Mp } %\text{ with}\ \Mp, \Vp \in \mathbb{R},\ 
+  \text{and}\ \Pp,\Tp \in \mathbb{R}^{n}.%
+\end{align}
+
+\vspace{1em}
+
+Velocity is the average number of coin turnovers per period.
+}
+\column{0.3\textwidth}\parbox[t][][t]{\textwidth}{
+  We introduce velocity measures for UTXO-based cryptocurrencies focused on
+  the subset of the money supply effectively in use for processing transactions. %  
+  We show that each of the velocity estimators is approximated best by the
+  simple ratio of on-chain transaction volume to total coin supply. %
+  \vspace{1em}
+}
+\end{columns}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Conference
+\newcommand{\printconference}{
+  4th ForDigital Blockchain Workshop\\[1ex]
+  Karlsruhe, Germany, March 2020
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newlength{\columnheight}
+\setlength{\columnheight}{105cm}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Acronyms
+
+\begin{frame}[t]
+\begin{columns}
+\begin{column}{.9\textwidth}  % Width for main content of the poster.
+\vspace{2em}
+\begin{columns}[T]
+\column{0.45\textwidth}
+{\Large I. THEORY AND MEASURES}\vspace{-1ex}
+\textcolor{hublau}{\rule{\textwidth}{4pt}}\\[1ex]
+
+
+\textbf{Adopted approximations:} 
+\begin{itemize}
+\item Coin days destroyed (\cite{deleo2014does}, \cite{georgoula2015using}, \cite{bouoiyour2015does}, \cite{luis2019drivers}, ...)
+\item Coin-turnover (\cite{smith2017bitcoin})
+\item Simplified velocity measure
+\end{itemize}
+\vspace{1em}
+
+\textbf{Recently proposed measures:} \linebreak{}
+\smallskip{}
+
+\emphtext{Simplified:}
+\cite{bolt2016value} and \cite{ciaian2018price}:
+\smallskip{}
+\begin{align}%
+  \VNaiveEstP = \frac{\text{"on-chain transaction volume"}}{\text{"total coin supply"}}%
+\end{align}%
+\smallskip{}
+
+\emphtext{Adjusted transaction volume:}
+\cite{kalodner2017blocksci} and \cite{athey2016bitcoin}:
+\smallskip{}
+\begin{align}
+  \VTotalEstP = \frac{\text{"\emphtext{adjusted} on-chain transaction volume"}}{\text{"total coin supply"}}%
+\end{align}
+\smallskip{}
+
+\emphtext{Based on money in effective circulation:}
+Theoretically proposed in \cite{bolt2016value}, \textbf{operationalized in this study}:
+\smallskip{}
+\begin{align}%
+    \VCircEstP = \frac{\text{"\emphtext{adjusted} on-chain transaction volume"}}{\text{"\emphtext{adjusted} coin supply"}}%
+\end{align}%
+
+% \smallskip{}
+
+% To see how excluding hoarded money relates to the quantity theory:
+% \begin{alignat}{4}%
+%   \VTotalP%
+%   \ & = &\ & \vp_h \frac{%
+%     \Np_h%
+%   }{%
+%     \bigl( \Np_h+\sum_{g\in\GStrokeP} \Np_g \bigr)%
+%   }\\%
+%   \ & \ + &\ & \sum_{g\in\GStrokeP} \vp_g \frac{%
+%     \Np_g%
+%   }{%
+%     \bigl( \Np_h+\sum_{g\in\GStrokeP} \Np_g \bigr)%
+%   }.\nonumber%
+% \end{alignat}%
+% % 
+% By definition, $h$ encompasses only non-transferred units, and thus $\vp_h=0$ in period $\perd$. Consequently %
+% \begin{align}%
+%   \label{eq:disentangle_vcirc}
+%   \VCircP %
+%   =  \sum_{g\in\GStrokeP} \vp_g
+%   \frac{\Np_g}{\sum_{g\in\GStrokeP} \Np_g },%
+% \end{align}%
+
+
+\column{0.45\textwidth}
+{\Large II. PROPOSED OPERATIONALIZATION}\vspace{-1ex}
+\textcolor{hublau}{\rule{\textwidth}{4pt}}\\[1ex]
+
+
+  % \subsection{Motivation}
+  
+  % \begin{itemize}
+  % \item No fullfillment of the money functions by \emphtext{money hoards}
+  % \item Hoarded money, as destroyed money, is \emphtext{``leakage''} that \emphtext{needs to be compensated} \deemphtext{(Keynes (1973), Commons (1973))}
+  % \item Effective money supply changes are modelled as \emphtext{link for feedback effects} between speculation and prices \deemphtext{(Athey et al. (2016) and Bolt et al. (2016))}
+  % \end{itemize}
+
+
+  \begin{figure}
+    \centering
+    \includegraphics[width=01\columnwidth]{fig/tx_chain}
+    \caption{An example of a transaction chain.}
+    \label{fig:unilogo}
+  \end{figure}
+  
+  \smallskip{}
+
+  \emphtext{\textbf{Two} issues:} %
+  \begin{itemize}
+  \item Change transactions
+  \item Undetermined link between inputs and outputs
+  \end{itemize}
+
+  \smallskip{}
+  
+  \emphtext{\textbf{Three} measures:}
+  \begin{itemize}
+  \item ``Whole-bill-approach'' 
+  \item ``Moved-coin-approach - First-in-first-out''
+  \item ``Moved-coin-approach - Last-in-first-out''
+  \end{itemize}
+
+  % \begin{figure}
+  %   \centering
+  %   \includegraphics[width=0.6\columnwidth]{fig/ts_meas_norm}
+  %   \caption{Normalized variables of volatility estimation.}
+  %   \label{fig:unilogo}
+  % \end{figure}
+  
+
+
+\end{columns}
+%% End of double-column
+
+\vspace{1em}
+{\Large III. ON THE QUALITY OF APPROXIMATIONS}\vspace{-1ex}
+\textcolor{hublau}{\rule{\textwidth}{4pt}}\\[1ex]
+
+\begin{columns}[c]
+  \column{0.2\textwidth}
+  \begin{center}
+    \begin{block}{Results:}
+      \begin{itemize}
+      \item For differenced data, \(\VNaiveEstP\) clearly superior
+      \item For raw data less clear - but coin days destroyed mostly outperformed
+      \end{itemize}
+    \end{block}
+    \begin{block}{Future research:}
+      \begin{itemize}
+      \item Find look-back window suited best
+      \item Add off-chain transaction data
+      \end{itemize}
+    \end{block}
+    \begin{block}{Paper available at:}
+      \centering{\includegraphics[width=0.25\columnwidth]{fig/ssrn_qrcode_fat.png}}
+    \end{block}
+  \end{center}
+  %%%%%%%%% 
+  \column{0.7\textwidth}
+  \begin{center}
+    \begin{table}
+      \caption{MAE and MSE between velocity approximation methods compared to estimation methods. If the proxy-variable is part of the superiority set of the respective Model Confidence Set Tests (1\% sig. levels) are marked with \(\dag\) (compare Hansen et al. 2011).
+      }
+      \inputTikZ{1}{../../text/ts_tables/appVSest_errors_w_mcs.tex}
+      \label{tbl: errortable1}
+    \end{table}
+    \vspace{-4mm}
+  \end{center}
+ %%%%%%%%%%%%%
+\end{columns}
+% %%%%%%%%%%%%%%
+% \vspace{2em}
+% %%%%%%%%%%%%%%
+% \begin{columns}
+%  \column{0.8\textwidth}
+% \begin{center}
+% \tikzset{every picture/.style={scale=2.5,every picture/.style={}}}
+%   \input{fig/node_with_all_ids}
+% \end{center}
+% Number of IDs seen, overlay connections and connections to \ac{DHT}-enabled peers of a node that has no connection limit.
+% %%%%%%%%%
+% \column{0.2\textwidth}
+% \begin{center}
+%   {\LARGE\bf Paper on arXiv:}\\
+% \includegraphics[width=\columnwidth]{fig/arxiv_qrcode.png}
+% \end{center}
+% \end{columns}
+
+
+\end{column}
+\end{columns}
+\end{frame}
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

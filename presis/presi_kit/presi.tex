@@ -1,0 +1,647 @@
+\documentclass{beamer}
+\usetheme{Dietzel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage{tabularx}
+\usepackage[raster]{tcolorbox}
+\usepackage{appendixnumberbeamer}
+\usepackage[sfdefault]{FiraSans}
+\usepackage{FiraMono}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata, shapes, plotmarks, decorations.pathreplacing}
+\usetikzlibrary{decorations.pathreplacing} % for expanding waves
+\usetikzlibrary{positioning}
+\usetikzlibrary{shadows.blur}
+
+\usepackage{siunitx}
+\usepackage{mathtools}
+\usepackage[normalem]{ulem}
+
+% % Emoticons!
+% \usepackage{fontspec} % needs lualatex!
+% \newfontfamily\DejaSans{DejaVu Sans}
+% \newcommand{\angry}{{\DejaSans 😠 }}
+% \newcommand{\scream}{{\DejaSans 😱 }}
+% \newcommand{\king}{{\DejaSans ♚ }}
+% \newcommand{\pawn}{{\DejaSans ♟️ }}
+% \newcommand{\ok}{{\DejaSans ✓ }}
+% \newcommand{\notok}{{\DejaSans ❌ }}
+
+% for ~ conforming to style in mazieres2015stellar
+\DeclareMathOperator{\V}{\mathbf{V}}
+\DeclareMathOperator{\Q}{\mathbf{Q}}
+
+% for making it more visible what is a superset and what is a regular set
+\renewcommand{\S}{\mathcal{S}}
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\M}{\mathcal{M}}
+
+% more textcolors... (regular alert is blue)
+\newcommand{\redalert}[1]{\textcolor{hured}{#1}}
+
+\newcommand{\arrow}[1][]{$\xrightarrow{\text{#1}}$ }
+\newcommand{\Arrow}[1][]{$\xRightarrow{\text{#1}}$ }
+\newcommand{\darrow}{$\leftrightarrow$ }
+\newcommand{\Darrow}{$\Leftrightarrow$ }
+
+\graphicspath{pics/}
+
+\title{On the Security and "Decentrality" of Federated Byzantine Agreement}
+\subtitle{(work in progress)}
+\author{Martin Florian}
+\date{November 13, 2019}
+%%%% \titlegraphic{\hfill\includegraphics[width=0.85\textheight]{hukombi_bbw}}
+
+\begin{document}
+
+\setbeamercolor{background canvas}{bg=hugraygreen}
+\maketitle
+\setbeamercolor{background canvas}{bg=white}
+
+%>-=- PART -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\section{Context...}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Weizenbaum Institute for the Networked Society}
+  \vspace{5ex}
+  \begin{itemize}
+    \item "Digitization" \darrow society
+    \item In Berlin since (officially) September 2017
+    % \begin{itemize}
+    %   \item Still bootstrapping in some regards...
+    %   \item Joint project by 5 universities and 2 research institutions from Berlin and Potsdam.
+    % \end{itemize}
+    \item Publicly funded
+    \item \alert{Interdisciplinary}
+  \end{itemize}
+  \begin{figure}[htpb]
+    \vspace{-5ex}
+    \hspace{8ex}
+    \includegraphics[width=0.4\linewidth]{pics/wi_disciplines.png}
+  \end{figure}
+  \url{https://www.weizenbaum-institut.de/}
+\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Trust in Distributed Environments}
+ \begin{itemize}
+    \item One of 20 Weizenbaum research groups
+     \hfill \includegraphics[width=0.28\linewidth]{pics/jwi_trudi.png}
+    \item Computer Science + Law + Sociology + Economics
+    \item "Demystifying Blockchain", and broader questions \begin{itemize}
+      \item Cryptocurrency economics% (stabilization, pricing...)
+      \item Resilience of peer-to-peer networks% (breaking Ethereum, understanding IPFS)
+      %\item Legal challenges% (what to do if my blockchain contains child porn)
+      \item Social and legal implications% of automatic rule enforcement% on collective decision-making and consumer welfare
+      \item ...
+      \vfill
+      \item \alert{Consensus protocols}
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Consensus}
+  \begin{itemize}
+    \item We have set of \alert{nodes} that want to agree on a value $x$
+    \item $x$ can be:\\
+      "what should be the next block on our blockchain"
+  \end{itemize}
+\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Solutions for consensus}
+  \begin{figure}[htpb]
+    \centering
+    \includegraphics[width=\linewidth]{pics/spectrum.pdf}
+  \end{figure}
+  \vfill
+  \vfill
+    In between: \alert{Federated Byzantine Agreement Systems} (FBAS)
+    \begin{itemize}
+      \item \emph{Stellar Consensus Protocol} (SCP) \cite{mazieres2015stellar}
+      \item Each node \alert{decides individually which nodes to "trust"}
+        \begin{itemize}
+          \item Related: \emph{Asymmetric Distributed Trust} \cite{cachin2019asymmetric}
+        \end{itemize}
+      \vfill
+      \item Secure permissionless consensus with the performance of classical BFT protocols?
+        % \begin{itemize}
+        %   % \item Security and decentrality depend on the sum of all individual decisions - but how exactly?
+        % \end{itemize}
+    \end{itemize}
+\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Agenda}
+  \begin{enumerate}
+    \item Federated Byzantine Agreement
+    \item \emph{FBAS Analyzer} + state of the Stellar network
+    \item \emph{Quorum Configuration Simulator} + first results there
+  \end{enumerate}
+  \vfill
+  This is a project-in-progress, (critical) feedback is very welcome!
+\end{frame}
+
+%>-=- PART -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\section{Federated Byzantine Agreement}
+
+%%>--- Slide -------------------------------------------
+%\begin{frame}{Byzantine agreement system}
+%  Idea:
+%  \begin{itemize}
+%    \item Fixed set of nodes, which is known by every node
+%    \item Everybody has one vote
+%  \end{itemize}
+%  Problem:
+%  \begin{itemize}
+%    \item Nodes can`t join the system without everybody agreeing to it
+%  \end{itemize}
+%\end{frame}
+
+%%>--- Slide -------------------------------------------
+%\begin{frame}{Bitcoin}
+%  Idea:
+%  \begin{itemize}
+%    \item Incite nodes to check the consistency by offering a reward
+%    \item Everybody has votes equal to his computing power
+%  \end{itemize}
+%  Problem:
+%  \begin{itemize}
+%    \item 51\% attack
+%    \item Energy consumption
+%  \end{itemize}
+%\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{A note about terminology}
+We use terminology based on \cite{lokhava2019stellar_payments}, \cite{mazieres2015stellar},
+\cite{lachowski2019complexity} and the Stellar code base.
+\vfill
+\redalert{We simplify a few aspects for this talk!}
+\end{frame}
+
+%%>--- Slide -------------------------------------------
+%\begin{frame}{By example...}
+%  \begin{itemize}
+%    \item These are the \emph{nodes} Alice, Bob and Carol: $\{a, b, c\}$
+%    \item They want to decide what to have for lunch (the value $x$)
+%  \end{itemize}
+%\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Quorum set and FBAS}
+
+  \begin{block}{Quorum set}
+    The \emph{quorum set} $\Q(v)$ of a node $v$ is a set of \emph{validator} nodes $\{v_0, v_1, ..\}$
+    and a \emph{threshold} value $t$ so that,
+    according to $v$'s \emph{opinion},
+    at least $t$ validators will be honest.
+    % so that confirmations from $\ge t$ members of $\Q(v)$ are sufficient for
+    % $v$ to \emph{accept} a statement.
+  \end{block}
+
+  \begin{itemize}
+    \item For example\begin{itemize}
+      \item $\Q(a) = (\{b, c\}, 2)$
+      \item $\Q(b) = \Q(c) = (\{a, b, c\}, 2)$
+      \end{itemize}
+  \end{itemize}
+
+  \vfill
+  $\{a,b,c\}$ and their quorum sets form a \alert{FBAS}.
+  % But is it any good?
+\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Will they agree on anything?}
+
+  \begin{block}{Quorum}
+    A set of nodes $U \subseteq \V$ in FBAS $\langle \V, \Q \rangle$
+    is a \emph{quorum} iff $U \neq \emptyset$ and
+    % $U$ is sufficient to convince any member---i.e.,
+    $U$ satisfies $\Q(v)$ for $\forall v \in U$.
+  \end{block}
+
+  \begin{itemize}
+    \item $\Q$ in our example FBAS:\\
+      \vfill
+      \begin{center}
+        $\Q(a) = (\{b, c\}, 2)$, $\Q(b) = \Q(c) = (\{a, b, c\}, 2)$
+      \end{center}
+      \vfill
+    \item So we get the quorums:\\
+      \vfill
+      \begin{center}
+        $\{\{a,b,c\},\{b,c\}\}$
+      \end{center}
+      \vfill
+    \item $\exists$ $\geq1$ non-faulty quorums $\iff$ \alert{quorum availability} \\
+      \Arrow parts of the FBAS can reach consensus
+  \end{itemize}
+\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Will they agree on the same thing?}
+
+  \begin{block}{Quorum intersection}
+    An FBAS enjoys \emph{quorum intersection} iff any two of
+    its quorums share a node—i.e., for all quorums
+    $U_{1}$ and $U_{2}$, $U_{1} \cap U_{2} \neq \emptyset$.
+  \end{block}
+  \begin{itemize}
+    % \item $\{\{a,b,c\},\{b,c\}\}$ obviously intersect
+    \item Quorum intersection \Arrow nodes will not accept conflicting statements
+      (s.a. \cite{mazieres2015stellar})
+    % \item If an FBAS doesn't enjoys quorum intersection, it could act as two separate FBAS
+  \end{itemize}
+  \vfill
+  \vfill
+  \vfill
+\end{frame}
+
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Summing up...}
+
+  % \begin{itemize}
+  %   \item Quorum set - node-individual "trust" configuration\\
+  %     \begin{center}
+  %       $\Q(a) = (\{b, c\}, 2)$, $\Q(b) = \Q(c) = (\{a, b, c\}, 2)$
+  %     \end{center}
+  %   \item Quorum - set of nodes that can achieve consensus
+  %     \begin{center}
+  %       $\{\{a,b,c\},\{b,c\}\}$
+  %     \end{center}
+  %   \item An FBAS has...
+      \begin{itemize}
+        \item Quorum availability: $\ge1$ quorum is non-faulty $\Leftarrow$ \alert{liveness}
+        \item Quorum intersection: every two quorums intersect in $\ge1$ non-faulty nodes $\Leftarrow$ \alert{safety}
+      \end{itemize}
+      % \vfill
+  % \end{itemize}
+      \vfill
+      (We assume that actual protocols like SCP \emph{just work}.)
+\end{frame}
+
+\section{What can we say about a specific FBAS instance?}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{It's complex?}
+  \vfill
+  \includegraphics[width=\linewidth]{pics/stellarbeat.png}
+  \vfill
+  \tiny\hfill
+  \url{https://www.stellarbeat.io/}
+\end{frame}
+
+%%>--- Slide -------------------------------------------
+%\begin{frame}{What is interesting?}
+%  \begin{itemize}
+%    \item How "secure" is it? \begin{itemize}
+%      \item Liveness: which sets of nodes can "stop" the system? (e.g., by crashing)
+%      \item Safety: which sets of nodes can cause "double spends"?
+%    \end{itemize}
+%    \item How "decentralized" is it? \begin{itemize}
+%      \item How is the "importance" of nodes distributed?
+%      \item How do nodes become important?
+%      \item How do they stop being important?
+%    \end{itemize}
+%  \end{itemize}
+%\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{In search for good metrics (liveness)}
+  \begin{itemize}
+    \item Liveness \Arrow $\ge1$ quorum is non-faulty
+  \end{itemize}
+  \begin{block}{Blocking set}
+    In the FBAS $\langle \V, \Q \rangle$,
+    $B \subseteq \V$ is as \emph{blocking set} iff
+    it intersects every quorum of the FBAS---i.e.,
+    for all quorums $U \in \U, B \cap U \neq \emptyset$
+  \end{block}
+  \begin{itemize}
+    \item For example: $\{b\}$ is \emph{a} blocking set for $\{\{a,b,c\},\{b,c\}\}$
+    \item A blocking set stops \Arrow no quorums possible\\\Arrow liveness lost (or censorship)
+  \end{itemize}
+  % related to usage in \cite{mazieres2015stellar} and \cite{losa2019stellar_instantiation} but not quite
+\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{In search for good metrics (minimal sets)}
+  \begin{block}{Minimal node set}% (\cite{lachowski2019complexity})}
+    Within set of node sets $\S \subseteq 2^{\V}$,
+    we denote the member set $M \in \S$ as \emph{minimal} iff
+    no other member of $\S$ is a strict subset of that set---i.e.,
+    $\forall S \in \S, S \not\subseteq M$
+  \end{block}
+  % Intersect \Arrow quorum intersection \cite{lachowski2019complexity}
+  If $\{\{a,b,c\},\{b,c\}\}$ are the quorums of an FBAS
+  \begin{itemize}
+    \item $\{\{b, c\}\}$ are its \alert{minimal quorums}
+    \item $\{\{b\}, \{c\}\}$ are its \alert{minimal blocking sets}
+      % \begin{itemize}
+      %   \item (blocking for all minimal sets \Darrow blocking for all sets)
+      % \end{itemize}
+  \end{itemize}
+
+
+\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{In search for good metrics (safety)}
+  \begin{itemize}
+    \item Safety \Arrow every two quorums intersect in $\ge1$ non-faulty nodes
+  \end{itemize}
+  \vfill
+  % draw pic of two circles, intersection tells different stories to different halves
+  \vfill
+  \vfill
+  % \begin{block}{Intersection}
+  %   Let $\U \subseteq 2^{\V}$ be the set of all quorums of the FBAS $\langle \V, \Q \rangle$.
+  %   We denote the set $I \subseteq \V$ as an \emph{intersection}
+  %   iff it contains an intersection of at least two quorums of the FBAS---i.e.,
+  %   there are distinct quorums $U_{1}$ and $U_{2}$ so that $U_{1} \cap U_{2} \subset I$.
+  % \end{block}
+  \begin{itemize}
+    \item \alert{Minimal intersections}
+      \begin{itemize}
+        \item Small sets of nodes that can compromise safety
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Calculemos!}
+  \newlength{\forkmeoffset}
+  \setlength{\forkmeoffset}{6em}
+  \tikzset{forkmerot/.style={rotate=-45}}
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[forkmerot, shift={(0, -\forkmeoffset)}] at (current page.north east) {
+      \begin{tikzpicture}[remember picture, overlay]
+        \node[fill=hublue, text centered, minimum width=50em, minimum
+          height=3.0em, blur shadow, shadow yshift=0pt, shadow xshift=0pt,
+          shadow blur radius=.4em, shadow opacity=50, text=white](fmogh) at
+          (0pt, 0pt) {\bfseries Fork me on GitHub*};
+        \draw[white!60, dashed, line width=.08em, dash pattern=on .5em off
+          1.5\pgflinewidth] (-25em,1.2em) rectangle (25em,-1.2em);
+      \end{tikzpicture}
+    };
+  \end{tikzpicture}
+  \vfill
+  \begin{itemize}
+    \item Problem: hard problems
+      \begin{itemize}
+        \item For example: checking a FBAS for quorum intersection is NP-hard \cite{lachowski2019complexity}
+        % \item Finding minimal blocking sets and minimal intersections is at least quadratic in the
+        %   number of minimal quorum sets (which is worst-case exponential in network size...)
+      \end{itemize}
+    \item \alert{FBAS analyzer} - tool for efficiently reasoning about FBAS
+    % \item {\small (My excuse for finally building something bigger with Rust :P)}
+    % \item Can parse data from \url{https://stellarbeat.io/}
+    % \item Finds all discussed node sets (some algorithms from \cite{lachowski2019complexity})
+    \item Also: simulation of FBAS evolution / quorum reconfigurations (more about that later)
+  \end{itemize}
+  \vfill
+  \includegraphics[width=0.1\linewidth]{pics/rust.pdf}
+  {\tiny\hfill* \url{https://github.com/marfl/fbas_analyzer} (older snapshot only for now)}
+
+\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{State of the current Stellar network}
+  \begin{itemize}
+    \item Data from \url{https://stellarbeat.io/}
+    \item Nodes collapsed by organization (1 node \darrow 1 org)
+  \end{itemize}
+  \begin{figure}[htpb]
+    \centering
+    \includegraphics[width=\linewidth]{pics/plot_stellar.pdf}
+  \end{figure}
+  % \begin{itemize}
+  %   \item November 12, 2019
+  \begin{itemize}
+    % \item 125 active nodes (machines) \begin{itemize}
+    %   \item 50 of them with broken quorum set configuration
+    % \end{itemize}
+    \item 49 active non-broken nodes (after collapsing by org.)
+    \item "Top tier" \begin{itemize}
+      \item $\{$ "Stellar Development Foundation", "COINQVEST Limited", "LOBSTR", "SatoshiPay", "Keybase", "Blockdaemon Inc." $\}$
+      \item 2-of-6 for liveness / 4-of-6 for safety
+    \end{itemize}
+  \end{itemize}
+  % \end{itemize}
+\end{frame}
+
+%>-=- PART -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\section{How FBAS evolve and what to do about it}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Designing a QSC strategy}
+  QSC := \emph{quorum set configuration}
+  \vfill
+  \begin{enumerate}
+    \item \alert{Who should be my "trusted nodes"?}
+    \item \alert{How to set thresholds?}% (i.e., how exactly to form my quorum set)
+  \end{enumerate}
+\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Random "I-have-no-idea-what-I'm-doing" QSC}
+  \vfill
+  \begin{enumerate}
+    \item \alert{Who should be my "trusted nodes"?} \begin{itemize}
+      \item I'll just pick \alert{randomly} (e.g., as in \cite{chitra2019committee})
+      % \item For more realism and minor sybil protection: randomness weighted by "fame"
+      \item \redalert{Vulnerable to sybil attacks!}
+      \item For more realism: weigh nodes based on "fame"% (power-law distribution)
+    \end{itemize}
+    \vfill
+    \item \alert{How to set thresholds?} \begin{itemize}
+      \item I'll just do what others are doing...
+      \item Average quorum set in Stellar today: \emph{4-of-5}
+        % \begin{itemize}
+        %   \item High threshold prioritizes safety over liveness
+        % \end{itemize}
+    \end{itemize}
+  \end{enumerate}
+  \vfill
+\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Random QSC in evolving network}
+  \begin{itemize}
+    \item FBAS grows one node at a time
+    \item Quorum sets picked based on nodes that are "there" + never readapted once big enough
+  \end{itemize}
+  \begin{figure}[htpb]
+    \centering
+    \includegraphics[width=\linewidth]{pics/plot_FameWeightedRandom_5_4_g.pdf}
+  \end{figure}
+  \centering
+  \arrow \alert{First nodes to join} become the \alert{top tier}.
+\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Random QSC in spontaneously instantiated network}
+  \begin{itemize}
+    \item Quorum sets picked from all nodes
+    % \item (Missing bars \arrow analysis didn't complete in time.)
+  \end{itemize}
+  \begin{figure}[htpb]
+    \centering
+    \includegraphics[width=\linewidth]{pics/plot_FameWeightedRandom_5_4_i.pdf}
+  \end{figure}
+  % All nodes involved in minimal blocking sets and intersections, but
+  High safety,
+  but there are \redalert{blocking sets} with only \redalert{2} nodes.
+\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Simple trust-based QSC}
+
+  \begin{itemize}
+    \item Idea: add \emph{only} nodes we "trust" to quorum sets
+    \item For simulation: trust modelled as synthetic graph
+  \end{itemize}
+  % \begin{itemize}
+  %   \item \alert{Scale-free} graphs often used to model all sorts of networks
+  %     {\tiny (also the Internet, which David Mazières would like Stellar to be like~\cite{mazieres2015stellar})}
+  %   \item \alert{Small-world} graphs are frequently used to describe social networks
+  % \end{itemize}
+  \vfill
+  \begin{enumerate}
+    \item \alert{Who should be my "trusted nodes"?} \begin{itemize}
+      \item My neighbors in the trust graph!
+    \end{itemize}
+    \item \alert{How to set thresholds?} \begin{itemize}
+      \item (In the interest of time...) Let's use \emph{4 out of 5} as orientation
+        \arrow \SI{80}{\percent} must agree
+      % \item Let's say that if \SI{67}{\percent} agree I believe that...
+      % \item (Rough approximation of the $n = 3f + 1$ calculation about how many byzantine nodes
+      %   $f$ we can at best tolerate in a BFT system with $n$ nodes.)
+    \end{itemize}
+  \end{enumerate}
+\end{frame}
+
+%>--- Slide -------------------------------------------
+% \begin{frame}{Evaluation tooling}
+%   \begin{itemize}
+%     \item \emph{Quorum Set Configuration Simulator} (\texttt{qsc\_sim}) as part of FBAS Analyzer framework
+%       \begin{itemize}
+%         \item Framework for implementing strategies
+%         \item Can also generate random trust graphs if needed \begin{itemize}
+%           \item Scale-free using Barabási–Albert model
+%           \item Small world using Watts–Strogatz model
+%         \end{itemize}
+%       \end{itemize}
+%     \item Worklfow for empirical evaluation:
+%   \end{itemize}
+%   \texttt{qsc\_sim} \arrow[an FBAS] \texttt{fbas\_analyzer} \arrow results (if lucky...)
+% \end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Simple trust-based QSC / Small world graph}
+  \begin{itemize}
+    \item Watts-Strogatz model ($K = 6, \beta = 0.05$)
+    % \item (Missing bars \arrow analysis didn't complete in time.)
+  \end{itemize}
+  \begin{figure}[htpb]
+    \centering
+    \includegraphics[width=\linewidth]{pics/plot_SimpleScaleFree_08_g.pdf}
+  \end{figure}
+  High safety,
+  but there are \redalert{blocking sets} with only \redalert{1-2} nodes.
+\end{frame}
+
+%%>--- Slide -------------------------------------------
+%\begin{frame}{More investigations in progress}
+%  \begin{itemize}
+%    \item Formalize explanations / bounds for current results
+%    \item How can global quorum structures be changed? \begin{itemize}
+%      \item Conjecture: Safe top tier changes are only possible with cooperation of top tier nodes.
+%      \item What is the option space for non-safe top tier changes? (Requires refined safety metric.)
+%    \end{itemize}
+%    % \item Tools for tackling larger networks? Statistical methods for getting rough results in
+%    %   polynomial time?
+%    % \item Can we think of a distributed policy of configuring FBAS nodes so that we don't get centralization, and so that we can react quickly to malicious nodes and stuff?
+%  \end{itemize}
+%\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Summary}
+  \begin{itemize}
+    \item FBAS: consensus with \alert{individually shaped quorums}
+      % The FBAS (and related \emph{distributed asymmetric trust}) paradigm allows individual
+      % nodes to chose their own quorum configuration
+    \item "Centralization" happens in naturally evolving networks (also Stellar)---\alert{early nodes become top tier}
+    \item "I trust only my friends"-type configurations seem to yield \alert{safe but brittle} (\Arrow easily censored) systems
+    \item More investigation in progress!
+  \end{itemize}
+  \vfill
+  \centering
+  \alert{Thank you for your attention!}
+\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Literature}
+  \tiny
+  \bibliographystyle{apalike}
+  % \bibliographystyle{alpha}
+  \bibliography{../paper}
+\end{frame}
+
+%>-=- PART -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\section{Backup}
+
+%>--- Empty Slide as potential drawing canvas ---------
+\begingroup
+  \renewcommand{\insertframenumber}{}
+  \begin{frame}
+  \end{frame}
+\endgroup
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Ideal QSC}
+  \begin{enumerate}
+    \item \alert{Who should be my "trusted nodes"?} \arrow \alert{everyone}!
+    \begin{itemize}
+      \item Can't get any more "decentralized" than that
+      \item But: vulnerable to \redalert{sybil attacks}
+    \end{itemize}
+    \item \alert{How to set thresholds?} \begin{itemize}
+      \item $t = \frac{2n + 1}{3}$ (theoretically optimal for PBFT \& Co.)
+        % of the total $n$ nodes can fail, where $n - 1 < 3f + 1 \leq n$
+    \end{itemize}
+    \begin{figure}[htpb]
+      \centering
+      \includegraphics[width=\linewidth]{pics/plot_ideal.pdf}
+    \end{figure}
+  \end{enumerate}
+\end{frame}
+
+%>--- Slide -------------------------------------------
+\begin{frame}{Simple trust-based QSC / Scale-free graph}
+  \begin{itemize}
+    \item Barabási–Albert model ($m_0 = m = 2$)
+    % \item (Missing bars \arrow analysis didn't complete in time.)
+  \end{itemize}
+  \begin{figure}[htpb]
+    \centering
+    \includegraphics[width=\linewidth]{pics/plot_SimpleScaleFree_08_g.pdf}
+  \end{figure}
+  % All nodes involved in minimal blocking sets and intersections, but
+  Sets of \redalert{1} nodes can destroy global liveness...
+\end{frame}
+
+\end{document}

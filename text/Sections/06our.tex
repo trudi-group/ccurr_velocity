@@ -1,0 +1,386 @@
+%Contribution Section
+\section{Velocity of money in effective circulation}
+\label{sec:newmeas}%
+%
+While these measures advanced quantifying the velocity of cryptocurrencies,
+they suffer from inaccuracy as money supply is defined as ``the aggregate of
+all monetary units ever issued'' ($\MTotalP$).  We therefore propose a
+measure based on the component of money that circulates effectively. %
+Denoting this circulating amount $\MCircP$, our measure yields
+\begin{align}%
+  \label{eq:vcirc_concept}
+  \VCircEstP = \frac{\langle\Pp,\Tp\rangle}{\MCircP}.%
+\end{align}%
+%
+% $\VCircP$ handles re-activated money gracefully, allowing %
+% for a deeper glance into the economics of the cryptocurrency markets. %
+% If money supply responds to price trends, not only numerator but also %
+% denominator change. %
+% For more or less money in potentially being available for transactions, %
+% $\VCircP$ reflects, whether this money indeed has been %
+% used for processing transactions and to which degree. %
+
+\subsection{Formal derivation}
+\label{sec:formal-derivation}
+
+To see how excluding hoarded money relates to the quantity theory, expand the
+sum in \refequ{velo_concept} and differentiate the set of all monetary units
+treated as investment, $h$, from its complement
+$\GStrokeP\coloneqq\Gp\setminus\{h\}$:
+\begin{alignat}{4}%
+  \VTotalP%
+  \ & = &\ & \vp_h \frac{%
+    \Np_h%
+  }{%
+    \bigl( \Np_h+\sum_{g\in\GStrokeP} \Np_g \bigr)%
+  }\\%
+  \ & \ + &\ & \sum_{g\in\GStrokeP} \vp_g \frac{%
+    \Np_g%
+  }{%
+    \bigl( \Np_h+\sum_{g\in\GStrokeP} \Np_g \bigr)%
+  }.\nonumber%
+\end{alignat}%
+%
+By definition, $h$ encompasses only non-transferred units, and thus $\vp_h=0$
+in period $\perd$. Consequently %
+% For a large fraction of money supply $\Np_z=0$ held %
+% as investment, the respective turnover rate $\vp_z$ receives a %
+% large weight %
+% \begin{align}
+% \frac{\Np_z}{\bigl( \Np_z+\sum_{g\in\GStrokeP} \Np_g \bigr)},
+% \end{align} %
+% while the components of actively used money supply receive a %
+% small weight. %
+% Velocity measured in the above way %
+% thus yields values close to zero, making the variable slightly abstract in its %
+% interpretation. %
+
+% Money switching from \textit{hoarded} to \textit{in circulation} %
+% increases or decreases the measure. %
+% Thus, a change in the measure $\VTotalEstP$ could either mean that "effectively %
+% circulating monetary units on average being turned over more times" or %
+% "formerly illiquid monetary units are being now used for transactions". %
+% %
+% Measure $\VCircP$ reduces the equation to% 
+\begin{align}%
+  \label{eq:disentangle_vcirc}
+  \VCircP %
+  =  \sum_{g\in\GStrokeP} \vp_g
+  \frac{\Np_g}{\sum_{g\in\GStrokeP} \Np_g },%
+\end{align}%
+% where group $h$, hoarded money, is not considered.
+% , an interpretation of a change in $\VCircP$ can here clearly %
+% be attributed to a higher intensity of turnover for the circulating money stock. %
+% Assuming that self-churn transactions in the calculation of %
+% the transaction volumes have been filtered out effectively, the measure %
+% might be interpreted as a proxy for the %
+% \textbf{average number of peer-to-peer hops that effectively circulating %
+% 	money units where able to achieve} in period $\perd$. 
+Hence, the measure can be interpreted as the average number of turnovers of
+units effectively circulating in period $\perd$. %
+Dropping non-circulating money in \refequ{disentangle_vcirc} amounts to an
+adjustment of the money supply $\Mp$ in the quantity equation
+\eqref{eq:fisher}.  %
+
+\subsection{Theoretical basis and practical considerations}
+An advantage of basing velocity on money in effective circulation is higher
+information content. %
+To begin with, it is questionable whether $\VNaiveEst$ and $\VTotalEst$
+capture more information than transaction volumes $\langle\Pp,\Tp\rangle$,
+respectively $\langle\Pp',\Tp'\rangle$. %
+After all, for most UTXO-based cryptocurrencies money supply is just a simple
+function of block height.%
+\footnote{Difficulty adjustments for mining lead to close-to-constant spans
+  between block creation times \citep{tschorsch2016bitcoin}.} %
+% So far, there are only few cryptocurrencies that implement a responsive %
+% money supply.%
+% \footnote{%
+%   Some so called ``stablecoins'' developed with the goal of a more stable %
+%   purchasing power are trying to implement a coin supply matching the %
+%   demand (compare \cite{klages2019stability}, \cite{routledge2018currency}, %
+%   \cite{sidorenko2019stablecoin} \cite{pernice2019monetary} or \cite{bullmann2019search}).%
+% } %
+Thus, the two former measures appear very close to merely scaled versions of
+their price-sums. %
+
+Moreover, the total coin supply used in $\VNaiveEst$ and $\VTotalEst$
+includes money that is technical dysfunctional (burnt coins). %
+Yet also coins held unused as storage of wealth\footnote{Compare
+  \cite{sawyer2003money} for a detailed discussion of the discrepancy arising
+  from money as storage of wealth.} %
+or speculation\footnote{Most studies conclude cryptocurrencies are currently used more for
+  long-term speculation rather than as media of exchange %
+  (see \eg \cite{%
+    bouri2019herding,%
+    anderson2019bitcoin,%
+    yang2018behavioral,%
+    yermack2015bitcoin%
+  }).
+  % The degree to which monetary units are hold unused can be %
+  % seen e.g. in \cite{kalodner2017blocksci}, who find that over the last 10 years only roughly %
+  % \SI{20}{\percent} of Bitcoins were %
+  % spent again within a month. %
+} %
+do not fulfill one of the key functions of money, use as medium of exchange.%
+\begin{figure*}[ht!]%
+	\centering
+	\ifdefined\varInputFigs%
+%	\includegraphics[width=0.8\linewidth]{fig/mcirc_concept_window_uneqal_period_HR}%
+	\input{ts_figs/mcirc_concept}
+	\else%
+	\fi%
+	\caption{%
+		An example of a transaction chain. %
+	}%
+	\label{fig:mcirc_concept}%
+\end{figure*}%
+
+Furthermore, the amount of money frozen in speculative investments might not
+be neutral to money flows or prices. %
+Since the beginnings of monetary economics, currency speculation has been
+associated with patterns in price levels. %
+In \cite{fullarton1845regulation} and \cite{marx1872kapital}, the illiquid
+component is considered a reservoir for neutralizing demand shocks and
+excluded from the money supply. %
+For \cite{keynes1930treatise} and \cite{commons2003institutional} hoarded
+money, as destroyed money, is \emph{leakage} which must be compensated to
+stabilise the price level. %
+\cite{fisher1911equation} associates the rise in market prices for one of the
+early fiat U.S.\ bank notes with a relation of speculation and circulating
+money as well: ``speculation acted as a regulator of the quantity of
+money.'' %
+
+Our proposed measure captures precisely this velocity of money in effective
+circulation.  %
+This perspective is already present in current theoretical research on
+cryptocurrency prices.  %
+For instance, the model of \cite{bolt2016value} distinguishes demand for
+transactions from demand for rational speculation.
+%and assume that a fiat currency is serving as denominator of value. %
+When using the quantity equation, they deduct coins bought and held as
+speculative investment. % and adjust it to cope with exchange rates between
+%cryptocurrency and fiat money. %
+Their modified quantity equation relates the exchange rate between fiat and
+cryptocurrency $S_{\perd}$ to the velocity of cryptocurrency in effective
+circulation $\VCircP$ and the volume of transactions $\Tp^{\ast}$ denominated
+in units of cryptocurrency as %
+\begin{align}
+  S_{\perd} = \frac{\Tp^{\ast} / \VCircP}{\MCircP}.
+\end{align}
+
+The speculators in the model purchase cryptocurrency units if traded prices
+lie below their risk-adjusted, discounted expected future price.  %
+With increasing aggregate speculative positions, the risk of marginal
+speculative investments rises, lowering the price speculators are willing to
+pay.  %
+On the other hand, higher speculative positions imply reduced $\MCircP$ and
+increase current price according to their modified quantity equation.  %
+A similar relation between money in circulation and speculation is modelled in
+\cite{athey2016bitcoin} as well.  %
+
+Hence, implicitly or explicitly theoretical research already employs velocity
+based on circulating money rather than the total money supply.  %
+We close the gap in empirical research by operationalizing the
+circulation-based velocity measure for UTXO-based cryptocurrencies.  %
+
+% START: BRING BACK?
+% \par Calculating velocity this way solves the bias by including %
+% coins with lost private keys, as they are excluded as sub-component of money with a velocity of zero. %
+% % Besides certain incomplete lists%
+%b % \footnote{%
+% % 	See for example \url{%
+% % 		https://en.bitcoin.it/wiki/List_of_Major_Bitcoin_Heists,_Thefts,_and_Losses%
+% % 	}%
+% % }, %
+% % there is currently no way to clearly disentangle to two. %
+% While concrete numbers are hard to estimate, locking cryptocurrency forever by losing %
+% the respective private keys is seen as a major challenge for %
+% cryptocurrencies (compare \cite{meiklejohn2018top}). %
+% END: BRING BACK?
+
+% We therefore want to adopt a different approach, which might be summarized as "money is what money does."%
+% \footnote{This phrase was coined by \cite{dalton1965primitive} as functional %
+%   definition of money in response to a stream of academic arguments in %
+%   search for a normative set of characteristics an asset should represent %
+%   to be classified as "money".} %
+% meaning that money which is not used for transactions but hoarded would be excluded. %
+% In~\cite{fisher1911equation}, "money" is defined ambiguously as money in circulation. %
+% "In circulation" might be just broadly referring to money hold by the %
+% population with the potential to be used in transactions at any moment in %
+% time---the approach used so far. %
+% However, "in circulation" might also be referred to money that is, in deed, %
+% moved within a certain period. %
+% \footnote{This question frames a major debate in monetary policy research %
+% which is the source the different money measures "MO", "M1", etc. that group %
+% money components with similar liquidity.} %
+% \par Given the hybrid role of cryptocurrencies, being designed as medium of exchange but %
+% mostly used as speculative asset, segregation of the money supply is an %
+% intuitive step.%
+% Given the historic dominance of commodity money (e.g. coins and notes based on %
+% precious metals), there are models trying to solve a similar challenge. %
+% Based on \cite{fullarton1845regulation}, the so-called \textit{anti-quantity theory %
+% of money} proposed by \cite{marx1872kapital} divides money supply into %
+% \textit{money taking the form of hoards} and \textit{circulating} money. %
+% % However, also \cite{fisher1911equation} noted that speculation might %
+% % act as "[...] regulator of the quantity of money [...]". %
+% For \cite{keynes1930treatise} and \cite{commons2003institutional} hoarded money, as %
+% destroyed money, is ``[...] leakage [...]'' that needs to be compensated. %
+% In \cite{fullarton1845regulation} and \cite{marx1872kapital} the illiquid %
+% component is used as reservoir for demand shocks and excluded from %
+% the quantity equation of money. %
+% In- and outflow into the pool of circulating money is governed by the %
+% \textit{law of reflux}. %
+% Summarized, the law of reflux states that money leaves the pool of %
+% hoards exclusively for enabling %
+% trades---and flows back immediately after the trade has been accomplished. %
+%
+% \par Certain asset pricing approaches like~\cite{bolt2016value} or~\cite{athey2016bitcoin} %
+% take up this thought and differentiate between money in circulation %
+% and money hold as speculative investment. %
+% Both model the price discovery processes to depend on the amount of money %
+% effectively circulating. %
+% This amount tightly interacts with money hoards from speculation leading to %
+% feedback effects between speculation and price development via the supply of %
+% money in circulation. %
+% The degree to which monetary units are hold as long-term investments can be %
+% seen e.g. in \cite{kalodner2017blocksci}, who find that over time only roughly %
+% \SI{20}{\percent} of Bitcoins are %
+% spent again within a month. %
+% %
+%
+
+% Additionally, e.g., for Bitcoin it is yet unknown to the public whether the %
+% money supply mined by Satoshi Nakamoto has just has stayed unused so far or %
+% whether its keys have been destroyed. %
+% \footnote{%
+% 	According to an estimation by the cryptocurrency exchange \emph{BitMex} %
+% 	over 600.000 Bitcoin might have been mined by %
+% 	Satoshi Nakamoto---a pseudonym for the developer or developing group of %
+% 	Bitcoin. Note that this is only a rough estimate based on the founders %
+% 	mining behavior. %
+% 	Compare \url{https://blog.bitmex.com/satoshis-1-million-bitcoin/}. %
+% } %
+%
+% Depending on the application field of the velocity estimate, %
+% this might be an advantage or disadvantage. %
+% \footnote{In contrast, the large influence of monetary units switching from %
+% $\Np_0$ to $\Np_11$ with $\vp_1 = 1$, might be desired when %
+% using velocity as regressor in price predictions. %
+% Then, however, one might argue that off-chain transactions on exchanges %
+% should be taken into account as well, while they should be excluded when %
+% utilizing the measure as estimate of "moneyness".} %
+%
+% Second, most cryptocurrencies are currently used mostly for speculation and %
+% rarely for peer-to-peer transactions %
+% (e.g. \cite{bouri2019herding}, \cite{corbet2019cryptocurrencies} or %
+% \cite{yang2018behavioral}). %
+% This, in turn, leads to a large fraction of unspent transaction outputs %
+% being temporarily deprived from being used for transactions. %
+% Appreciating cryptocurrency prices might draw large fractions of the %
+% hoarding component into circulation, distorting measures for the %
+% fundamental use of the cryptocurrency as medium of exchange.
+% 
+% More importantly, the radical exclusion of money supply unused for %
+% processing transactions within a certain period leads to a very helpful interpretation:
+% The velocity %
+% $V_{\perd, name-for-new} = \frac{\Pp \Tp}{\MCircP}$ 
+% of coins used within a certain period can be interpreted as %
+% \textbf{the number of peer-to-peer hops}, the respective coins are %
+% able to accomplish on average in that period.%
+% The measure has a lower bound of 1, providing an intuitive means to compare %
+% the use of different cryptocurrenes as medium of exchange. %
+% \footnote{Note that the rather simplistic arithmetic formulation is made %
+% concrete and applicable for UTXO-based cryptocurrencies in \refsec{oldmeas:sub:types}.} %
+% This measure, in contrast to the Ricardian definition of the velocity of money, %
+% is constructed to be robust against distortions from hype-driven single-hop %
+% transactions to exchanges. %
+% \todo{This is still somewhat weak. The more evidence here, the better we %
+% can show why the world needs our measure.}
+%
+% While the Ricardian measure would increase with the surge of long-term %
+% investments being transferred to exchanges and traded there off-chain, %
+% the above measure only increases when the same coin performs various transactions. %
+% We thus see the above measure as a useful indicator for the "moneyness" %
+% of a cryptocurrency. %
+% While cryptocurrency prices are a  simple and widely used success indicator, %
+% a measure for the use of the digital asset for peer-to-peer transactions might %
+% be a first step into the direction of a more fundamental valuation of cryptocurrencies. %
+%
+% % Separating the money stock into a hoarded, illiquid component and a liquid, %
+% money-like component has, among others, been reviewed and criticized %
+% by~\cite{likitkijsomboon2005marx} and \cite{roche1985marx}. %
+% % The theory has been criticized from various perspectives. %
+% While we apply certain aspects of the anti-quantity equation of money to %
+% modify the classical velocity of money 
+% with the goal of defining a well interpretable and robust measure for the %
+% "moneyness" of a cryptocurrency , establishing the anti-quantity theory of %
+% money as model of thought for cryptocurrencies is not the objective of %
+% this paper. However, the application of the anti-quantity equation of money, %
+% still can be seen as a deviation from mainstream economics that mandates %
+% thorough justification.
+% 
+% Most importantly, it should be emphasized, that our velocity definition %
+% draws only from three basic concepts within the anti-quantity theory of %
+% money: %
+% Firstly, the separation of the money stock into a investment-like and a %
+% money-like component; secondly, the law-of-reflux described earlier and %
+% lastly the tautological form of the of the money equation. %
+% This mitigates several issues. %
+% For example, an important point of criticism regarding the theory arises %
+% around the argumentation chain around modeling the equality of the %
+% price-sum of transactions and the product of the money supply and velocity. %
+% The equality is established using supply-demand arguments \todo{Which ones?}, %
+% which conflicts with the law-of-reflux establishing independence between %
+% supply and value of money (\cite{likitkijsomboon2005marx}). %
+% This indeed highlights a conceptional inconsistency of the anti-quantity %
+% equation theory. %
+% It still holds, however, that the equation establishes a tautology at %
+% any given point in time when seen in isolation. %
+% This tautology suffices as basis for a mechanical definition of the %
+% velocity of money.
+% 
+% Also, cryptocurrency markets are very different from full-blown economies. %%
+% One major point of criticism is that the law-of-reflux might draw an %
+% improper picture of the economy. %
+% Surges in the money-demand due to an increased demand for the transaction %
+% volume of goods would be compensated entirely by money flowing from money %
+% hoards into circulation. %
+% Likewise, increases of the total money stock would be absorbed quickly %
+% by the hoarding component of money (\cite{likitkijsomboon2005marx}). %
+% While this indeed seems odd \todo{explain} for national economies, for %
+% cryptocurrencies the situation is different: %
+% It seems plausible, that an increase in the demand for transactions %
+% (often for speculative reasons) %
+% draws to a high degree from long-term invested money.%
+% \footnote{%
+%		And indication for that has been offered earlier in %
+%		[missing diagram introduced already above].%
+% } %
+% Also it does not seem implausible at all, that newly mined coins are %
+% flowing first into money hoards and are used in transactions only when needed. %
+% 
+% An indication might be offered by staleness of newly mined coins that is %
+% illuminated in \textbf{[missing diagram [see above: 1.eD1, 1.eD2, 1.cD1 + 4.eD1]]}. %
+%
+% Many other points of criticisms refer to irreconcilability of the theory %
+% with realities of national economies (compare \cite{lavoie1986marx}, %
+% \cite{foley2005marx} or \cite{likitkijsomboon2005marx}) and fortunately %
+% are of little importance to the application for cryptocurrencies. %
+% \todo{If we feel fruity, we might make this an own section and argue for %
+% that theory in more detail. I would favor a simple and quick justification though.}
+% For example, it has been criticized that the theory impedes the explanation %
+% of trade imbalances and shifts in the foreign exchange markets, leads to unrealistic %
+% characterizations of the market for loans, and the assumption of banks %
+% following the real bills doctrine (\cite{likitkijsomboon2005marx}). %
+% 
+% However, the theory might be criticized on a very fundamental level. %
+% Hoarded money and money in circulation are lastly indistinguishable and %
+% differ only in their velocity of money. Classical monetary theorists see %
+% money hoards simply as a subgroup of money with a velocity of zero. %
+% [Note: This is argument is just "mäh". ]
+%
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

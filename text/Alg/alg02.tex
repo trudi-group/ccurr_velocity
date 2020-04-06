@@ -1,0 +1,65 @@
+%
+% line numbering
+%
+\renewcommand{\LinesNumbered}{%
+	\setboolean{algocf@linesnumbered}{true}%
+	\renewcommand{\algocf@linesnumbered}{\everypar={\nl}}}%
+
+\let\oldnl\nl% Store \nl in \oldnl
+\newcommand{\nonl}{\renewcommand{\nl}{\let\nl\oldnl}}% Remove line number for one line
+
+\ifdefined\varInputAlgos%
+\renewcommand{\arraystretch}{1.90}%
+%\todo{Do we mean non-recycling or not circulating?}%
+\begin{algorithm*}[!h]%
+	\DontPrintSemicolon
+  \caption{Moved-coin-approach: Measurement $\protect\MCircM$ for $\mathtt{type}$ (\acs*{fifo}, \acs*{lifo}) within period $\perd$, window $\wndw$.%
+  }\label{algo:code_mcirc_mc}%
+%
+	\KwData{$\wndw_\Start$ \tcc*{Beginn of look-back window $w$}}%
+	\KwData{$ \TxP$                                                                     \tcc*{Set of transactions in period $\perd$}}%
+	\KwData{$ \Out^{\selfchurn}$                                                        \tcc*{Set of self-churning outputs}}%
+%	\KwResult{$\MCircM$                                                                 \tcc*{Money supply to be estimated in period $\perd$ with window $\wndw$}}%
+%
+	$\MCircM \gets {0}$																	\tcc*{Money supply to be estimated in period $\perd$ with window $\wndw$}%
+%
+	\ForEach {$ t \in \TxP $%
+%		                                                            \tcc*{Loop through each transaction $t$ in period $\perd$}%
+	                                                            }%
+	{%
+		$\MCircM(t) \gets {0}$                                                          \tcc*{Set summand of $\MCircM(t)$ for every transaction $t$}%
+		$\valO^\mathtt{break}(t) \gets {0}$                                             \tcc*{Set break condition helper for every transaction $t$}%
+		$\Out'_{t} \gets{\Out_{t}\setminus{}O^{\selfchurn}}$                            \tcc*{Determine the set of outputs of $t$ excluding self-churning outputs}%
+		$\valO^\sendToOthers(t)  \gets{\sum_{o\in{}\Out'_{t}} \valO(o)}$                \tcc*{Amount of money sent to third parties}%
+		\If{$\valO^\sendToOthers(t) = 0$}{%
+			continue                                                                    \tcc*{Skip current transaction and go to the next}%
+		}%
+	    $\InpSortedT(\mathtt{type}) \gets{\InpT\ \text{sorted ascending (\acs*{fifo})/descending (\acs*{lifo}) according to $\mathtt{type}$ and thus generation time of inputs}}$\\%
+	    \nonl\mbox{}\tcc*{$\InpT$ is the unsorted set of all inputs of $t$}%
+	    \ForEach {$i \in \InpSortedT(\mathtt{type})$     \label{algo:code_mcirc_mc_for}%
+%	    	                                              \tcc*{Loop through each input $i$ of sorted input set $\InpSortedT$}%
+    	}{%
+	    	$\valO^\mathtt{break} \gets{\valO^\mathtt{break} + \valI(i)}$\\%
+			\If {
+				$\dateGen(i)<\wndw_\Start$\ or\ $\genByCoinbase(i)$\label{algo:code_mcirc_mcCond}\tcc*{Was $i$ generated before $\wndw_\Start$/from a coinbase transaction?}
+			}{%        
+				$ \MCircM(t) \gets{\MCircM(t) + \valI(i)} $									\tcc*{Update money supply}%	
+				\If{%
+					$\valO^{\mathtt{break}}(t) > \valO^\sendToOthers(t)$ 					\tcc*{Update foreach-loop break helper}%
+				}{%
+					\If{%
+						$\MCircM(t) > \valO^\sendToOthers(t)$								\tcc*{Use $\valO^\sendToOthers(t)$ as upper cap for  $\MCircM(t)$}%
+					}{%
+						$\MCircM(t) \gets{ \valO^\sendToOthers(t) }$%      		       
+					}{%
+						break                                                               \tcc*{Break foreach-loop on line \ref{algo:code_mcirc_mc_for} and proceed with line \ref{algo:code_mcirc_mc_break}}%
+					}% 
+				}%       
+			}%   
+		}%
+	   	$ \MCircM \gets{\MCircM + \MCircM(t)} $\label{algo:code_mcirc_mc_break}%
+	}%
+	return $\MCircM$                                                                    \tcc*{Result: Return estimated money in circulation in period $\perd$ with window $\wndw$ for \ac*{mca}}%
+\end{algorithm*}%
+\else%
+\fi%

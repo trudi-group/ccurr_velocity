@@ -1,0 +1,101 @@
+% 06 results A
+\begin{frame}{Could we simply use approximations?}
+  
+  Simple ways out to not use all these complicated measures:
+  \begin{itemize}\setlength{\itemsep}{0.5em}
+  \item \textbf{Coin days destroyed}
+  \item Approximate coin-turnovers\footnote{\emph{\scriptsize[Smith, Reginald D: Bitcoin Average Dormancy: {A} Measure of Turnover and Trading Activity. 2017.]}}% \cite{smith2017bitcoin}
+  \item Ratio: Raw on-chain transaction volume to total coin supply
+  \end{itemize}
+
+\end{frame}
+
+% \begin{frame}{Coin Days Destroyed VS. \(\VCircWbP\) with $p = 1$ day}
+%   \vspace{0.75cm}
+%   \begin{figure}[h]
+%     \centering
+%     \inputTikz{desc_all_app_norm}
+%     \caption{Data for Bitcoin, 06/2013 to 06/2019}
+%   \end{figure}
+%   \vspace{2em}
+
+%   How can we compare these lines?
+% \end{frame}
+
+% \begin{frame}{Velocity measures over time with $p = 1$ day}
+% 	\vspace{0.75cm}
+% 	\begin{figure}[h]
+% 		\centering
+% 		\inputTikz{desc_all_est_norm}
+% 	%    \caption{Velocity measures (normalized) over time.}
+% 	\end{figure}
+% \end{frame}
+
+%\begin{frame}{Coin Days Destroyed VS. $\VCirc$}
+%\vspace{0.75cm}
+%	\begin{figure}[h]
+%		\centering
+%		\inputTikz{desc_all_cmp_norm}
+%		%    \caption{.}
+%	\end{figure}
+%\end{frame}
+
+\begin{frame}{Which one should I use?}	
+	\begin{alertblockc}{}{jwigreige!100!white}%
+		Coin days destroyed is almost in all constellations yielding the largest deviations
+	\end{alertblockc}
+	\begin{alertblockc}{}{jwilightgreen!90!white}%
+		The trivial measure is almost always significantly lowest
+	\end{alertblockc}
+	
+	\textbf{\emphtext{How did we test?}}
+	\begin{itemize}  
+		\item Bitcoin, daily, 06/2013-06/2019
+		\item Normalization / Standardization
+		\item Mean Absolute Errors / Mean squared Errors
+		\item Raw / First differences
+		\item Model Confidence Set test for significance\footnote{\emph{\scriptsize[Hansen et al.: {T}he model confidence set. 2011.]}}
+	\end{itemize}
+\end{frame}
+
+%\begin{frame}{Model Confidence Test---Significance of results}
+%
+%We compare models \(i\) and \(j\) for all $ i,j \in M $ where $i \neq j$. \newline  %
+%\smallskip
+%Loss functions are MAE and MSE. \newline%
+%\smallskip
+%Thus (exemplified for MSE)
+%  \begin{align*}
+%    d_{ij \perd} = \bigl( V^{\est}_\perd
+%    - V^{\app}_{i \perd} \bigr)^{2}
+%    - \bigl( V^{\est}_\perd
+%    - V^{\app}_{j \perd} \bigr)^{2}.%
+%  \end{align*}
+%  % \begin{align*}
+%  %   d_{ij \perd} = \bigl| V^{\est}_\perd
+%  %   - V^{\app}_{i \perd} \bigr|
+%  %   - \bigl| V^{\est}_\perd
+%  %   - V^{\app}_{j \perd} \bigr|.%
+%  % \end{align*}
+%  The \emphtext{relative performance} of model $i$ compared to all other models then is
+%  \begin{align*}
+%    d_{i \boldsymbol{\cdot}} = \frac{1}{m-1} \sum_{j \in M \setminus i} d_{ij},%.
+%  \end{align*}
+%  with $i = 1,...,m$. %
+%  The null hypothesis states %
+%  \begin{align*}
+%    H_{0M}: E(d_{i \boldsymbol{\cdot}}) = 0,\ \forall i \in M. %
+%  \end{align*}  
+%\end{frame}
+
+% \begin{frame}{What are the approximators approximating? And how well?}
+  
+%   \begin{center}
+%     \begin{table}
+%       \caption{MAE and MSE between velocity approximation methods compared to estimation methods. Approximators in superiority set of MCS test (1\% sig. levels) are marked with \(\dag\).}
+%       \inputTable{0.55}{appVSest_errors_w_mcs}
+%     \end{table}
+%     \vspace{-4mm}
+%   \end{center}
+
+% \end{frame}

@@ -1,0 +1,279 @@
+\def \debugPoint   {}%
+%			\def \debugPoint   {point}%
+% font settings ############################################################
+\def \fontset      {\scriptsize\sffamily}
+% color definition #########################################################
+\def \colorOut     {jwigreige!50}
+\def \colorOutH    {jwigreige!25!black}
+\def \colorIn      {black!10!white}
+\def \colorCoin    {white}
+\def \colorCoinY   {jwilightgreen!80!bg}
+\def \colorCoinN   {jwiorange}
+\def \colorCoinUtxoL {black!30!white}
+\def \colorCoinUtxo  {black!40!white}
+% arrow and line definitions ###############################################
+\def \lineW        {1.3pt}
+% width/height definition ##################################################
+\def \picW         {\linewidth*31/31}%
+\def \picH         {\paperheight*24/31}%
+\def \TH           {\picH*0.4}%picH*0.5*0.8
+\def \TxDist       {\linewidth*9.12/31}%
+
+\def \WBA          {\picW*11.50/31}
+\def \WLA          {\picW* 7.75/31}
+\def \WBB          {\picW* 4.00/31}
+\def \WLB          {\picW* 0.25/31}
+\def \WBC          {\picW* 3.50/31}
+\def \WBD          {\picW*10.50/31}
+\def \WLD          {\picW*14.25/31}
+% width/height nodes/boxes###################################################
+\def \BOH          {\picH* 0.35  }
+\def \BOW          {\picW* 6.0/31}
+
+% node positioning
+\def \BIPX         {\BOW*0.2375}
+
+% tikz styles################################################################
+\tikzstyle{lineIO}       = [
+	- ,
+	line width = \lineW*0.8,
+]
+\tikzstyle{lineION}      = [
+	- ,
+	line width = \lineW*0.8,
+	dotted,
+]
+\tikzstyle{nodeOuter}    = [
+	draw,
+	rectangle,
+	rounded corners=5pt,
+	solid,
+	line width = \lineW,
+	black,
+	fill=\colorOut,
+	inner sep = 0pt,
+	outer sep = 0pt,
+	text width = \BOW,
+	minimum width = \BOW,
+	minimum height = \BOH*1.075,
+]
+\tikzstyle{nodeOuterH}   = [
+	draw,
+	rectangle,
+	rounded corners=5pt,
+	solid,
+	line width = \lineW,
+	black,
+	fill=\colorOutH,
+	inner sep = 0pt,
+	outer sep = 0pt,
+	text width = \BOW,
+	minimum width = \BOW,
+	minimum height = \BOH*1.075,
+]
+\tikzstyle{nodeInner}    = [
+	draw,
+	rectangle,
+	rounded corners=3pt,
+	solid,
+	line width = \lineW*0.9,
+	black,
+	fill = \colorIn,
+	inner sep = 0pt,
+	outer sep = 0pt,
+]
+\tikzstyle{nodeInnerA}   = [
+	nodeInner,
+	align = center,
+	text width = \BOW*0.9-3pt,
+	minimum width = \BOW*0.9,
+	minimum height = \BOH*0.15,
+]
+\tikzstyle{nodeInnerB}   = [
+	nodeInner,
+	align = left,
+	text width = \BOW*0.425-5pt,
+	minimum width = \BOW*0.425,
+]	
+\tikzstyle{nodeInnerBY}  = [
+	nodeInner,
+	align = left,
+	text width = \BOW*0.425-5pt,
+	minimum width = \BOW*0.425,
+	fill = jwiblue!80!bg,
+]
+\tikzstyle{nodeInnerBA}  = [
+	nodeInnerB,
+	minimum height = \BOH*0.15,
+]		
+\tikzstyle{nodeInnerBAY} = [
+	nodeInnerBY,
+	minimum height = \BOH*0.15,
+]
+\tikzstyle{nodeInnerBAC} = [
+	nodeInnerB,
+	minimum height = \BOH*0.15,
+	align = center,
+]
+\tikzstyle{nodeInnerBACY}= [
+	nodeInnerBY,
+	minimum height = \BOH*0.15,
+	align = center,
+]
+\tikzstyle{nodeInnerBB}  = [
+	nodeInnerB,
+	minimum height = \BOH*0.25,
+]
+\tikzstyle{nodeInnerBBY} = [
+	nodeInnerBY,
+	minimum height = \BOH*0.25,
+]	
+\tikzstyle{nodeInnerBC}  = [
+	nodeInnerB,
+	minimum height = \BOH*0.35,
+]
+\tikzstyle{nodeInnerBCY} = [
+	nodeInnerBY,
+	minimum height = \BOH*0.35,
+]
+\tikzstyle{nodeInnerBD}  = [
+	nodeInnerB,
+	minimum height = \BOH*0.55,
+]
+\tikzstyle{nodeInnerBDY} = [
+	nodeInnerBY,
+	minimum height = \BOH*0.55,
+]
+
+% coordinates ###############################################################
+% 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 |
+% A | B | C | D | E | F | G | H | I |  J |  K |  L |  M |  N |			
+
+\coordinate (cen)          at ($(current page.center) + ( 0.0 ,-\BOH*0.15  )$) (cen)       [\debugPoint];%			
+\coordinate (lef)          at ($(cen)          + (-\TxDist   , 0.0         )$) (lef)       [\debugPoint];%
+\coordinate (rig)          at ($(cen)          + ( \TxDist   , 0.0         )$) (rig)       [\debugPoint];%
+
+\coordinate (str)          at ($(cen) + (-\paperwidth*0.5    ,-\BOH *0.2   )$) (str)       [\debugPoint];%
+\coordinate (end)          at ($(cen) + ( \paperwidth*0.5    ,-\BOH *0.2   )$) (end)       [\debugPoint];%
+
+%coordinates, Tx left	
+\coordinate (BTxLefCC)     at ($(lef)          + ( 0.0       , 0.0         )$) (BTxLefCC)  [\debugPoint];%
+\coordinate (BTxLefCL)     at ($(BTxLefCC)     + (-\BIPX     , 0.0         )$) (BTxLefCL)  [\debugPoint];%
+\coordinate (BTxLefCR)     at ($(BTxLefCC)     + ( \BIPX     , 0.0         )$) (BTxLefCR)  [\debugPoint];%
+\coordinate (BTxLefAC)     at ($(BTxLefCC)     + ( 0.0       ,-\BOH *0.4   )$) (BTxLefAC)  [\debugPoint];%
+\coordinate (BTxLefAL)     at ($(BTxLefAC)     + (-\BIPX     , 0.0         )$) (BTxLefAL)  [\debugPoint];%
+\coordinate (BTxLefAR)     at ($(BTxLefAC)     + ( \BIPX     , 0.0         )$) (BTxLefAR)  [\debugPoint];%
+\coordinate (BTxLefBC)     at ($(BTxLefCC)     + ( 0.0       ,-\BOH *0.2   )$) (BTxLefBC)  [\debugPoint];%
+\coordinate (BTxLefBL)     at ($(BTxLefBC)     + (-\BIPX     , 0.0         )$) (BTxLefBL)  [\debugPoint];%
+\coordinate (BTxLefBR)     at ($(BTxLefBC)     + ( \BIPX     , 0.0         )$) (BTxLefBR)  [\debugPoint];%
+\coordinate (BTxLefDC)     at ($(BTxLefCC)     + ( 0.0       , \BOH *0.2   )$) (BTxLefDC)  [\debugPoint];%
+\coordinate (BTxLefDL)     at ($(BTxLefDC)     + (-\BIPX     , 0.0         )$) (BTxLefDL)  [\debugPoint];%
+\coordinate (BTxLefDR)     at ($(BTxLefDC)     + ( \BIPX     , 0.0         )$) (BTxLefDR)  [\debugPoint];%
+\coordinate (BTxLefEC)     at ($(BTxLefCC)     + ( 0.0       , \BOH *0.4   )$) (BTxLefEC)  [\debugPoint];%
+
+%coordinates, Tx centered
+\coordinate (BTxCenCC)     at ($(cen)          + ( 0.0       , 0.0         )$) (BTxCenCC)  [\debugPoint];%
+\coordinate (BTxCenCL)     at ($(BTxCenCC)     + (-\BIPX     , 0.0         )$) (BTxCenCL)  [\debugPoint];%
+\coordinate (BTxCenCR)     at ($(BTxCenCC)     + ( \BIPX     , 0.0         )$) (BTxCenCR)  [\debugPoint];%
+\coordinate (BTxCenAC)     at ($(BTxCenCC)     + ( 0.0       ,-\BOH *0.4   )$) (BTxCenAC)  [\debugPoint];%
+\coordinate (BTxCenAL)     at ($(BTxCenAC)     + (-\BIPX     , 0.0         )$) (BTxCenAL)  [\debugPoint];%
+\coordinate (BTxCenAR)     at ($(BTxCenAC)     + ( \BIPX     , 0.0         )$) (BTxCenAR)  [\debugPoint];%
+\coordinate (BTxCenBC)     at ($(BTxCenCC)     + ( 0.0       ,-\BOH *0.2   )$) (BTxCenBC)  [\debugPoint];%
+\coordinate (BTxCenBL)     at ($(BTxCenBC)     + (-\BIPX     , 0.0         )$) (BTxCenBL)  [\debugPoint];%
+\coordinate (BTxCenBR)     at ($(BTxCenBC)     + ( \BIPX     , 0.0         )$) (BTxCenBR)  [\debugPoint];%
+\coordinate (BTxCenDC)     at ($(BTxCenCC)     + ( 0.0       , \BOH *0.2   )$) (BTxCenDC)  [\debugPoint];%
+\coordinate (BTxCenDL)     at ($(BTxCenDC)     + (-\BIPX     , 0.0         )$) (BTxCenDL)  [\debugPoint];%
+\coordinate (BTxCenDR)     at ($(BTxCenDC)     + ( \BIPX     , 0.0         )$) (BTxCenDR)  [\debugPoint];%
+\coordinate (BTxCenEC)     at ($(BTxCenCC)     + ( 0.0       , \BOH *0.4   )$) (BTxCenEC)  [\debugPoint];%
+
+%coordinates, Tx 
+\coordinate (BTxRigCC)     at ($(rig)          + ( 0.0       , 0.0         )$) (BTxRigCC)  [\debugPoint];%
+\coordinate (BTxRigCL)     at ($(BTxRigCC)     + (-\BIPX     , 0.0         )$) (BTxRigCL)  [\debugPoint];%
+\coordinate (BTxRigCR)     at ($(BTxRigCC)     + ( \BIPX     , 0.0         )$) (BTxRigCR)  [\debugPoint];%
+\coordinate (BTxRigAC)     at ($(BTxRigCC)     + ( 0.0       ,-\BOH *0.4   )$) (BTxRigAC)  [\debugPoint];%
+\coordinate (BTxRigAL)     at ($(BTxRigAC)     + (-\BIPX     , 0.0         )$) (BTxRigAL)  [\debugPoint];%
+\coordinate (BTxRigAR)     at ($(BTxRigAC)     + ( \BIPX     , 0.0         )$) (BTxRigAR)  [\debugPoint];%
+\coordinate (BTxRigBC)     at ($(BTxRigCC)     + ( 0.0       ,-\BOH *0.2   )$) (BTxRigBC)  [\debugPoint];%
+\coordinate (BTxRigBL)     at ($(BTxRigBC)     + (-\BIPX     , 0.0         )$) (BTxRigBL)  [\debugPoint];%
+\coordinate (BTxRigBR)     at ($(BTxRigBC)     + ( \BIPX     , 0.0         )$) (BTxRigBR)  [\debugPoint];%
+\coordinate (BTxRigDC)     at ($(BTxRigCC)     + ( 0.0       , \BOH *0.2   )$) (BTxRigDC)  [\debugPoint];%
+\coordinate (BTxRigDL)     at ($(BTxRigDC)     + (-\BIPX     , 0.0         )$) (BTxRigDL)  [\debugPoint];%
+\coordinate (BTxRigDR)     at ($(BTxRigDC)     + ( \BIPX     , 0.0         )$) (BTxRigDR)  [\debugPoint];%
+\coordinate (BTxRigEC)     at ($(BTxRigCC)     + ( 0.0       , \BOH *0.4   )$) (BTxRigEC)  [\debugPoint];%	
+
+%Tx left-----------------------------------------------------------%
+\node[vis on =<3-> , nodeOuter]    (NBTxLef)   at (BTxLefCC)                      {};			
+\node[vis on =<3-> , nodeInnerA]   (NBTxLefEC) at (BTxLefEC)                      {\fontset{}$\mathsf{Tx}$};			
+\node[vis on =<3-> , nodeInnerBAC] (NBTxLefDL) at (BTxLefDL)                      {\fontset{}\textbf{Input}};
+\node[vis on =<3-> , nodeInnerBAC] (NBTxLefDR) at (BTxLefDR)                      {\fontset{}\textbf{Output}};
+\node[vis on =<3-5>, nodeInnerBD]  (NBTxLefBL) at (BTxLefBL)                      {\fontset{}$\mathsf{Inp_1}$};	
+\node[vis on =<3-4>, nodeInnerBA]  (NBTxLefCR) at (BTxLefCR)                      {\color{black!50}\fontset{}$\mathit{Out_1}$};
+\node[vis on =<5-5>, nodeInnerBAY] (NBTxLefCR) at (BTxLefCR)                      {\color{black!50}\fontset{}$\mathit{Out_1}$};
+\node[vis on =<3-4>, nodeInnerBA]  (NBTxLefBR) at (BTxLefBR)                      {\fontset{}$\mathsf{Out_2}$};
+\node[vis on =<5-5>, nodeInnerBAY] (NBTxLefBR) at (BTxLefBR)                      {\fontset{}$\mathsf{Out_2}$};
+\node[vis on =<3-4>, nodeInnerBA]  (NBTxLefAR) at (BTxLefAR)                      {\color{black!50}\fontset{}$\mathit{Out_3}$};
+\node[vis on =<5-5>, nodeInnerBAY] (NBTxLefAR) at (BTxLefAR)                      {\color{black!50}\fontset{}$\mathit{Out_3}$};
+\node[vis on =<6-6>, nodeInnerBDY] (NBTxLefBR) at (BTxLefBR)                      {{\fontset{}$\,\mathsf{Minted}$}};			
+\node[vis on =<7-> , nodeInnerBD]  (NBTxLefBR) at (BTxLefBR)                      {{\fontset{}$\,\mathsf{Minted}$}};			
+
+%Tx centered-------------------------------------------------------%
+\node[vis on =<3-> , nodeOuter]    (NBTxCen)   at (BTxCenCC)                      {};
+\node[vis on =<3-> , nodeInnerA]   (NBTxCenEC) at (BTxCenEC)                      {\fontset{}$\mathsf{Tx}$};
+\node[vis on =<3-> , nodeInnerBAC] (NBTxCenDL) at (BTxCenDL)                      {\fontset{}\textbf{Input}};
+\node[vis on =<3-> , nodeInnerBAC] (NBTxCenDR) at (BTxCenDR)                      {\fontset{}\textbf{Output}};	
+\node[vis on =<3-> , nodeInnerBD]  (NBTxCenCL) at (BTxCenBL)                      {\fontset{}$\mathsf{Inp_1}$};	
+\node[vis on =<3-4>, nodeInnerBA]  (NBTxCenCR) at (BTxCenCR)                      {\fontset{}$\mathsf{Out_1}$};
+\node[vis on =<5-5>, nodeInnerBAY] (NBTxCenCR) at (BTxCenCR)                      {\fontset{}$\mathsf{Out_1}$};
+\node[vis on =<6-6>, nodeInnerBA]  (NBTxCenCR) at (BTxCenCR)                      {\fontset{}$\mathsf{Out_1}$};
+\node[vis on =<7-7>, nodeInnerBAY] (NBTxCenCR) at (BTxCenCR)                      {\fontset{}$\mathsf{Out_1}$};
+\node[vis on =<3-4>, nodeInnerBA]  (NBTxCenBR) at (BTxCenBR)                      {\fontset{}$\mathsf{Out_2}$};
+\node[vis on =<5-5>, nodeInnerBAY] (NBTxCenBR) at (BTxCenBR)                      {\fontset{}$\mathsf{Out_2}$};
+\node[vis on =<6-6>, nodeInnerBA]  (NBTxCenBR) at (BTxCenBR)                      {\fontset{}$\mathsf{Out_2}$};
+\node[vis on =<7-7>, nodeInnerBAY] (NBTxCenBR) at (BTxCenBR)                      {\fontset{}$\mathsf{Out_2}$};
+\node[vis on =<3-4>, nodeInnerBA]  (NBTxCenAR) at (BTxCenAR)                      {\color{black!50}\fontset{}$\mathit{Out_3}$};
+\node[vis on =<5-5>, nodeInnerBAY] (NBTxCenAR) at (BTxCenAR)                      {\color{black!50}\fontset{}$\mathit{Out_3}$};
+\node[vis on =<6-6>, nodeInnerBA]  (NBTxCenAR) at (BTxCenAR)                      {\color{black!50}\fontset{}$\mathit{Out_3}$};
+\node[vis on =<7-7>, nodeInnerBAY] (NBTxCenAR) at (BTxCenAR)                      {\color{black!50}\fontset{}$\mathit{Out_3}$};
+
+%Tx right----------------------------------------------------------%
+\node[vis on =<3-> , nodeOuter]    (NBTxRig)   at (BTxRigCC)                      {};			
+\node[vis on =<3-> , nodeInnerA]   (NBTxRigEC) at (BTxRigEC)                      {\fontset{}$\mathsf{Tx}$};			
+\node[vis on =<3-> , nodeInnerBAC] (NBTxRigDL) at (BTxRigDL)                      {\fontset{}\textbf{Input}};
+\node[vis on =<3-> , nodeInnerBAC] (NBTxRigDR) at (BTxRigDR)                      {\fontset{}\textbf{Output}};
+\node[vis on =<3-> , nodeInnerBB]  (NBTxRigCL) at ($(BTxRigBL)+(0.0, \BOH*0.15)$) {\fontset{}$\mathsf{Inp_1}$};	
+\node[vis on =<3-> , nodeInnerBB]  (NBTxRigBL) at ($(BTxRigBL)+(0.0,-\BOH*0.15)$) {\fontset{}$\mathsf{Inp_2}$};	
+\node[vis on =<3-4>, nodeInnerBA]  (NBTxRigCR) at (BTxRigCR)                      {\color{black!50}\fontset{}$\mathit{Out_1}$};
+\node[vis on =<5-5>, nodeInnerBAY] (NBTxRigCR) at (BTxRigCR)                      {\color{black!50}\fontset{}$\mathit{Out_1}$};
+\node[vis on =<6-6>, nodeInnerBA]  (NBTxRigCR) at (BTxRigCR)                      {\color{black!50}\fontset{}$\mathit{Out_1}$};
+\node[vis on =<7-> , nodeInnerBAY] (NBTxRigCR) at (BTxRigCR)                      {\color{black!50}\fontset{}$\mathit{Out_1}$};
+\node[vis on =<3-4>, nodeInnerBA]  (NBTxRigBR) at (BTxRigBR)                      {\fontset{}$\mathsf{Out_2}$};
+\node[vis on =<5-5>, nodeInnerBAY] (NBTxRigBR) at (BTxRigBR)                      {\fontset{}$\mathsf{Out_2}$};
+\node[vis on =<6-6>, nodeInnerBA]  (NBTxRigBR) at (BTxRigBR)                      {\fontset{}$\mathsf{Out_2}$};
+\node[vis on =<7-> , nodeInnerBAY] (NBTxRigBR) at (BTxRigBR)                      {\fontset{}$\mathsf{Out_2}$};
+\node[vis on =<3-4>, nodeInnerBA]  (NBTxRigAR) at (BTxRigAR)                      {\fontset{}$\mathit{Out_3}$};
+\node[vis on =<5-5>, nodeInnerBAY] (NBTxRigAR) at (BTxRigAR)                      {\fontset{}$\mathit{Out_3}$};
+\node[vis on =<6-6>, nodeInnerBA]  (NBTxRigAR) at (BTxRigAR)                      {\fontset{}$\mathit{Out_3}$};
+\node[vis on =<7-> , nodeInnerBA]  (NBTxRigAR) at (BTxRigAR)                      {\fontset{}$\mathit{Chng}$};
+
+%Arrows of transactions--------------------------------------------%
+%str --> Tx left
+\draw[lineIO , ->, vis on=<3-5> ] (str)           .. controls ($(str)            + ( 0.00, 0.00)$) and ($(NBTxLefBL.west) + ( 0.00, 0.00)$) .. (NBTxLefBL.west);
+%Tx left -- > Txcen
+\draw[lineIO , ->, vis on=<3-> ] (NBTxLefBR.east).. controls ($(NBTxLefBR.east) + ( 0.00, 0.00)$) and ($(NBTxCenCL.west) + ( 0.00, 0.00)$) .. (NBTxCenCL.west);
+%Tx cen -- > Tx right #1 
+\draw[lineIO , ->, vis on=<3-> ] (NBTxCenCR.east).. controls ($(NBTxCenCR.east) + ( 0.00, 0.00)$) and ($(NBTxRigCL.west) + ( 0.00, 0.00)$) .. (NBTxRigCL.west);
+%Tx cen -- > Tx right #2
+\draw[lineIO , ->, vis on=<3-> ] (NBTxCenBR.east).. controls ($(NBTxCenBR.east) + ( 0.00, 0.00)$) and ($(NBTxRigBL.west) + ( 0.00, 0.00)$) .. (NBTxRigBL.west);
+%Tx right -- > end #1
+\draw[lineIO , ->, vis on=<3-> ] (NBTxRigBR.east).. controls ($(NBTxRigBR.east) + ( 0.00, 0.00)$) and ($(end) + ( 0.00, 0.00)$) .. (end);
+%Tx right -- > end #2
+\draw[lineIO , ->, vis on=<3-> ] (NBTxRigAR.east).. controls ($(NBTxRigAR.east) + ( 0.00, 0.00)$) and ($(end) + ( 0.00, -\BOH*0.2)$) .. ($(end)+(0.0, -\BOH*0.2)$);
+
+%Slide numbering helper----------------------------------------%
+%\node[vis on=<1-1>,] () at ($(cen) + ( 0.00, 0.00)$) {\fontset{}\huge\textbf{1}};
+%\node[vis on=<2-2>,] () at ($(cen) + ( 0.00, 0.00)$) {\fontset{}\huge\textbf{2}};	
+%\node[vis on=<3-3>,] () at ($(cen) + ( 0.00, 0.00)$) {\fontset{}\huge\textbf{3}};
+%\node[vis on=<4-4>,] () at ($(cen) + ( 0.00, 0.00)$) {\fontset{}\huge\textbf{4}};
+%\node[vis on=<5-5>,] () at ($(cen) + ( 0.00, 0.00)$) {\fontset{}\huge\textbf{5}};
+%\node[vis on=<6-6>,] () at ($(cen) + ( 0.00, 0.00)$) {\fontset{}\huge\textbf{6}};
+%\node[vis on=<7-7>,] () at ($(cen) + ( 0.00, 0.00)$) {\fontset{}\huge\textbf{7}};

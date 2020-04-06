@@ -1,0 +1,67 @@
+\begin{abstract}%
+  % [...]
+  % For fiat currencies, velocity plays a crucial role in the quantity theory of
+  % money.  Due to its unobservability, it has been subject to both pronounced
+  % debate and a large empirical literature.
+  % For blockchain-based cryptocurrencies, all transactions are publicly
+  % recorded, and therefore velocity does not need to be estimated; it can be
+  % calculated.  This paper does that for the Bitcoin blockchain.
+  % However, due to both differing conceptual approaches as well as technical
+  % properties of the protocol, no unique measure of velocity exists.  We
+  % therefore explore the design space to characterise meaningful velocity
+  % constructions, including their discussion from technical questions to
+  % economic interpretation.
+  % We also review most popular alternative proxies for circulation intensity,
+  % and compare them with the velocity measures.  We show that while for certain
+  % aspects specific measures are most appropriate, generally our primary
+  % velocity measure is suited best.  %% by what metric?
+
+  % % We show it interacts tightly with the demand of money, %% ?
+  % % with cryptocurrency returns, ...
+  % %% Among other, distributions, predictability, stability, levels, and relation
+  % %% to the Bitcoin price are illuminated.
+
+  % %% test quantity theory
+
+  % Our research has implications for the increasingly popular approaches of
+  % blockchain protocols with dynamic cryptocurrencies supply.
+  % Contributions are: 
+  % \begin{itemize}
+  % \item Economic studies of cryptocurrencies mostly (actually all but one) used bad approximations of the velocity of money for cryptocurrencies.
+  % \item We review estimation and approximation methods for velocity of money for a subset of UTXO-based cryptocurrencies conceptionally and empirically.
+  % \item We add a velocity measure, that has more economic depth and is not merly an (almost) scaled version of a self-churn free transaction volume.
+  % \item Our measure explicitly takes the use hybrid use of cryptocurrencies as medium of exchange and speculative investment into account and is based on the "law-of-reflux" which is part of a model solving a similar challenge for commodity money (Marx's Anti-Quantity Theory of Money).
+  % \item We propose the old and new velocity of money measures as means to estimate the "moneyness" of cryptocurrencies and argue that the new velocity measure handles hype driven flows between dormant and active money more gracefully. (OR maybe just use both: old one is to optimistic, new one is more pessimistic).
+  % \end{itemize}
+
+%  The velocity of money denotes the intensity with which its tokens
+%  circulate.
+  Velocity of money is central to the quantity theory of money, which relates it to
+  the general price level. %
+  While the theory motivated countless empirical studies to include velocity
+  as price determinant, few find a significant relationship in the short or
+  medium run. %
+  Since the velocity of money is generally unobservable, these studies were
+  limited to use proxy variables, leaving it unclear whether the lacking
+  relationship refutes the theory or the proxies. %
+  Cryptocurrencies on public blockchains, however, visibly record all
+  transactions, and thus allow to measure---rather than
+  approximate---velocity. %
+  This paper evaluates most suggested proxies for velocity and also proposes
+  a novel measurement approach. %
+  We introduce velocity measures for UTXO-based cryptocurrencies focused on
+  the subset of the money supply effectively in use for the processing of
+  transactions. %
+  Our approach thus explicitly addresses the hybrid use of cryptocurrencies as media of
+  exchange and as stores of value, a major distinction in recently proposed
+  theoretical pricing models. %
+  We show that each of the velocity estimators is approximated best by the
+  simple ratio of on-chain transaction volume to total coin supply. %
+  Moreover, ``coin days destroyed'', if used as an approximation for
+  velocity, shows considerable discrepancy from the other approaches. %
+\end{abstract}%
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

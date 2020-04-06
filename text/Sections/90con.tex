@@ -1,0 +1,37 @@
+%Conclusion
+\section{Conclusion}
+\label{sec:concl}%
+
+% Recognizing the need for an integral analysis of proxy-variables and recently emerged estimators for the velocity of money for cryptocurrencies, this paper not only systematically reviews established and recently developed approaches but also operationalizes a flexible estimator as a function of money in effective circulation. %
+% \par Rooted in a profound exploration of the concept of velocity adapted to cryptocurrencies, we found that the recently proposed estimator by \cite{kalodner2017blocksci} can be seen as only one within a spectrum of measures depending on the definition of money in circulation. %
+% While \cite{kalodner2017blocksci} base their estimator on the total money supply, money in circulation can also be defined as money effectively circulating within the last week, month, year, or any other time window conceivable. %
+% This practice can be seen as originating in the works of important economists like \cite{pigou1936mr}, \cite{fisher1922purch}, \cite{marx1859preface}, \cite{fullarton1845regulation} or \cite{commons2003institutional}. %
+% We thus operationalize a general approach for velocity measures based on the multitude of potential monetary aggregates for UTXO-based cryptocurrencies. %
+% Applying our approach to Bitcoin we compare a variety of potential proxy-variables to estimators characterizing the two extremes of the design space and evaluate the goodness of fit from a variety of perspectives. %
+% Disconcertingly, the dominant proxy-variable, \acl{cdd} in the grand majority of tests delivered higher approximation errors than the simple ratio of unadjusted, on-chain transaction volume and total coin supply. %
+
+We analyzed approaches quantifying the velocity of money for
+cryptocurrencies; moreover, we introduced novel measurement methods based on
+money in effective circulation.  %
+
+Our implementation shows that velocity as a function of the period within
+which money is considered as \emph{effectively circulating} can be more
+informative than prior velocity measures.  Our results also raise questions
+for future research: Is velocity for certain time spans more related to
+price?  If so, can such a relationship be exploited in the construction of
+stablecoins \citep[cf.][]{perniceetal2019stabil}?  What is the effect of
+including off-chain transactions?  %
+
+In addition, we analyze goodness of fit for common velocity
+approximations.  %
+In most tests we find that the common proxy variable \acl{cdd} delivers
+higher approximation errors than the simple ratio of unadjusted, on-chain
+transaction volume to total coin supply.  %
+
+On a broader scale, by publishing our code we hope to foster research on the
+economic properties of cryptocurrencies. %
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

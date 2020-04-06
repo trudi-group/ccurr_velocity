@@ -1,0 +1,13 @@
+#*#
+.Rhistory
+.RData
+*~
+*.log
+*.blg
+*.bbl
+*.aux
+*.log
+*.out
+*__*__/
+text/draft/velocitypaper_v0.pdf
+text/main.pdf

@@ -1,0 +1,125 @@
+% %Moneyness section
+% \section{Discussion: Missing off-chain transactions---bug or feature}\label{sec:moneyness}%
+% %
+% While our analysis covered a lot of different aspects of on-chain velocity of %
+% money for cryptocurrencies, obviously a conceptional weakness is the economic %
+% importace of off-chain transactions on exchanges.%
+% \footnote{Off-chain trading volume was roughly XYZ times higher then the corresponding on-chain volume end of 2018.} %
+% In this section, we first propose a potential way to include off-chain transactions into the estimation of velocity but would like to add a different use case of velocity turning the exclusion of investment and trading into a desirable feature. %
+% %
+% \subsection{Including off-chain transactions}\label{sec:moneyness:offchain_idea}%
+% A potentially viable approach to measure on-chain velocity might be to identify public addresses controlled by major exchanges%
+% \footnote{This has been done e.g. by \cite{meiklejohn2013fistful}.} %
+% and measuring the amount of money hold on these addresses over time. %
+% While this aggregate might be interpreted as money supply available for off-chain transactions, the simple off-chain transaction volume of the exchange might represent an the transaction volume. %
+% A the ratio of the two might be considered as first estimate of an off-chain velocity of money. %
+% This estimate, in turn, might be aggregated with our on-chain measures by building a weighted sum using the involved amounts of money supply as weights. %
+% Remaining a rough scetch, however, this is left to future research. %
+% %
+% \subsection{Velocity and a cryptocurrencies usage as medium-of-exchange}\label{sec:moneyness:measure}%
+% To the best of our knowledge, prior economic and technical cryptocurrency %
+% studies applied the concept of velocity exclusively as simple regressor %
+% in empirical analyses of price determinants or part of theoretic pricing %
+% models (compare section~\ref{sec:lit}). %
+% We would argue, however, that with its convenient interpretation of average %
+% turnovers of monetary units within a certain time period, the discussed %
+% measures might already be seen as a first step towards %
+% measuring a cryptocurrencies usage as medium-of-exchange and thus one of %
+% the central functions of money. %
+% \par Many pricing models for cryptocurrencies%
+% \footnote{Compare \cite{schilling2018dp12831}, \cite{athey2016bitcoin}, \cite{garratt2018bitcoin} or \cite{biais2018equilibrium}} %
+% assume, that expectations %
+% of future adoption as medium-of-exchange drives demand. %
+% A good measure might help to quantify trends of adoption and form more %
+% educated expectations in cryptocurrency pricing models. %
+% Which of the two grant types of velocity estimation is suited better? %
+% Both, broadly speaking, calculate an estimate for an ``average coin turnover''. %
+% While $\VCircP$ averages only over money in effective %
+% circulation, $\VTotalEstP$ averages over the complete money %
+% supply and thus reflects flows between the money components to a larger degree. %
+% \par This difference leads to an interesting distinction in the reaction to hype cycles. % 
+% Induced by the expectation of a "boom" in cryptocurrency prices, monetary units %
+% in circulation might be kept in hot- or cold-wallets to wait for future price %
+% increases or be kept on exchanges for trading. %
+% Expecting a \textit{bust}, cryptocurrency holders might reactivate money units in %
+% their wallets to transfer them to exchanges for selling them off %
+% (compare e.g. \cite{glaser2014bitcoin,gurdgiev2018ripples,celeste2018fractal}). %
+% % These activities could be seen as \textit{portfolio management} activities which should not effect a
+% % measure for the degree to that a cryptocurrency is used as medium of exchange. %
+% While there has little research been done yet, exchanges might be %
+% expected to process most of trading off-chain and hold a pooled %
+% amount of cryptocurrency units on their own wallets to save costs. %
+% Indication is provided by high off-chain trading volumes compared to %
+% on-chain transaction volumes and balance sheets %
+% (compare \cite{anderson2019bitcoin}). %
+% Therefore, the aforementioned activities on-chain might be reflected by %
+% UTXOs staying unspent for a long time, being transferred once and yielding %
+% a new UTXO which stays again unspent for a long time.%
+% \par In the measure $\VTotalEstP$, these activities are imported %
+% via the changing fraction of money with a velocity of zero. %
+% As most of the money supply is dormant, even ``sleep-hop-sleep'' transaction %
+% patterns as the ones described above increase the aggregated measure. %
+% As a consequence, for an increase in velocity $\VTotalEstP$ we cannot be sure, whether monetary %
+% units in circulation achieve more turnovers in a certain period $\perd$ or %
+% whether just more monetary units have been turned over exactly once due to speculation.%
+% \footnote{While this is note only way speculation might represent itself on-chain, %
+%   we argue that the described pattern covers a significant part of scenarios.} %
+% %
+% $\VCircP$, however, is always based exactly on the monetary stock in circulation. %
+% The described ``sleep-hop-sleep'' patterns contribute to an increase of both of %
+% its components: money supply \( \MCircP \) and transaction volume $\langle\Pp,\Tp\rangle$. %
+% This causes the measure to handles hype-driven transaction patterns in a more graceful way. %
+% Additional money in circulation only increases the measure, when the monetary %
+% units are used for an above average intensity of peer-to-peer transactions. %
+% If not, the measure even might decrease as reaction to additional money in %
+% circulation that is used in a below-average manner. %
+% While additional research is encouraged, we form the hypothesis that \(\VCircP\) might %
+% be a preferable measure when using velocity of money as approximation %
+% of a cryptocurrencies usage as medium of exchange. %
+% %Future research might analyse to which degree the measure drives long term prices levels. %
+
+% % Speculation has been shown to interact with the component of money hold for %
+% % the purpose of long-term investment. %
+% % \cite{smith2017bitcoin} shows that higher prices correlate strongly with %
+% % larger time periods since the transacted monetary supply as been last used %
+% % in transactions before. %
+% % \textbf{[Missing diagram [2.cW1, 2.eT1, 2.eT2]]} relates price lagged daily %
+% % price changes to \ac{cdd} for Bitcoin, Bitcoin Cash, Litecoin, %
+% % Namecoin and Dash. %
+% % Similar to \cite{smith2017bitcoin}, we find that ...
+% % \textbf{[Missing diagram [3.cW1, 3.eD1, 3.eD2, 3.eT1, 3.eT2]]} gives the %
+% % number of transactions with outputs belonging to addresses of major %
+% % exchange-wallets  (Kraken, Coinbase and Bitfinex) relative to lagged %
+% % daily price changes. %
+% % The dotted line highlights the number of transactions that have stayed %
+% % at this address for over one month. %
+% % \footnote{%
+% %	The respective addresses have been gathered from %https://www.walletexplorer.com.%
+% %} %
+% %
+% % Among others, \textbf{[Citation: Corbet 2017, Corbet 2018]} found existence %
+% % for pricing bubbles for Bitcoin and Ethereum,  Cheah and Fry 2015 and 2016 %
+% % tested for the existence of bubbles in Bitcoin prices.
+% % Glaser et al 2014 find that the motivation of users, exchanging fiat %
+% % currency to Bitcoin is driven by demand for a speculative asset, rather %
+% % than as payment means. Mai et al 2015, Fry 2018 and  find impact of trends %
+% % in posts in social media channels on prices. %
+% % Off-chain speculative transaction are reflected only slightly in on-chain %
+% % transactions. %
+% % On the one hand, this is indicated by the enormous gap between on-chain and %
+% % off-chain trading volume and on the other by balance sheet analyses of large %
+% % exchanges. %
+% % 
+% % Speculation on-chain is to large degree represented by UTXOs staying unspent %
+% % for a long time, being transferred once and yielding an new UTXO which stays %
+% % unspent again for a long time. 
+% % \footnote{Obviously, these components are, apart from their turnover rates, %
+% % in principle indistinguishable (compare \cite{likitkijsomboon2005marx}).}
+% %
+
+
+
+% %%% Local Variables:
+% %%% mode: latex
+% %%% TeX-master: "../main"
+% %%% End:

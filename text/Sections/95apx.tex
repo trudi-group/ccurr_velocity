@@ -1,0 +1,150 @@
+\onecolumn%
+%\appendices%
+% 
+\newcommand{\tbf}[1]{\textbf{#1}}%
+\newcommand{\mco}[3]{\multicolumn{#1}{#2}{#3}}%
+% notation
+\newcommand{\notaCdd}{$\BddP$}%
+\newcommand{\notaTuO}{$\TurnP$}%
+\newcommand{\notaTrv}{$\VNaiveEstP$}%
+\newcommand{\notaTtl}{$\VTotalEst$}%
+\newcommand{\notaWba}{$\VCircWbEstPWl$}%
+\newcommand{\notaMcL}{$\VCircMfEstPWl$}%
+\newcommand{\notaMcF}{$\VCircMlEstPWl$}%
+%
+% descriptions
+\newcommand{\descCdd}{Coin days destroyed}%
+\newcommand{\descTuO}{Turnover}%
+\newcommand{\descTrv}{Trivial velocity measure}%
+\newcommand{\descTtl}{Velocity measure based on total money supply}%
+\newcommand{\descWba}{Based on money in effective circulation using the Whole Bill Approach}%
+\newcommand{\descMcL}{Based on money in effective circulation using the Moved Coin Approach (LIFO)}%
+\newcommand{\descMcF}{Based on money in effective circulation using the Moved Coin Approach (FIFO)}%
+%
+% formulas
+\newcommand{\formCdd}{$\sum_{t\in\TxP} \bdd(t)$}%
+\newcommand{\formTuO}{$\frac{1}{\DormP} \cdot \delta$}%
+\newcommand{\formTrv}{$\frac{\langle\Pp',\Tp'\rangle}{\MTotalP}$}%
+\newcommand{\formTtl}{$\frac{\langle\Pp,\Tp\rangle}{\MTotalP}$}%
+\newcommand{\formWba}{$\frac{\langle\Pp,\Tp\rangle}{\MCircWbEstPWl}$}%
+\newcommand{\formMcL}{$\frac{\langle\Pp,\Tp\rangle}{\MCircMfEstPWl}$}%
+\newcommand{\formMcF}{$\frac{\langle\Pp,\Tp\rangle}{\MCircMlEstPWl}$}%
+%
+% ref Section
+\newcommand{\refsCdd}{\ref{sec:results:sub:approx_crypto:subsub:bdd}}%
+\newcommand{\refsTuO}{\ref{sec:results:sub:approx_crypto:subsub:dorm}}%
+\newcommand{\refsTrv}{\ref{sec:oldmeas}}%
+\newcommand{\refsTtl}{\ref{sec:oldmeas}}%
+\newcommand{\refsWba}{\ref{sec:cc_money_seg:sub:}}%
+\newcommand{\refsMcL}{\ref{sec:cc_money_seg:sub:}}%
+\newcommand{\refsMcF}{\ref{sec:cc_money_seg:sub:}}%
+%
+% Sources
+\newcommand{\sourCdd}{\emph{Bitcointalk.org}, 2011}%
+\newcommand{\sourTuO}{\cite{smith2017bitcoin}}%
+\newcommand{\sourTrv}{\cite{bolt2016value}}%
+\newcommand{\sourTtl}{\cite{athey2016bitcoin, kalodner2017blocksci}}%
+\newcommand{\sourWba}{novel}%
+\newcommand{\sourMcL}{novel}%
+\newcommand{\sourMcF}{novel}%
+%
+% Considered in
+\newcommand{\consCdd}{\cite{kancs2015digital, ciaian2016digital, deleo2014does, georgoula2015using, bouoiyour2015does, luis2019drivers, ciaian2016economics}}%
+\newcommand{\consTuO}{\cite{smith2017bitcoin}}%
+\newcommand{\consTrv}{\cite{bolt2016value}}%
+\newcommand{\consTtl}{\cite{athey2016bitcoin, kalodner2017blocksci}}%
+\newcommand{\consWba}{}%
+\newcommand{\consMcL}{}%
+\newcommand{\consMcF}{}%
+%
+\addtolength{\textwidth}{20pt}
+\begin{landscape}%
+  \section{Summary of on-chain velocity measures and proxy-variables}\label{sec:summ-veloc-meas}%
+  % 
+  \begin{table}[hp]%
+  	\footnotesize%commet out in ieee style mode
+    \caption{Summary of on-chain velocity measures and proxy-variables.}%
+    \label{tab:summary_notation}%
+    \centering%
+    \renewcommand{\arraystretch}{2.0}%
+    \begin{tabularx}{\linewidth}{L{0.1}C{0.15}C{0.15}C{0.12}C{0.12}C{0.12}C{0.12}C{0.12}}%
+      \toprule%
+      & \mco{2}{c}{\tbf{Proxy-Variables}} & \mco{5}{c}{\tbf{Measures}}             \\%
+      \tbf{Type}           & \mco{2}{c}{} & \mco{2}{c}{\tbf{non-segregated money supply}} & \mco{3}{c}{\tbf{segregated money supply}} \\%
+      \midrule%
+      \tbf{Notation}       & \notaCdd & \notaTuO & \notaTrv & \notaTtl & \notaWba & \notaMcF & \notaMcL \\%
+      \tbf{Description}    & \descCdd & \descTuO & \descTrv & \descTtl & \descWba & \descMcF & \descMcL \\%		
+      \tbf{Formula}        & \formCdd & \formTuO & \formTrv & \formTtl & \formWba & \formMcF & \formMcL \\%	
+      \tbf{Related Section}& \refsCdd & \refsTuO & \refsTrv & \refsTtl & \refsWba & \refsMcF & \refsMcL \\%	
+      \tbf{Sources}        & \sourCdd & \sourTuO & \sourTrv & \sourTtl & \sourWba & \sourMcF & \sourMcL \\%
+      \tbf{Considered in}  & \consCdd & \consTuO & \consTrv & \consTtl & \consWba & \consMcF & \consMcL \\%
+      \bottomrule%
+    \end{tabularx}%
+  \end{table}%
+%
+  \capstartfalse
+  \begin{table}[ht]%
+  	\footnotesize%commet out in ieee style mode
+    \renewcommand{\arraystretch}{1.5}%
+    \begin{tabular}{lll}%
+      $t$                       & $\hdots{}$ &  an individual transaction\\%
+      $\TxP$                    & $\hdots{}$ & the set of all transactions in period \(\perd\) \\%
+      $\bdd(t)$                 & $\hdots{}$ &  coin days destroyed for transaction \(t\) as defined
+                                          in Section \ref{sec:results:sub:approx_crypto}\\%
+      $\DormP$                  & $\hdots{}$ &  dormancy in period \(\perd\) as defined in
+                                          Section \ref{sec:results:sub:approx_crypto:subsub:dorm}\\%
+      $\delta$                  & $\hdots{}$ &  the period for which an approximated turnover per coin in circulation is calculated\\%
+      $\langle\Pp',\Tp'\rangle$ & $\hdots{}$ &  the inflated price-sum \\%
+      $\langle\Pp ,\Tp\rangle$  & $\hdots{}$ &  the deflated price-sum \\%
+      $\MTotalP$                & $\hdots{}$ &  the complete, ever mined coin supply\\%
+      $\MCircWbEstPWl$          & $\hdots{}$ &  money in effective circulation using the Whole Bill Approach\\%
+      $\MCircMfEstPWl$          & $\hdots{}$ &  money in effective circulation using the Moved Coin Approach
+                                          adopting first-in-first-out assignment between inputs and outputs\\%
+      $\MCircMlEstPWl$          & $\hdots{}$ &  money in effective circulation using the Moved Coin Approach
+                                          adopting last-in-first-out assignment between inputs and outputs%
+    \end{tabular}%
+  \end{table}%
+  \capstarttrue
+\end{landscape}%
+
+\addtolength{\textwidth}{-20pt}
+%
+\newpage{}%
+%
+\section{Descriptives of the entirety of raw data}\label{sec:descr-entir-raw}
+\addtolength{\tabcolsep}{-2pt}  
+\renewcommand{\captionGlo} {Basic descriptive statistics based on Bitcoin data from 01.06.2013 to 01.06.2019 with $\perd = \wndwLength = 1 \ttext{ day} $. Variables marked by "$^{\ast}$" are scaled down by factor 1,000,000.}%
+\renewcommand{\labelGlo}   {\label{tbl:appendix_desc_other}}%
+\tableTwoColumn{descriptives_other}
+\addtolength{\tabcolsep}{+2pt}
+
+\section{Descriptives of the normalized proxy-variables and measurements}\label{sec:descr-norm-proxy}
+\addtolength{\tabcolsep}{-2pt}  
+\renewcommand{\captionGlo} {Basic descriptive statistics based on normalized velocity measurement and approximation data from 01.06.2013 to 01.06.2019 with $\perd = \wndwLength = 1 \ttext{ day} $.}%
+\renewcommand{\labelGlo}   {\label{tbl:appendix_desc_other_norm}}%
+\tableTwoColumn{descriptives_nest_and_napp}
+\addtolength{\tabcolsep}{+2pt}
+
+\newpage%
+\section{Descriptives of the standardized proxy-variables and measurements}\label{sec:descr-stand-proxy}
+\addtolength{\tabcolsep}{-2pt}  
+\renewcommand{\captionGlo} {Basic descriptive statistics based on standardized velocity measurement and approximation data from 01.06.2013 to 01.06.2019 with $\perd = \wndwLength = 1 \ttext{ day} $.}%
+\renewcommand{\labelGlo}   {\label{tbl:appendix_desc_other_stand}}%
+\tableTwoColumn{descriptives_sest_and_sapp}
+\addtolength{\tabcolsep}{+2pt}
+
+%\newpage{}
+\section{Correlations of the entirety of raw data}\label{sec:corr-entir-raw}
+\addtolength{\tabcolsep}{-5pt}  
+\renewcommand{\captionGlo} {Correlations based on Bitcoin data from 01.06.2013 to 01.06.2019 with $\perd = \wndwLength = 1 \ttext{ day} $.}%
+\renewcommand{\labelGlo}   {\label{tbl:corrtable_all}}%
+\tableTwoColumn{corrtable_all}
+\addtolength{\tabcolsep}{+5pt}
+
+
+
+% %%% Local Variables:
+% %%% mode: latex
+% %%% TeX-master: "../main"
+% %%% End:
+%

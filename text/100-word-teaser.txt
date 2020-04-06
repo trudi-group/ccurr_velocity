@@ -1,0 +1,9 @@
+The velocity of money is a central yet unobservable concept for fiat money.
+Public blockchains, in contrast, allow to measure -- rather than approximate
+-- velocity.  However, for cryptocurrencies the dichotomy of means for
+transactions and (speculative) assets storing value is particularly stark.
+We thus develop velocity measures for UTXO-based cryptocurrencies focused on
+the subset of the money supply effectively in circulation (and free and
+open-source code).  We show the velocity measures are approximated best by
+the simple ratio of on-chain transaction volume to total coin supply, while
+the common proxy "coin days destroyed" shows considerable discrepancy.

@@ -1,0 +1,138 @@
+% Introduction
+\section{Introduction}\label{sec:intro}%
+Velocity of money plays a key role in traditional monetary economics %
+since having been popularized by \cite{fisher1911equation} over a century ago. %
+\parRemain{%
+  Broadly speaking, velocity of money denotes the average number of
+  transactions per monetary unit within a certain time period.%
+  \footnote{We refer to its definition arising from the ``transaction form''
+    of the quantity theory of money.}  %
+  In the quantity theory of money, velocity is related to the price level. %
+  While empirical studies frequently apply this concept to cryptocurrencies,
+  surprisingly few find a significant relationship between velocity and
+  prices.  %
+  We take this discrepancy as occasion to evaluate current approaches to
+  quantify the velocity of money for cryptocurrencies, and propose a novel
+  one. %
+}%
+
+Until recently, meaningful measures for velocity of cryptocurrencies did not
+exist, and most studies resorted to proxy variables.%
+\footnote{We use \emph{measure} and \emph{estimator} interchangeably but
+  contrast them to the terms \emph{proxy variable} or \emph{approximating
+    variable}.  The former quantify the addressed concept directly (\eg
+  length with a yardstick), while the latter rely on the quantification of a
+  distinct concept which is assumed to be correlated with the one sought (\eg
+  wealth via horsepower of owned cars).} %
+\parRemain{%
+  Recent years saw first advances to measure---instead of approximate---the
+  velocity of money. %
+  In \cite{athey2016bitcoin} and \cite{bolt2016value} the
+  quantity equation of money has first been considered
+  to measure velocity as the ratio of transaction volume and money supply. %
+  In \cite{athey2016bitcoin}, however, this approach is modified to create a measure handling
+  the change transactions in cryptocurrency systems. %
+  While \cite{athey2016bitcoin} and later \cite{kalodner2017blocksci} focused
+  on adjusting the transaction volume in the above ratio, we complement their
+  approach by adjusting the money supply. %
+}%
+
+Money in effective circulation should be differentiated from money held for
+long-term investment or speculation. %
+\parRemain{%
+  Not only does the total monetary aggregate contain technically
+  dysfunctional money (burnt coins), a major portion of cryptocurrency is
+  stored unused over long time periods (compare \cite{glaser2014bitcoin} or
+  \cite{kalodner2017blocksci}). %
+  Economists like \cite{fisher1911equation}, \cite{commons2003institutional}
+  or \cite{keynes1930treatise} have argued to exclude such funds and focus on
+  money in circulation. %
+  To our knowledge, \cite{bolt2016value} and \cite{athey2016bitcoin} were
+  first to apply this distinction in theoretical cryptocurrency pricing
+  models. %
+  Both link feedback effects from speculation and price levels to a reduction
+  of coins in effective circulation. %
+  In \cite{bolt2016value} velocity of money is explicitly defined as based on
+  the component of coin supply in effective circulation. %
+  In this paper, we operationalize this definition for velocity
+  measurement. %
+}%
+
+In implementing this concept, we make common implicit assumptions explicit. %
+\parRemain{%
+  For example, the separation of money into \emph{hoarded} or
+  \emph{circulating} depends on the choice of a time window. %
+  Tokens can be defined as circulating if moved within the last day, month,
+  year or any other period. %
+%
+  The choice of \cite{athey2016bitcoin} and \cite{kalodner2017blocksci},
+  defining money in circulation as the total coin supply, implies an infinite
+  time window. %
+  The other extreme might be a very restrictive definition requiring coins to
+  be moved within the period for which velocity is measured. %
+  As the optimal time-window might depend on the respective use case, we
+  operationalize a velocity measure for UTXO-based%
+  \footnote{Descendants of Bitcoin's approach to build a transaction graph
+    are known as \textit{UTXO-based cryptocurrencies}.  See
+    \refsec{concept_utxo} for details.} %
+  cryptocurrencies as a function of the respective time-window. %
+}%
+
+Subsequently, we apply our approach to Bitcoin and compare a variety of
+potential proxy variables to measures characterizing the two extremes of the
+design space. %
+\parRemain{%
+  Measuring the goodness of fit from a variety of perspectives, we show that
+  the most common proxy-variable, \ac{cdd}%
+  \footnote{The variable is discussed in
+    \refsec{results:sub:approx_crypto:subsub:bdd}.
+  % \Acl{cdd} %
+  % of a transaction roughly can be interpreted as the product of value %
+  % of spent coins and the days since these coins have been used. %
+  % The measure aggregates these products over the transactions %
+  % of a certain period.%
+  } %
+  in the vast majority of tests shows higher approximation errors than the
+  simple ratio of unadjusted, on-chain transaction volume and total coin
+  supply as shown by a series of \ac{mcs} tests. %
+  As the majority of research opted for \ac{cdd}, our results might suggest a
+  reason for the unexpectedly missing relation between velocity and prices in
+  most studies. %
+}%
+
+%use in ieee
+%\newpage
+
+Our implementation is based on the open-source blockchain parser
+\emph{BlockSci}%
+\footnote{\url{https://citp.github.io/BlockSci/index.html}}. %
+\parRemain{%
+  The codebase to calculate the evaluated velocity measures for UTXO-based
+  cryptocurrencies is re-usable and will be openly available after
+  publication. %
+  In summary, we offer three contributions to research on cryptocurrencies:
+\begin{itemize}\setlength{\itemsep}{0pt}
+\item a review of approaches to quantify velocity,%
+  \footnote{Refer to Appendix \ref{sec:summ-veloc-meas} for a condensed
+    summary of all approaches.}
+\item novel measures based on money in circulation, and%
+%\item a reusable toolset to estimate velocity
+\item an evaluation of common approximation methods.%
+\end{itemize}
+}%
+
+% The remainder of this paper is structured as follows. In \refsec{lit}, we review related literature. %
+% The theoretic foundations are introduced in \ref{concepts} and~\ref{sec:concept_utxo}. %
+% Practical issues of the on-chain transaction volume are discussed in \refsec{particularities_txvol}. %
+% Subsequently, we review the recently emerged estimation methods in \refsec{oldmeas}. %
+% We introduce the concept of an estimator based on money in effective circulation in \refsec{newmeas} and propose the new operationalization for identifying the respective monetary aggregate in \refsec{cc_money_seg} and finally introduce three variations of the measure in \refsec{newest}. %
+% \refsec{approx_crypto} introduces used and proposed approximation methods for the velocity of money, which are lastly compared to the implemented estimators in \refsec{results}. %
+% We conclude with \refsec{concl}.
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:
+
+

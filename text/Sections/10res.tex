@@ -1,0 +1,520 @@
+% Results
+
+\section{Benchmarking popular velocity proxies on the Bitcoin blockchain }
+\label{sec:results}%
+
+Equipped with our proposed velocity measures that are calculated on a level
+of detail of each output in each transaction in each block on the blockchain,
+we can now use these measures to empirically assess the quality of popular
+proxies for velocity.
+
+To this end, we first review the most common proxies in
+\refsec{results:sub:approx_crypto}, then implement the proposed estimators to
+calculate velocity measures for Bitcoin in \refsec{results:sub:comp}, and
+finally run tests in \refsec{results:sub:goodness} to evaluate the goodness
+of fit of the proxies \wrt the measures.
+
+\input{Alg/alg01.tex}%
+\input{Alg/alg02.tex}%
+\vspace*{1em}%
+\renewcommand{\captionGlo} {Descriptives for velocity proxies and measures
+  with $\perd = \wndwLength = 1 \ttext{ day}$ for 2013-06-01 to 2019-06-01.}%
+\renewcommand{\labelGlo}{\label{tbl:descriptives_est_and_app}}%
+\tableTwoColumnH{descriptives_est_and_app}%
+% We assume that the availability of public price data marks the beginning of
+% bitcoins being used as media of exchange.
+% \footnote{While the results for \ac{mae}, \ac{mse} and \ac{msc} tests hold in equivalently also for data from 2009 onwards, the Minzer-Zarnowitz regressions does not allow for conclusive interferences.}%
+
+\subsection{Popular proxy variables for velocity of UTXO-based
+  cryptocurrencies}
+\label{sec:results:sub:approx_crypto}%
+% The following approximations are commonly used so far.
+
+% \subsubsection{Turnover}
+% \label{sec:results:sub:approx_crypto:subsub:turn}%
+% Classical \emph{turnover} refers to the simple sum total of transacted
+% amounts within a period $\perd$:%
+% \begin{align}
+%   \TurnoverP = \sum_{t\in\TxP} \sum_{i\in\InpT} \valI(i).%
+% \end{align}
+
+% Of course, modified variants of turnover can be constructed based on
+% excluding change transactions, or transactions within user clusters.
+
+% The main advantage is its simplicity and immediate correspondence to turnover
+% as understood in classical financial markets.  It lacks the scaling by the
+% money supply central to the concept of velocity, but it can still be used as
+% a proxy for velocity measures based on total supply---which for
+% cryptocurrencies after all is locally close to flat for short periods, and
+% importantly, is (in contrast to fiat currencies) exogenously determined.
+
+\subsubsection{Coin Days Destroyed}
+\label{sec:results:sub:approx_crypto:subsub:bdd}%
+
+Since turnover can be gamed via repeated transfers of an agent to
+herself,\footnote{Primarily, allegations centered on exchanges inflating
+  trading volumes to pretend to be more liquid.} %
+the \Ac{cdd} measure was introduced as a manipulation-proof alternative in
+\url{bitcointalk.org} in 2011.%
+\footnote{\url{https://bitcointalk.org/index.php?topic=6172.msg90789\#msg90789}} %
+For each input, \emph{coin days} refer to the product of its monetary value
+and the number of days ``since it was last spent,'' \ie how many days the
+funding output had remained a UTXO.  %
+\Ac{cdd} then is defined as the sum of coin days over all transactions within
+a period $\perd$:%
+\begin{align}%
+  \BddP = \sum_{t\in\TxP} \bdd(t),%
+\end{align}%
+where%
+\begin{align}%
+  \bdd(t) = \sum_{i\in\InpT}  \Delta(i) \cdot \valI(i)%
+\end{align} %
+with $\Delta(i)$ denoting the number of days since the respective input
+originated as output (or coinbase transaction) in a prior block, and
+$ \valI(i)$ the value of input $i$ of transaction $t$ in period $\perd$.  %
+% For transactions $t=1$ to $\Tp$ for period $\perd$, this can be %
+% calculated using the volume of transaction $t$ including fees %
+% $\val^{\tx^{+}}_\perdT$ %
+% and the weighted average days $\Delta \tp_t$ since the transaction $t$ of period $\perd$ has last been spent:%
+% \begin{align}\label{eq:bdd}%
+%   \BddP = \sum_{t=1}^{\Tp} \Delta \tp_t \cdot \val^{\tx^{+}}_\perdT,%
+% \end{align}%
+% where %
+% \begin{align}%
+%   \val^{\tx^{+}}_\perdT %
+%   = \sum_{o=1}^{O_\perdT} \val^{\out}_{\perdTi} %
+%   + \val^{\mathtt{fees}}_\perdT %
+%   = \sum_{i=1}^{\Ip_t} \valI(\perdTi).%
+% \end{align}%
+% \Ac{cdd} was initially introduced by \emph{ByteCoin} as resilient %
+% measure of transaction volume, unbiased by sending money back and forth artificially. %
+% However, user \emph{MoonShadow} quickly brought it into discussion as measure %
+% for the velocity of money. %$
+
+The \Ac{cdd} measure puts larger weight on the reactivation of long-dormant
+coins compared to ones frequently spun, a feature clearly differing from the
+concept of velocity. %
+
+\subsubsection{Turnover based on dormancy}
+\label{sec:results:sub:approx_crypto:subsub:dorm}%
+
+In \cite{smith2017bitcoin} a proxy for velocity, aiming at ``the average number of times the actively used
+[coins] can be expected to turn over'' was proposed. %
+While named ``turnover'' in \cite{smith2017bitcoin}, this is not to be confused with the classical \emph{turnover} that refers to the simple sum total of transacted
+amounts within a period $\perd$:%
+\begin{align}
+  \TurnoverP = \sum_{t\in\TxP} \sum_{i\in\InpT} \valI(i).%
+\end{align}
+The measure in \cite{smith2017bitcoin} in contrast is constructed as the
+inverse of average dormancy $\DormP$ multiplied by the time period, where
+dormancy amounts to \ac{cdd} scaled by the sum of inputs spent during the
+period $\perd$ \citep[cf.][]{smith2017bitcoin}:%%
+% % BEGIN SHORTENING?
+% \cite{smith2017bitcoin} developed dormancy as a measure for the average time that %
+% coins have been hold unused before being transacted. %
+% It is calculated as the weighted average days $\Delta \tp_t$ passed since %
+% the last transaction. %
+% As weights, the respective transaction volumes $\val^{\tx^{+}}_{t}$ relative to %
+% the aggregated transaction volumes over period $\perd$ are used:
+% \begin{align}%
+%   \DormP %
+%   = \frac{%
+%   		\sum_{t\in\TxP}\Delta \tp_t \val^{\tx^{+}}_{t}%
+%   	}{%
+%   		\sum_{t\in\TxP} \val^{\tx^{+}}_{t}%
+%   	} .%
+% \end{align}%
+% The number of weighted average days $\Delta \tp_t$ since the transaction has %
+% last been spend %
+% can be calculated%
+% \footnote{
+%   In the published working paper of \cite{smith2017bitcoin} it remains %
+%   unclear, how the author conceptualizes this variable exactly. %
+%   We thus suggest an appropriate definition of $\Delta \tp_t$.
+% } %
+% from the values of transaction inputs %
+% $\valI(\perdTi)$ and the days since the spent input %
+% has been generated in a preceding transaction $\Delta t_{\perdTi} $ as%
+% \begin{align}%
+%   \Delta \tp_t %
+%   = \frac{%
+%   	\sum_{i\in\InpPT}\Delta t_{\perdTi} \valI(\perdTi)%
+%   }{%
+%   	\sum_{i\in\InpPT} \valI(\perdTi)%
+%   }.%
+% \end{align}%
+% %
+% % END SHORTENING?
+\begin{align}%
+  \TurnP = \frac{1}{\DormP} \cdot  \delta,%
+\end{align}%
+with%
+\begin{align}%
+  \DormP = \frac{\BddP}{\sum_{t\in\TxP} \sum_{i\in\InpT} \valI(i)}.%
+\end{align}%
+Here $\delta$ refers to the length of the period for which turnover is
+calculated.  %
+To illustrate the concept, assume the coins spent today stayed unused on
+average for 6 hours before their transaction.  %
+Hence, circulating coins are turned over
+$\frac{\SI{24}{\hour}}{\SI{6}{\hour}} = 4$ times per day on average.  %
+Dormancy-based turnover, however, remains an approximation depending on
+transactions distributed homogeneously over time.  %
+% To see that, consider an example where there is only one coin %
+% that is spend $5$ times rapidly over and over again in the first minutes %
+% of the day. After that, nothing happens. The inferred approximation could be arbitrarily high depending on how little time passes %
+% between the transactions. %
+\renewcommand{\labelGlo}    {\label{fig:globfigComponents}}%
+\renewcommand{\captionLocL} {Components of velocity measures.}%
+\renewcommand{\captionLocR} {Correlations between the measures and price.}%
+\renewcommand{\labelLocL}   {\label{fig:subfigComponentsPlot}}%
+\renewcommand{\labelLocR}   {\label{fig:subfigComponentsCorr}}%
+\figureTwoColumn{ts_figs/desc_components}{ts_figs/corrplot_components}%
+\renewcommand{\captionGlo}  {Time series plots for proxy-variables.}%
+\renewcommand{\labelGlo}    {\label{fig:globfigApp}}%
+\renewcommand{\captionLocL} {Normalized variables of volatility approximation.}%
+\renewcommand{\captionLocR} {Standardized variables of volatility approximation.}%
+\renewcommand{\labelLocL}   {\label{fig:subfigAppNorm}}%
+\renewcommand{\labelLocR}   {\label{fig:subfigAppStand}}%
+\figureTwoColumn{ts_figs/desc_all_app_norm}{ts_figs/desc_all_app_stand}%
+
+\subsection{Data sources and calculations}%Origin and description of approximation and measurement data}
+\label{sec:results:sub:comp}%
+
+%%% First data:
+We collect a dataset spanning from June 2013 until June 2019, starting with
+the rise of the first cryptocurrency exchanges and thus reliable trading
+data. %
+
+For the proxy variables, we tap existing sources as far as possible.  %
+\Ac{cdd} data is gathered via API from
+Blockwatch,\footnote{\url{https://blockwatch.cc}} %
+trading data taken from
+CoinMarketCap.\footnote{\url{https://coinmarketcap.com}}  %
+
+To calculate the velocity measures, however, access to the atomic units of
+cryptocurrency transactions is needed.  %
+We rely on the open-source blockchain parser \emph{BlockSci} introduced by
+\cite{kalodner2017blocksci}.  %
+We also provide the code of our paper at
+\url{https://github.com/wiberlin/ccurr_velocity/}. %
+In replicating the clustering approach of \cite{kalodner2017blocksci} (see
+\refsec{particularities_txvol:adjustment_txvol}), in order to mitigate the
+amount and effect of false positives we exclude one unreasonably large
+cluster with over 297 million addresses.  %
+\footnote{Only 13 clusters contain more than $20,000$ addresses.}  %
+
+%%% Then calculations:
+We calculate our velocity measures based on a time window for money in active
+circulation $\wndwLength$ equal to period $\perd = 1 \text{ day}$.%
+\footnote{We define days based on transaction block times and UTC
+  timezone.} %
+Therefore, a \textit{coin} is in circulation if it is transferred at least
+once within the day for which velocity is computed.  %
+This daily measure can be interpreted as average turnover of monetary units
+which are part of the daily circulating money supply.  %
+While our choice for the window $\wndwLength$ within which moved coins are
+considered actively in circulation is short, this allows us to flesh out the
+difference between velocity based on the total money supply and our proposed
+measures based on circulating supply most clearly.  Moreover, since
+\cite{kalodner2017blocksci} provide results with an
+implicitly\footnote{\cite{kalodner2017blocksci} equate money in circulation
+  with total coin supply, implying an infinite time window.}  %
+infinite $\wndwLength$, we provide evidence on the opposite endpoint on the
+spectrum.  %
+Naturally, neither the BlockSci parser nor our approach are restricted to
+these choices and can be extended both to other time windows and other
+UTXO-based cryptocurrencies.  %
+% Calculating a daily velocity, for example, it might be interesting to base %
+% the measure on money that circulated within the last week, month or year. %
+% Analyzing the impact of the time window selection on velocity and its %
+% relationship to returns or volatility might be highly interesting but %
+% is left for future research. %
+% In this section, we will display central characteristics of %
+% approximation and estimator data and compare them from different perspectives. %
+
+%%% Then properties of the calculated numbers:
+\reftbl{descriptives_est_and_app} shows descriptive statistics for the
+proxies and the measures.  %
+$\Bdd$ denotes \ac{cdd} in million coin days, while $\Turn$ denotes
+\emph{active turnover} in expected on-chain coin transfers.  %
+For both proxy variables, means exceed medians, suggesting outliers in the
+skewed distribution.  %
+% 
+According to $\VNaiveEst$, a monetary unit of the total coin supply is turned
+over $0.11$ times on average, while the more sophisticated measure
+$\VTotalEst$ results in turnover of $0.09$.  %
+The difference stems from the deflated transaction volume used by
+$\VTotalEst$ being strictly lower then the inflated one (see
+\refsec{particularities_txvol}).  %
+According to the measure $\VCircWbEst$, which is based on the \ac{wba}, coins
+in effective circulation during the day reach turnover of around $5.83$.  %
+Assuming the clustering heuristics work well, coin transfers correspond to
+peer-to-peer hops.  %
+Accordingly, $\VCircWbEst$ estimates that monetary units in circulation
+change owners $5.83$ times per day, while $\VCircMfEst$ and $\VCircMlEst$ give
+an estimate of around $6.09$ peer-to-peer hops.  %
+The reason for the higher turnover estimate is the more conservative
+operationalization of the concept of \textit{being in circulation} (see
+\refsec{cc_money_seg:sub:mcirc_pract}).  %
+
+The different levels can be disentangled by looking at the components of the
+velocity measures.  %
+\reffig{subfigComponentsPlot} exemplarily shows this for the components of
+$\VTotalEst$ and $\VCircWbEst$.  %
+While $\MTotal$ increases steadily over time, the subset of coins transacted
+at least once per day, with an average \SI{1.5}{\percent} of the total
+supply, is minuscule but volatile in comparison.%
+\footnote{Compare appendix \ref{tbl:appendix_desc_other},
+  \ref{tbl:appendix_desc_other_norm}, \ref{tbl:appendix_desc_other_stand} and
+  \ref{tbl:corrtable_all} for additional descriptive statistics on the
+  dataset.}  %
+The deflated on-chain transaction volume varies widely---clearly always below
+total supply, yet above the supply in circulation.  %
+While the volatility in the transaction volume feeds fully into $\VTotalEst$,
+for $\VCircWbEst$ the relation is less obvious.  %
+In \reffig{subfigComponentsCorr}, the components' co-variation with bitcoin
+price indicates that not only deflated on-chain transaction volume
+$\mathtt{Vol}$, but also the monetary aggregates are positively correlated
+with price changes.  %
+% While this provides only anecdotal evidence, it is consistent with the
+% hypothesis that transaction volumes as well as the liquid component of the
+% money supply rise with price, and in consequence lower the correlation of the
+% velocity measure $\VCircWbEst$ with price.  %
+% This hypothesis is related to the broader question how far speculation might
+% act as ``regulator of the quantity of money'' \citep{fisher1911equation}.  %
+Somewhat surprising the velocity measures show a slightly negative correlation
+with prices however. %
+% 
+\renewcommand{\captionGlo}{Components of velocity measures
+  $\protect\VTotalEst$ and $\protect\VCircWbEst$ with
+  $\perd = \wndwLength = 1 \ttext{ day} $.}%
+
+Comparing maxima and minima across time series, as
+\reftbl{descriptives_est_and_app} shows, requires scaling.  %
+We use two methods: normalization and standardization.  %
+Normalization is based on the usual %
+$X^{norm} = (X-X_{min})/(X_{max}-X_{min})\in[0, 1]$.  %
+Standardization is based on Z-scores
+$X^{stand} = \frac{X-\mu(X)}{\sigma(X)},$ with mean $\mu(\cdot)$ and standard
+deviation $\sigma(\cdot)$.  Both are sensitive to outliers
+\citep[cf.][]{angelov2019empirical}, so we truncate at $10$ standard
+deviations around the mean.%
+\footnote{This procedure truncated a maximum of 3 values across time
+  series.}  %
+%
+\reffig{globfigApp} shows the time series of proxy variables for velocity.  %
+The scaling leads to a visible difference, relevant when comparing proxies to
+measurement results.  %
+A first indication of the quality of the proxy variables is their
+diversity.  %
+Not only spikes but also general trends vary across methods.  %
+%
+\reffig{globfigEst} depicts the different velocity measures.  %
+Differences across measures are smaller, highs and lows correspond more. %
+% The figure further shows the similarity between \ac{wba} and \ac{mca}. %
+The next section provides quantitative evidence.
+
+\renewcommand{\captionGlo}   {Time series plots for volatility measures with $\perd = \wndwLength = 1 \ttext{ day} $.}%
+\renewcommand{\labelGlo}     {\label{fig:globfigEst}}%
+\renewcommand{\captionLocL}  {Normalized variables of volatility measurement.}%
+\renewcommand{\captionLocR}  {Standardized variables of volatility approximation.}%
+\renewcommand{\labelLocL}    {\label{fig:subfigEstNorm}}%
+\renewcommand{\labelLocR}    {\label{fig:subfigEstStand}}%
+\figureTwoColumn{ts_figs/desc_all_est_norm}{ts_figs/desc_all_est_stand}%
+
+\subsection{Assessing the goodness of fit of the proxies}
+\label{sec:results:sub:goodness}%
+We now turn to evaluate the proxy variables for velocity based on our
+estimated measures.  %
+In so doing, we include the trivial velocity measure $\VNaiveEst$ in the set
+of proxies, as it is calculated on very high-level inputs (raw on-chain
+transaction volume and total coin supply) that are similarly easy to obtain
+as \ac{cdd} or \emph{turnover}.%
+% \footnote{Note that \ac{cdd} for Bitcoin are available at 
+%   many free blockchain explorers. \emph{Turnover} can, in combination with the 
+%   daily inflated transaction volume, be inferred from the latter.} 
+
+In order to evaluate the quality of proxy variables perfectly, the ``true''
+velocity ought to be known.  At the same time, we have proposed three novel
+measures, in addition to those suggested by \cite{athey2016bitcoin} and
+\cite{kalodner2017blocksci}.  We do not view this a contradiction: after all,
+the measures capture different concepts of velocity.  Ours, for example,
+address the velocity of money in circulation.  Therefore, we do not horserace
+all proxies against one benchmark, but rather evaluate the goodness of fit of
+the proxy variables with any of the measures.  We do, however, take the
+position that the measures are more precise estimators of ``true velocity''
+(its respective concepts) than the proxies, and thus evaluate the latter
+in terms of their fit to the former.
+
+Perhaps surprisingly, the results do not vary qualitatively much across
+different measurement approaches. %, so our results do not depend on a certain
+%velocity measure.  %
+
+\subsubsection{Approximation errors}
+\label{sec:results:sub:comp:subsub:errors}%
+A common approach assesses approximation errors by comparing \aclp{mse} or
+\aclp{mae}.  %
+\ac{mse}, by squaring them, punishes large deviations more rigorously than
+the linear \ac{mae}.  We provide both, not only to the standardized and
+normalized time series, but also on their first differences.  %
+This is motivated, as in econometric studies like those in \refsec{lit}, by
+doubts about the stationarity of the time series.  %
+
+\reftbl{errortable} shows that the above transformations differ in their
+assessment of the goodness of fit of approximation methods.  %
+When judging by the normalized but undifferenced dataset, \emph{turnover}
+$\Turn$ (as alternatively defined by \cite{smith2017bitcoin}) achieves the
+lowest error in approximating velocity measures based on effectively
+circulating money supply.  %
+However, for all other constellations we find that the trivial measure
+$\VNaiveEst$ provides the closest fit to all ways to measure velocity.  %
+
+
+\subsubsection{Model confidence set test}
+\label{sec:results:sub:comp:subsub:mcs}%
+To understand if the approximation methods indeed differ significantly, we
+perform \acf{mcs} tests.  %
+\cite{hansen2011model} introduced \Ac{mcs} tests to measure the performance
+of forecasting methods, but they are applicable more generally.  %
+The method uses equivalence tests and an elimination procedure to determine
+which set of models significantly outperforms the rest of the models.  %
+For an intuitive understanding of the test one might think of a set $M$ of
+models (here the different approximation methods).  %
+The models are indexed using $i \text{ and } j \in 1,..,m $.  %
+When comparing model $i$ to a benchmark, for each period $\perd$ model $i$
+leads to loss functions
+$ L_{i \perd} = L(V^{\est}_\perd, V^{\app}_{i \perd})$, where
+$V^{\est}_\perd$ denotes the benchmark velocity measure and
+$V^{\app}_{i \perd}$ the approximation method $i$.
+
+To compare the performance of the models in $M$, relative performance metrics
+$d_{ij \perd}$ are defined as %
+\begin{align*}
+  d_{ij \perd} = L_{i \perd} - L_{j \perd}%
+\end{align*}
+for all $ i,j \in M $ where $i \neq j $.  %
+We use absolute and squared errors for the loss function $L$, so that it takes the forms %
+\begin{align*}
+  d_{ij \perd} = \bigl| V^{\est}_\perd
+  - V^{\app}_{i \perd} \bigr|
+  - \bigl| V^{\est}_\perd
+  - V^{\app}_{j \perd} \bigr|%
+\end{align*}
+or
+\begin{align*}
+  d_{ij \perd} = \bigl( V^{\est}_\perd
+  - V^{\app}_{i \perd} \bigr)^{2}
+  - \bigl( V^{\est}_\perd
+  - V^{\app}_{j \perd} \bigr)^{2}%
+\end{align*}
+respectively. %
+
+The relative performance of model $i$ compared to all other models then is
+\begin{align*}
+  d_{i \boldsymbol{\cdot}} = \frac{1}{m-1} \sum_{j \in M \setminus i} d_{ij},%.
+\end{align*}
+with $i = 1,...,m$. %
+The null hypothesis states %
+\begin{align*}
+  H_{0M}: E(d_{i \boldsymbol{\cdot}}) = 0,\ \forall i \in M. %
+\end{align*}
+If it can be rejected for set $M$, there exist models in the set that are
+significantly outperforming the remaining ones.  %
+The above equivalence test is then re-iterated after elimination of the
+worst-performing model(s) until the null hypothesis cannot be rejected.  %
+For details, see \cite{hansen2011model}.
+
+%\FloatBarrier
+\renewcommand{\captionGlo} {%
+  Mean absolute error for normalized data of approximation methods compared %
+  to measurement methods with $\perd = \wndwLength = 1 \ttext{ day} $. %
+  Proxy-variables in \SI{1}{\percent} \acl{mcs} marked by $\dag$.%
+}%
+\renewcommand{\labelGlo}{\label{tbl:errortable}}%
+\tableTwoColumnF{appVSest_errors_w_mcs}
+%
+\addtolength{\tabcolsep}{-2pt} \renewcommand{\captionGlo} {\acl{mcs}
+  regressions for standardized and normalized approximation and measurement
+  data with $\perd = \wndwLength = 1 \ttext{ day}$.}%
+\renewcommand{\labelGlo} {\label{tbl:mzregression}}%
+\tableTwoColumnF{appVSest_mz_table} \addtolength{\tabcolsep}{+2pt}
+%\FloatBarrier
+
+
+\reftbl{errortable} displays the \ac{mcs} tests' results, denoting
+significance at the \SI{1}{\percent} level with $\dag$.  %
+Results for the differenced dataset are clear: the \ac{mcs} tests select even
+at the tight \SI{1}{\percent} significance levels a single winning
+approximation method for each constellation.  %
+This evidence confirms \refsec{results:sub:comp:subsub:errors} at high
+significance levels.  %
+$\VNaiveEst$ is the single best element of the \SI{1}{\percent}-\ac{mcs} for
+all constellations.  %
+For the normalized undifferenced dataset the \emph{turnover} $\Turn$ is
+the single best proxy for velocity based on circulating money for all but one
+of the constellations. %
+If velocity is measured as $\VTotalEst$, however, the trivial measure
+$\VNaiveEst$ again performs significantly better than all other proxies.  %
+In summary, \ac{mcs} tests mostly support the trivial measure
+$\VNaiveEst$.  %
+Only in cases with time trends and less focus on outliers than on smaller
+changes, \emph{turnover} might be the better choice.  %
+Again, $\Bdd$, the most common proxy, is significantly outperformed in all
+constellations.  %
+
+
+\subsubsection{Mincer-Zarnowitz regressions}\label{sec:results:sub:comp:subsub:mzr}%
+The \ac{mz} approach regresses estimates on the benchmark in simple
+ordinary-least-squares regressions \citep{mincer1969evaluation}.  %
+In order to avoid spurious regression results, we only use the first
+differences of the standardized and normalized series.  %
+The regression structure for proxy $i$ can be expressed as:
+\begin{align*}
+  \Delta V^{\est}_{i \perd} = \alpha_{i} + \beta_{i} \Delta V^{\app}_{i
+  \perd} + u_{i \perd}.
+\end{align*}
+
+An ideal proxy would yield an intercept of 0 and a $\beta$ equal to 1 with an
+adjusted $R^{2}$ of $1$.  %
+The results of the \ac{mz} regressions in \reftbl{mzregression} confirm the
+simple ratio of inflated on-chain transaction volume to total coin supply
+$\VNaiveEst$ as superior.  %
+This simple ratio yields an adjusted $R^{2}$ between $0.34$ and $0.53$; other
+proxies' $R^{2}$ is much lower for all measurement methods of velocity.  %
+While for none of the approximations a significant intercept indicates bias,
+the slope coefficients $\beta$ for most constellations are significant and
+positive.  %
+Furthermore, with respect to the $\beta$ coefficients, $\VNaiveEst$ performs
+best.  %
+The latter shows coefficients between $0.99$ and $1.07$ for normalized and
+between $0.78$ and $0.80$ for standardized data.  %
+
+The \ac{mz} regressions are in line with the evidence in prior sections.  %
+Again, the trivial measure approximates the more sophisticated velocity
+measures better than the two commonly used proxy variables.  %
+
+
+
+%\subsection{The robustness of V-mcirc to hype-cycles}\label{sec:results:sub:comp_hype}%
+%\subsection{The "moneyness" of Bitcoin derivatives}\label{sec:results:sub:comp_moneyness}
+%\section{Outlook: Off-chain measures}\label{sec:results:sub:offchain}%
+% Already in 2013, a considerable amount of transactions was taken off-chain %
+% to exchanges~\cite{glaser2014bitcoin}. While there are no later studies on %
+% the relation of on- to off-chain volume we suspect that the fraction of %
+% off-chain transaction increased with the boom cycle in 2017 and large %
+% scale mainstream media coverage.
+% 
+% We thus feel the need to calculate the velocity of money for BTC hold %
+% on exchanges. % 
+% Using again the transposed Fisher Equation to calculate velocity %
+% off-chain BTC possessions, define $M_{off-chain}$ as BTC hold by blockchain %
+% addresses belonging likely to exchanges or wallet providers. We then extract %
+% $(PT)_{off-chain}$ as the trading volume in BTC on the respective exchanges %
+% over the given time period. %
+%
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:
+%

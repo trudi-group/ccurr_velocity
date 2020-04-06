@@ -1,0 +1,61 @@
+\ProvidesPackage{beamercolorthemehhucn}  % this style is based on a poster style by Florian Tschorsch
+
+\RequirePackage{color}
+\selectcolormodel{cmyk}
+\mode<presentation>
+
+% Corporate design colors
+\definecolor{hublau}{cmyk}{1.0, 0.6, 0.0, 0.2}                 % 100%
+\definecolor{huhellblau}{cmyk}{0.24, 0.15, 0.0, 0.15}          %  30%
+\definecolor{husehrhellblau}{cmyk}{0.08 ,0.06, 0, 0.07}        %  10%
+
+\definecolor{hurot}{cmyk}{0, 0.9, 0.8, 0.4}                    % 100%
+\definecolor{huhellrot}{cmyk}{0, 0.21, 0.27, 0.13}             %  30%
+\definecolor{husehrhellrot}{cmyk}{0 , 0.08, 0.11, 0.05}        %  10%
+
+\definecolor{hugruen}{cmyk}{0.9, 0.1, 0.8, 0.4}                % 100%
+\definecolor{huhellgruen}{cmyk}{0.14, 0, 0.07, 0.24}           %  30%
+\definecolor{husehrhellgruen}{cmyk}{0.04, 0, 0.02, 0.1}        %  10%
+
+\definecolor{sand}{cmyk}{0.00, 0.09, 0.51, 0.1}        % 100%
+
+\definecolor{husand}{cmyk}{0.00, 0.05, 0.5, 0.2}
+
+\definecolor{hugraugruen}{cmyk}{0, 0, 0.1, 0.2}
+\colorlet{huhellgraugruen}{hugraugruen!50}
+
+% Top and bottom elements
+\setbeamercolor{headline}{fg=black,bg=white}
+\setbeamercolor{footline}{fg=white, bg=hublau}
+\setbeamercolor{abstract}{fg=black, bg=huhellgraugruen}
+
+\setbeamercolor{local structure}{bg=white, fg=black}
+\setbeamercolor{structure}{bg=white, fg=black}
+\setbeamercolor{item}{bg=white, fg=hublau}
+
+\setbeamercolor{normal text}{fg=black,bg=white}
+
+\setbeamercolor*{sidebar}{use=structure,bg=structure.fg}
+
+\setbeamercolor*{palette sidebar primary}{use=structure,fg=structure.fg!10}
+\setbeamercolor*{palette sidebar secondary}{fg=white}
+\setbeamercolor*{palette sidebar tertiary}{use=structure,fg=structure.fg!50}
+\setbeamercolor*{palette sidebar quaternary}{fg=white}
+
+\setbeamercolor*{titlelike}{parent=palette primary}
+
+\setbeamercolor*{separation line}{}
+\setbeamercolor*{fine separation line}{}
+
+% Block style definitions
+\setbeamercolor{block title}{fg=black,bg=huhellblau}
+\setbeamercolor{block title alerted}{use=alerted text,fg=alerted text.fg,bg=huhellrot}
+\setbeamercolor{block title example}{use=example text,fg=example text.fg,bg=huhellgruen}
+
+\setbeamercolor{block body}{parent=normal text,use=block title,bg=husehrhellblau}
+\setbeamercolor{block body important}{parent=normal text,use=block title,bg=sand}
+\setbeamercolor{block body alerted}{parent=normal text,use=block title alerted,bg=husehrhellrot}
+\setbeamercolor{block body example}{parent=normal text,use=block title example,bg=husehrhellgruen}
+
+\mode
+<all>

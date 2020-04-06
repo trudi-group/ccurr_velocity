@@ -1,0 +1,118 @@
+%Preamble Mainfile
+
+%usenix style-------------------------------------------------------------------
+\documentclass[letterpaper,twocolumn,10pt]{article}
+\usepackage{usenix2019_v3}
+%-------------------------------------------------------------------------------
+
+%IEEE tyle----------------------------------------------------------------------
+%\documentclass[10pt, conference, letterpaper]{IEEEtran}
+% Enable Hyperrefs without ugly boxes
+%\usepackage
+%[pdfusetitle]
+%{hyperref}
+%\hypersetup{
+%	hidelinks,%
+%	colorlinks=true,%
+%	allcolors=black,%
+%	pdfstartview=Fit,%
+%	breaklinks=true%
+%}%
+%-------------------------------------------------------------------------------
+
+
+\usepackage[utf8]{inputenc}
+% For R table rotating colnames
+\usepackage{rotating}
+\usepackage[T1]{fontenc}
+\usepackage{tabularx}
+\usepackage{lscape}
+\usepackage{longtable}
+\usepackage{rotating}
+\usepackage{makecell}
+% Check references for unused items
+%\usepackage{refcheck}
+% Used for nice quotes
+\usepackage{csquotes}%
+% For bigger sum signs
+\usepackage{relsize}
+% Used to display urls nicely %
+\usepackage{url}%
+% Necessary to provide the correct spacing for e.g. and i.e. %
+\usepackage{xspace}%
+% Useful for todos, used with \todo{<Text>} to make orange 
+% boxes at the margins of the document. Use \todo[inline]{<Text>} for in-text-boxes
+\usepackage{todonotes}%
+% For the align-environment %
+\usepackage{amsmath}%
+% For the maths symbols %
+\usepackage{amssymb}%
+% For the maths text %
+\usepackage{amstext}%
+% package for multicolumn
+\usepackage{multirow}
+% Euro symbol %
+\usepackage{eurosym}%
+% Units such as percent, meters, seconds, ... %
+\usepackage{siunitx}%
+% For the x mark
+\usepackage{pifont}%
+% For fancy graphics
+\usepackage{tikz}%
+\usepackage{pgfplots}%
+\pgfplotsset{compat=1.15}
+% For the graph
+\usetikzlibrary{shapes}%
+% For stuff like right=of etc.
+\usetikzlibrary{positioning}%
+% For not-so-fancy graphics
+\usepackage{graphicx}%
+% For better quoting
+\usepackage{csquotes}%
+% For subfigures
+% \usepackage{algorithm}%
+% % For algorithm form
+% \usepackage{algorithmic}%
+% % for more pseudo code formulas
+\usepackage[linesnumbered,ruled,lined]{algorithm2e}
+% for more pseudo code goodness
+%subfig and subfigures are deprecated!!!!!
+%\usepackage[lofdepth,lotdepth]{subfig}%
+% Correct Package: Used for side-by-side figures and tikz pictures
+\usepackage[skip=6pt]{subcaption}
+%
+% TEMP for readable quotes
+\usepackage[]{natbib}
+% \newcommand{\ttext}[1]{\text{{\ttfamily\bfseries\slshape #1}}}
+\newcommand{\ttext}[1]{\text{{#1}}}
+%%% Coloring the comment as blue
+\newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommfont}
+
+\SetKwInput{KwInput}{Input}                % Set the Input
+\SetKwInput{KwOutput}{Output}              % set the Output
+% 
+% For "Consolas" font of ttfamily fonts
+%\usepackage{inconsolata} 
+% 
+% Enable correct jumping to Figures when referencing
+\usepackage[all]{hypcap}%
+% 
+% Use package for more maths tools
+\usepackage{mathtools}%
+% 
+% Make stargazer work
+\usepackage{dcolumn}%
+% 
+\usepackage{array}%
+%\newcolumntype{L}[1]{>{\raggedright\arraybackslash}m{#1}}%
+%
+%Used for acronyms
+\usepackage{expl3}
+\ExplSyntaxOn
+\tex_let:D \c_minus_one \scan_stop:
+\int_const:Nn \c_minus_one {-1}
+\ExplSyntaxOff
+\usepackage{acro}
+%Used for fresher tables
+\usepackage{booktabs}

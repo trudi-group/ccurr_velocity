@@ -1,0 +1,19 @@
+https://www.usenix.org/conferences/author-resources/paper-templates
+
+Templates for Conference Papers
+2019 Conferences
+
+Beginning with FAST '19, USENIX paper formatting specs have changed. Please use the updated files below:
+
+LaTeX template for USENIX papers
+LaTeX style file for USENIX papers
+MS Word sample file for USENIX papers
+Sample PDF for USENIX papers
+
+If you choose not to use one of these templates, please format your paper as follows:
+
+    U.S. letter-sized pages
+    Two-column format
+    Text block 7" wide by 9" deep.
+    10-point Times Roman or similar type on 12-point leading (single-spaced)
+

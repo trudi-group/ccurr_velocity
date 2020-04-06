@@ -1,0 +1,289 @@
+%Segregation of money
+
+\section{Novel measures of velocity of money in effective circulation}
+\label{sec:cc_money_seg}%
+
+Based on the concept of velocity of money in effective circulation as
+clarified last section, we now propose algorithms to calculate velocity for
+UTXO-based cryptocurrencies. %
+
+\subsection{Determining money in circulation}
+\label{sec:cc_money_seg:sub:mcirc_concept}% 
+
+Conceptually, a monetary unit has circulated in a period if and only if it
+has been used as a medium of exchange.  Therefore, first a time window must
+be specified with respect to which monetary units are to be classified as
+\emph{circulating} or not.  %
+Money is referred to as circulating if it has been moved economically within
+the last day, month, year or generally any time period $\wndw$ covering
+$[\wndw_\Start , \wndw_\End]$. %
+
+To identify the fraction of the money supply which circulated within $\wndw$,
+we step trough every transaction recorded in period $\wndw$.  %
+Transactions spending outputs generated before $\wndw$ as well as outputs
+from coinbase transactions (seignorage) have the interpretation of bringing
+an amount into circulation that corresponds to the value of spent outputs.  %
+%%% NOTE: Why would fees be excluded here?? -> DISCUSS %%%hwe
+All inputs referring to UTXOs generated \emph{within} period $\wndw$, on the
+other hand, re-spend money which has already been counted as circulating.%
+\footnote{To develop an intuition, remember the example of sheep Eve being
+  sold and re-bought by Bob in $2020$.  %
+  This time Bitcoin was used and Alice held unspent outputs of $2$ bitcoin
+  from transactions $5$ years ago.  %
+  The transaction formed by Alice to buy sheep Eve, $Tx_1$, spends her
+  five-year-old output and generates a new one in 2020 which is controlled by
+  Bob.  %
+  When Bob buys Eve back, he pays with the output of $1$ bitcoin from $Tx_1$
+  in a second transaction ($Tx_2$).  %
+  For $\wndw = \perd = 2020$, the value of $Tx_1$ (1 bitcoin) originated
+  prior to 2020 and is thus money brought into circulation.  %
+  $Tx_2$, however, spent an output generated in 2020---an already counted
+  monetary unit.  %
+%In the example, thus $\MCirc_{2019}=1 \ttext{ Bitcoin}$. 
+} %
+% This can be illustrated with \reffig{mcirc_concept} where values are %
+% symbolized with coins. %
+% Here, we would need to determine, how many monetary units have made the %
+% transaction volume $8$ (sum of outputs in C, D, E and F excluding
+% self-churn) during period $\wndw$ possible. %
+% In this example, we would need to focus on transactions A, B and D in
+% contrast to transactions C and E which reused monetary unspent transaction
+% outputs that have been generated within period $\wndw$. %
+
+Note that we define the time window $\wndw$ within which spent coins are
+considered as \emph{circulating} distinct from the period $\perd$ for which
+the velocity measure is calculated, $ [\perd_\Start, \perd_{\End}]$.  This
+distinction can be parametrized via a maximum length $\wndwLength$ of the
+look-back window $\wndw$, where $\wndw_\Start = \perd_\Start - \wndwLength$
+and $\wndw_\End = \perd_\End$.  %
+
+The approach as characterized so far, however, does not account for two
+technical properties of UTXO-based cryptocurrencies: %
+First, transactions always spend prior transaction outputs in full.  %
+Second, there exists no attribution of individual outputs to the inputs of a
+transaction; thus it remains undefined which input corresponds to which
+output(s).  %
+
+The first property raises the question how to deal with transactions which
+send back change: %
+Should the sum of all inputs be considered \textit{in circulation,} as
+technically all was transferred---or should only the fraction sent to third
+parties be considered?  %
+We analyze both choices, naming the first \ac{wba} and the second
+\ac{mca}.  %
+They are visualized in \reffig{mcirc_concept}.  %
+The moved-coin approach considers only output $\mathsf{Out_1}$ of transaction
+$\mathsf{Tx_C}$ as circulating, not the change output.  %
+This approach captures the net economic value transferred to a third
+party.  %
+The \ac{wba} classifies the whole input of transaction $\mathsf{Tx_C}$ as
+circulating.  %
+This approach captures the amount of money that has been moved technically;
+it can also be interpreted as revealed to be available for transactions.  %
+
+In the \ac{mca}, the sum of inputs is counted as circulating only net of
+change outputs.  %
+However, due to the second property of UTXO blockchains ambiguous
+constellations can occur: If for a given transaction one input was generated
+within and one before $\wndw$, it remains unspecified which one corresponds
+to the change output.  %
+
+Transaction $\mathsf{Tx_F}$ in \reffig{mcirc_concept} illustrates the
+point.  %
+It has two inputs: $\mathsf{Inp_1}$ originated before period $\wndw$ and
+$\mathsf{Inp_2}$ originated within $\wndw$.  %
+If only amounts sent to third parties matter, it remains unclear which of the
+two inputs funded the change output.  %
+For $\mathsf{Inp_1}$, the transaction would not increase money in
+circulation.  %
+In contrast, if $\mathsf{Inp_2}$ funded the change output, the transaction
+would increase the amount in circulation by $\mathsf{Inp_1}$. %
+
+To resolve the ambiguity, an assignment rule between transaction inputs and
+outputs is required.  %
+% Utilizing the terminology of cost accounting,
+We consider both endpoints on the spectrum of the age of the input assigned
+to the change transaction and thus differentiate between \ac{lifo}, where
+oldest inputs get assigned to outputs first, and \ac{fifo}, where it is the
+other way around.  %
+
+Naturally, with the \ac{wba} this differentiation is void.  %
+Hence, we have three definitions of money in circulation, each a function of
+the activity window length $\wndwLength$: %
+Money in circulation for period $\wndw$ adopting the \ac{wba}
+($ \MCircWbPWl $), and both the \ac{mca} with the \ac{lifo} rule
+($ \MCircMlPWl $) and the \ac{fifo} rule ($ \MCircMfPWl $).
+
+\subsection{Definition of velocity measures}
+\label{sec:cc_money_seg:sub:}%
+
+Based on the above definitions of money in circulation, three variations of
+velocity can be calculated in accordance with \refequ{vcirc_concept}---one
+per money aggregate.  %
+%
+All measures capture the average number of peer-to-peer coin turnovers of
+effectively circulating monetary units in period $\perd$.  They concur in
+capturing on-chain liquidity; they differ \wrt to definitions of
+\textit{circulating monetary units} and assignment rules linking transaction
+inputs to outputs.  %
+% 
+The first measure is based on $\MCircWbP$ and simply calculated as %
+\begin{align}%
+  \label{equ:VCircWbEstPWl}
+  \VCircWbEstPWl = \frac{\langle\Pp,\Tp\rangle}{\MCircWbEstPWl}.%
+\end{align}%
+$\VCircWbP$ is recommended if a conservative measurement of coin turnover is
+sought or additional assumptions about how to link inputs to outputs should
+be avoided.
+% 
+The second and third measures are based on $\MCircMfPWl$ and $\MCircMlPWl$,
+respectively:  %
+\begin{align}%
+  \label{equ:VCircMfEstPWl}
+  \VCircMfEstPWl = \frac{\langle\Pp,\Tp\rangle}{\MCircMfEstPWl}, \\
+  \VCircMlEstPWl = \frac{\langle\Pp,\Tp\rangle}{\MCircMlEstPWl}.%
+  \label{equ:VCircMlEstPWl}
+\end{align}%
+%
+$\VCircMfEstP$ and $\VCircMlEstP$ are more stringent on the definition of
+money in circulation.  %
+Their monetary aggregates do not count ``touched'' funds, but only amounts
+transferred to somebody other than the sender.
+% Another advantage of the two measures is lower boundedness at 1 if \(\perd\) is set equal to \(\wndw\) which allows for
+% an intutive understanding of the circulation of coins.%
+% \footnote{Every transaction, by construction, can draw at most its own
+%   transaction value into circulation. %
+%   Transaction volume in both, numerator and denominator, is calculated free of change money.} % 
+However, this comes at the cost of the additional assumption with respect to the assignment rule between transaction inputs and outputs.  %
+
+\subsection{Algorithmic implementation}
+\label{sec:cc_money_seg:sub:mcirc_pract}%
+Having defined three velocity measures, we now detail our technical approach
+and the implementation.
+
+Money in circulation under the \ac{wba} is measured as in
+\refalgo{code_mcirc_wb}.  %
+For every period $\wndw$, we loop over all transactions $t\in\TxW$ and add
+their inputs to circulating money if they either reference outputs from
+coinbase transactions, denoted by $\genByCoinbase(i)$, or outputs with
+timestamps $\dateGen(i)$ before the first timestamp $\wndw_\Start$ of period
+$\wndw$.  %
+%
+%  \footnote{In \reffig{mcirc_concept}, the algorithm would go trough %
+%  transaction C (adding output $\mathsf{1}$ of transaction B, referenced by input $\mathsf{1}$ %
+%  of transaction C), would then go to transaction D (finding no input at all), %
+%  then to transaction E (skipping output $\mathsf{1}$ of transaction E but adding output $\mathsf{1}$ %
+%  of transaction D as referenced by input $\mathsf{2}$ of transaction E) and so forth. %
+% } %
+%
+%\input{Alg/alg01}
+
+Measuring money in circulation under the \ac{mca} is depicted in
+\refalgo{code_mcirc_mc}.  %
+%
+As in \refalgo{code_mcirc_wb}, for time window $\wndw$ we loop over all
+transactions $t\in\TxP$ and add inputs based on the same core condition
+(compare lines~\ref{algo:code_mcirc_mc}-\ref{algo:code_mcirc_mcCond} and
+\ref{algo:code_mcirc_wb}-\ref{algo:code_mcirc_wbCond}).  %
+This time, however, only those inputs are regarded for further counting,
+which add up to the amount sent to third parties. Therefore, the calculated
+amount of money in circulation per transaction can be less or equal to the
+amount sent to third parties, but never more.
+The order of inputs to consider is determined by the \ac{lifo} or \ac{fifo}
+principle.  %
+For every transaction $t$ in time window $\wndw$, the amount sent to third
+parties is determined net of self-churn as
+$\valO^\sendToOthers(t) = \sum_{o\in{}\Out'_{t}} \valO(o)$ %
+where $\Out'_{t}$ denotes non-self-churn outputs of transaction $t$.  %
+If all outputs are identified as self-churn, $\valO^\sendToOthers(t) = 0$ and
+the algorithm continues with the next transaction.  %
+%
+If $\valO^\sendToOthers(t) > 0$, the algorithm collects input values in a
+vector $\InpSortedT$; they are sorted in either ascending (\ac{lifo}) or
+descending (\ac{fifo}) order \wrt to the timestamp when the UTXOs were
+generated.  %
+Then, looping over inputs $i$, input values $\valI(i)$ are added to
+$\MCircMPWl(t)$ if they meet the core condition (compare line 17) introduced
+in line 6 of \refalgo{code_mcirc_wb}.  %
+\footnote{Summands $\MCircMPWl(t)$ can be interpreted as money drawn into
+  effective circulation by transaction $t$.} %
+However, one additional condition applies: If the last added input would
+increase the summand $\MCircMPWl(t)$ beyond the value of outputs sent to
+third parties $\valO^\sendToOthers(t)$, we only add up to the latter
+amount.  %
+% This effectively adds only the necessary fraction of the inputs of
+% transaction $t$, generated before window $w$ or from coinbase transactions,
+% that were required to match $\valO^\sendToOthers(t)$.  %
+
+  % The components $\MCircMPWl(t)$ are consecutively summing all transaction
+  % values to calculate money in circulation $\MCircMPWl$ for the given period
+  % $p$ with respect to time window $\wndw$ as well as the applied sorting type.
+
+% \par While our algorithms theoretically might be applied to any window length $\wndwLength$, in practice they lack performance for large windows. %
+% Additional methods of optimization might be needed, to apply the method windows larger then 30 days. %
+
+
+\subsection{Manipulation potential}
+\label{sec:cc_money_seg:manipul}% 
+
+One important concern with any measure of economic activity asks, how
+amenable is it to manipulation?  In the case of velocity, the question is
+specifically if the measure can be inflated by a single agent (or a small
+group) of limited means.  After all, one proxy variable for velocity has been
+designed as a manipulation-proof alternative to turnover (see
+\refsec{results:sub:approx_crypto:subsub:bdd}).  How easy would it be to
+create fake velocity in order to inflate our measures?
+
+Indeed, no direct technical impossibility prevents generating transactions
+affecting Equations~(\ref{equ:VCircWbEstPWl})--(\ref{equ:VCircMlEstPWl}).
+Nonetheless, there exist reasonably tight limits to the manipulation
+potential of our measures, in particular compared to trading volumes on
+exchanges.
+
+First and foremost, calculating our measure on on-chain transactions puts an upper
+limit to fake transfers.  First, a fake transaction needs to be committed to
+the blockchain, and thus can be repeated only once per block time.  As long
+as the manipulator is not the miner confirming the next block (a random and
+unlikely outcome even for large pools), the on-chain settlement is also
+costly, incurring fees.
+
+Second, the manipulator must fully fund her fake transactions: she cannot
+send more than she owns once per block.  The question then turns to how she
+should structure the fake transfers.  Send the entire amount in a single
+transaction, or split it up into as many as can fit into a block?  In the
+latter case, the fees rise.  In the former, should she minimize or maximize
+the number of outputs?  If she maximizes, the fees rise again, and she
+quickly fragments her wealth across a diverging multitude of wallets,
+reducing the funds available in each for the next round (block) of
+manipulation.
+
+In this context it is critical that we follow the literature in clustering
+user addresses: As long as the clustering works, the manipulator cannot
+combine her funds ever again, lest she would be deconspired as a single agent
+and all her fake transactions disregarded.  It follows that her strategy
+minimizes the number of outputs, generating a chain of fresh addresses across
+which a large sum, tied up in the manipulation, traverses indefinitely to
+make-believe ``newcomers.''  This, however, matches peeling transactions,
+which we also exclude.  She would thus need to break frequently enough in
+order to escape this classification, slowing her manipulation further.
+
+% More importantly, this strategy appears highly specific to game a measure
+% which we only introduce in this paper.  Moreover, it is also straightforward
+% to detect and exclude in the future.
+
+% In sum, we are unaware of why anyone should want to pay to inflate our
+% measures (unlike exchange turnover), who has the cryptocurrency funds and
+% willingness and expertise to conduct such a technically elaborate
+% manipulation.
+
+In sum, manipulation attempts are both technically elaborate and relatively
+straightforward to detect and exclude in the future. %
+We thus do not consider manipulation a serious concern for our current
+results, nor for our measures.
+
+% 
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:
+%

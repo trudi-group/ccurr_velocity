@@ -1,0 +1,78 @@
+%conclusion
+\begin{frame}{Conclusion}	
+	\only<1-2>{
+	\begin{enumerate}\setlength{\itemsep}{1.25em}
+		\item \emphtext{Operationalization of a new velocity measure} accounting for money that ``does \textbf{not} do what money does''.
+		\item \emphtext{Benchmarking of approximation quality} for simple, established proxy-variables.
+		\begin{itemize}\setlength{\itemsep}{0.25em}
+			\item Indication that ``coin days destroyed'' should be reevaluated.
+			\item Simple ratio $\frac{\langle\Pp,\Tp\rangle }{\Mp}$ might be preferable.
+		\end{itemize}
+		\item \emphtext{Limitations \& Future research:}
+		\begin{itemize}\setlength{\itemsep}{0.25em}
+			\item Only on-chain data so far.
+			\item More sophisticated heuristics for identifying change money.
+			\item Augment the benchmarking study (different coins, different periodicities)
+			\item Search for an optimal window-size
+		\end{itemize}
+	\end{enumerate}
+	}
+\end{frame}
+
+\begin{frame}[noframenumbering]{Testing}
+	\begin{itemize}
+		\item $X_{t}^{\mathtt{norm}} = \frac{X_{t}-X^{\mathtt{min}}_{t}}{X^{\mathtt{max}}_{t}-X^{\mathtt{min}}_{t}} \in [0, 1]$%
+		\item $X_{t}^{\mathtt{stand}} = \frac{X_{t}-\mu(X_{t})}{\sigma(X_{t})}$
+	\end{itemize}
+	\bigskip{}
+	
+	Mean Absolute Errors / Mean squared Errors
+	\begin{itemize}
+	      \item $MAE = \sum_t MAE_{t} = \sum_t \bigl\vert\hat{X_t}-X_t\bigr\vert$
+	      \item $MSE = \sum_t MSE_{t} = \sum_t \bigl(\hat{X_{t}}-X_{t}\bigr)^2$
+	\end{itemize}
+	\bigskip{}
+	
+	Raw / First differences
+	\begin{itemize}
+		\item \(X_{t}^{\mathtt{raw}} = X_{t}\)
+		\item \(X_{t}^{\mathtt{diff}} = X_{t}-X_{t-1}\)    
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[noframenumbering]{Model Confidence Test---Significance of results}%
+	We compare models $i$ and $j$ for all $i,j \in M $ where $i \neq j$. \newline  %
+	\smallskip
+	Loss functions are MAE and MSE. \newline%
+	\smallskip
+	Thus (exemplified for MSE)
+	\begin{align*}
+		d_{ij \perd} = \bigl( V^{\est}_\perd - V^{\app}_{i \perd} \bigr)^{2} - \bigl( V^{\est}_\perd - V^{\app}_{j \perd} \bigr)^{2}.%
+	\end{align*}
+	% \begin{align*}
+	%   d_{ij \perd} = \bigl| V^{\est}_\perd
+	%   - V^{\app}_{i \perd} \bigr|
+	%   - \bigl| V^{\est}_\perd
+	%   - V^{\app}_{j \perd} \bigr|.%
+	% \end{align*}
+	The \emphtext{relative performance} of model $i$ compared to all other models then is
+	\begin{align*}
+		d_{i \boldsymbol{\cdot}} = \frac{1}{m-1} \sum_{j \in M \setminus i} d_{ij},%.
+	\end{align*}
+	with $i = 1,...,m$. %
+	The null hypothesis states %
+	\begin{align*}
+		H_{0M}: E(d_{i \boldsymbol{\cdot}}) = 0,\ \forall i \in M. %
+	\end{align*}  
+\end{frame}
+	
+%	 \begin{frame}{What are the approximators approximating? And how well?}
+%	
+%	   \begin{center}
+%	     \begin{table}
+%	       \caption{MAE and MSE between velocity approximation methods compared to estimation methods. Approximators in superiority set of MCS test (1\% sig. levels) are marked with \(\dag\).}
+%	       \inputTable{0.55}{appVSest_errors_w_mcs}
+%	     \end{table}
+%	     \vspace{-4mm}
+%	   \end{center}	
+%	 \end{frame}

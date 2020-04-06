@@ -1,0 +1,174 @@
+%\tikzsetef
+%coordinate test point. Use as follows: 	\coordinate (cen) 	 	 at (0,0) (cen) [point];
+\tikzset{
+	every point/.style = {radius={\pgflinewidth}, opacity=1, draw, solid, fill=white},
+	pt/.pic = {
+		\begin{pgfonlayer}{foreground}
+			\path[every point, #1] circle;
+		\end{pgfonlayer}
+	},
+	point/.style={insert path={pic{pt={#1}}}}, point/.default={},
+	point name/.style = {insert path={coordinate (#1)}}
+}
+
+% basic delacations
+  \pgfdeclarelayer{background}
+  \pgfdeclarelayer{foreground}
+  \pgfsetlayers{background,main,foreground}
+% main spacing of picture   
+  \def\picwidth 	{\linewidth} %*31/31}
+  \def\picheigth 	{\picwidth*10/16*29.00/31		}
+% Font Settings
+  \def\fontSize {\normalsize}
+  \def\fontSet {\fontSize\sffamily\color{iblack}}
+% Box Settings and Margins
+  \def\boxDistMargin    {\picwidth  * 0.02}%0.02
+  \def\boxDistH 		{\picwidth  * 0.37}%0.37
+  \def\boxDistIH 		{\picwidth  * 0.28}%0.28
+  \def\boxDistIV 		{\picheigth * 0.10}%0.20
+  \def\boxDistOH 		{\picwidth  * 0.32}%0.32
+  \def\boxDistOV 		{\picheigth * 0.5}%0.83
+  \def\boxDistOTV		{\picheigth*0.52738}%\boxDistOV-\boxDistIV-\boxDistMargin*3, 
+                                            %where \boxDistMargin is dependend on picwidth
+                                            %instead of picheight. Therefore, picheight needs to
+                                            %be computed:
+                                            %picheight     = picwidth*10/16*29/31
+                                            %=>
+                                            %picwidth      = picheight*16/10*31/29
+                                            %boxDistMargin = picwidth*0.02
+                                            %              = picheight*16/10*31/29*0.02
+                                            %boxDistOTV    = boxDistOV-boxDistIV-boxDistMargin*3
+                                            %              = 0.83 - 0.20 - boxDistMargin*3
+                                            %              = 0.63 - 16/10*31/29*0.02*3
+                                            %              = 0.52738
+  \def\boxDistOTH		{\boxDistIH}
+% tikzstyle definitions
+  \tikzstyle{nodetextinner} = [
+    draw=none,
+    inner sep=0pt,
+    %  text width=1.75cm
+  ]
+  \tikzstyle{nodetextouter} = [
+    draw=none,
+    inner sep=0pt,
+    outer sep=0pt,
+    align=left,
+    text width=\boxDistOTH, 
+    %text height=\boxDistOTV*1/2,
+    text depth=\boxDistOTV,
+    rectangle,
+    iblack
+  ]
+  \tikzstyle{nodeouter} = [
+    rectangle, 
+    rounded corners, 
+    inner sep=0pt,
+    outer sep=0pt,
+    minimum width=\boxDistOH, 
+    minimum height=\boxDistOV, 
+    text centered, 
+    draw=gray!80!black, 
+    fill=jwigreige!90!iblack
+  ]
+  \tikzstyle{nodeinner} = [
+    rectangle, 
+    rounded corners, 
+    inner sep=0pt,
+    outer sep=0pt,
+    minimum width=\boxDistIH, 
+    minimum height=\boxDistIV, 
+    text centered, 
+    draw=gray!80!black, 
+    fill=jwigreige!75!white
+  ]
+% Other definitions
+  \def\widthArrows{1.3pt}		
+  \addtolength{\leftmargini}{-8.5pt}
+% The Tikzpicture
+  \only<1->{
+    \makebox[\textwidth][c]{
+      \begin{tikzpicture}[>=stealth] 
+        %Coordinates
+          \coordinate (cen) 	at ($(0,0)	+ ( 0.0	       , 0.0               )$);%(cen) [point];
+          \coordinate (COB) 	at ($(cen)	+ ( 0.0        , 0.0               )$);%(COB) [point];
+          \coordinate (COA) 	at ($(COB)	- ( \boxDistH  , 0.0               )$);%(COA) [point];
+          \coordinate (COC) 	at ($(COB)	+ ( \boxDistH  , 0.0               )$);%(COC) [point];
+          \coordinate (CIB) 	at ($(COB)	+ ( 0.0        , \boxDistOV*1/2    ) 
+                                            - ( 0.0        , \boxDistIV*1/2    ) 
+                                            - ( 0.0        , \boxDistMargin    )
+                                                                              $);%(CIB)   [point];
+          \coordinate (CIA) 	at ($(COA)	+ ( 0.0        , \boxDistOV*1/2    ) 
+                                            - ( 0.0        , \boxDistIV*1/2    ) 
+                                            - ( 0.0        , \boxDistMargin    )
+                                                                              $);%(CIA)	  [point];
+          \coordinate (CIC) 	at ($(COC)	+ ( 0.0        , \boxDistOV*1/2    ) 
+                                            - ( 0.0        , \boxDistIV*1/2    ) 
+                                            - ( 0.0        , \boxDistMargin    )$);%(CIC) [point];
+          \coordinate (CTIA)	at ($(CIA)	+ ( 0.0        , 0.0               )$);%(CTIA)[point];
+          \coordinate (CTIB)	at ($(CIB)	+ ( 0.0        , 0.0               )$);%(CTIB)[point];
+          \coordinate (CTIC)	at ($(CIC)	+ ( 0.0        , 0.0               )$);%(CTIC)[point];
+          \coordinate (CTOA)	at ($(COA)	- ( 0.0        , \boxDistOV*1/2    )
+                                            + ( 0.0        , \boxDistMargin    )
+                                            + ( 0.0        , \boxDistOTV*1/2   )$);%(CTOA)[point];
+          \coordinate (CTOB)	at ($(COB)	- ( 0.0        , \boxDistOV*1/2    )
+                                            + ( 0.0        , \boxDistMargin    )
+                                            + ( 0.0        , \boxDistOTV*1/2   )$);%(CTOB)[point];
+          \coordinate (CTOC)	at ($(COC)	- ( 0.0        , \boxDistOV*1/2    )
+                                            + ( 0.0        , \boxDistMargin    )
+                                            + ( 0.0        , \boxDistOTV*1/2   )$);%(CTOC)[point];
+        % Nodes
+          \node[vis on=<1->, nodeouter]     (NOA) at (COA)  {};
+          \node[vis on=<1->, nodeouter]     (NOB) at (COB)  {};
+          \node[vis on=<1->, nodeouter]     (NOC) at (COC)  {};
+          \node[vis on=<1->, nodeinner]     (NIA) at (CIA)  {};
+          \node[vis on=<1->, nodeinner]     (NIB) at (CIB)  {};
+          \node[vis on=<1->, nodeinner]     (NIC) at (CIC)  {};
+          \node[vis on=<1->, nodetextinner] (NTA) at (CTIA) {\large\sffamily\color{iblack}Functionality};
+          \node[vis on=<1->, nodetextinner] (NTB) at (CTIB) {\large\sffamily\color{iblack}Feedback Loops};
+          \node[vis on=<1->, nodetextinner] (NTC) at (CTIC) {\large\sffamily\color{iblack}Technical};
+          \node[vis on=<1->, nodetextouter] (NDA) at ($(CTOA)+(0,-\boxDistOV*0.475)$) {
+				% \framebox{
+				\footnotesize
+				{
+                    \begin{varwidth}{\linewidth}
+						\begin{itemize}\setlength{\itemsep}{1em}%%[leftmargin=*]
+						\item 3 functions not fulfilled %as ``leakage''; Keynes (1973)  %,Commons (1973)
+                        \item supply split also in f.e. Fisher (1922), Keynes (1973), Commons (1973)\\
+                        \phantom{vertical white space}\\
+                        \phantom{vertical white space}\\
+						\end{itemize}
+					\end{varwidth}
+				}
+				%}
+			};     
+	      \node[vis on=<1->, nodetextouter] (NDB) at ($(CTOB)+(0,-\boxDistOV*0.60)$) {
+	           \footnotesize
+	           {                     
+	             \begin{varwidth}{\linewidth}
+	               \begin{itemize}\setlength{\itemsep}{1em}%%[leftmargin=*]
+                       \item Expected increases of prices and ``hodling''
+	                 \item Athey et al. (2016) , Bolt et al. (2016)
+	               \end{itemize}
+	             \end{varwidth}
+	           }
+	         };
+          \node[vis on=<1->, nodetextouter] (NDC) at ($(CTOC)+(0,-\boxDistOV*0.65)$) {
+             % \framebox{
+             \footnotesize
+               {                 
+                 \begin{varwidth}{\linewidth}
+                   \begin{itemize}\setlength{\itemsep}{1em}%
+                     \item lost crypto keys
+                     \item destroyed coins\\
+                     \phantom{vertical white space}\\
+                     \phantom{vertical white space}\\
+                     \phantom{vertical white space}\\
+                     \phantom{vertical white space}\\
+                   \end{itemize}
+                 \end{varwidth}
+               }
+              %}
+             };                             
+      \end{tikzpicture}
+    }
+  }

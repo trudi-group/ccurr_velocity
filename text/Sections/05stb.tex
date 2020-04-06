@@ -1,0 +1,212 @@
+%State-of-the-art estimations
+\section{Self-churn and Clustering}
+\label{sec:particularities_txvol}%
+% 
+As discussed in the last section, by construction many cryptocurrency
+transactions contain outputs sending a fraction of the value back to the
+sender. %
+Such change outputs as well as other self-churn ought to be excluded from
+transaction volume: %
+%
+\blockquote[%
+\cite{fisher1922purch}%
+]{%
+  What is desired is the rate at which money is used for purchasing %
+  goods, not for making change
+}. %
+
+\subsection{Transaction volume inflated by self-churn}
+\label{sec:particularities_txvol:inflated}% 
+While the transaction volume in principle can be calculated accumulating the
+output values $\valO(o)$%
+\footnote{To simplify notation, we denote many variables as functions of
+  transactions, outputs or inputs. %
+  For example, function $\valO(o)$ extracts the output value of output \(o\)
+  of transaction \(t\) in period \(\perd\).} %
+of all transactions $t$ recorded within period $\perd$ this yields an
+inflated aggregate $\langle\Pp',\Tp'\rangle$ when defined as
+\begin{align}%
+  \langle\Pp',\Tp'\rangle = \sum_{t\in\TxP}\sum_{o\in\Out_\mathtt{t}} \valO(o),%
+\end{align} %
+with $o\in\Out_\perdT$ the set of all outputs of transaction $t$ in period
+$\perd$ and \(\TxP\) the set of all transactions $t$ recorded within %
+period $\perd$.  Thus, this volume needs to be adjusted. %
+Defining $\Out^{\selfchurn}$ as the set of all self-churn outputs, the
+accumulated transaction volume from these outputs $\Op$ can be obtained by
+summing the individual self-churn outputs $c \in \Out^{\selfchurn}$ as%
+\begin{align}%
+  \Op = \sum_{t\in\TxP} \sum_{o\in\Out^{\selfchurn}} \valO(o).%
+\end{align}%
+Hence a corrected transaction volume can be calculated as %
+$\langle\Pp,\Tp\rangle= \langle\Pp',\Tp'\rangle - \Op$.
+
+Note that in practice we only observe the above transaction volume in terms
+of monetary units rather than the full vector of prices and transacted
+units. %
+% These two are implicitly part of the measure $\langle\Pp,\Tp\rangle$.
+
+\subsection{Adjustment heuristics to deflate transaction volumes}
+\label{sec:particularities_txvol:adjustment_txvol}% 
+%
+As discussed in \refsec{concept_utxo}, only addresses but no identities are
+recorded in the transaction ledger. %
+This complicates the classifications of self-churn, needed to calculate
+adjusted (deflated) transaction volume. %
+However, statistical properties have been used to classify outputs as likely
+belonging to the same individual user as the transactions inputs (compare
+\cite{meiklejohn2013fistful}). %
+While \emph{heuristics}, such procedures are now commonly employed to create
+\emph{user clusters} of addresses. %
+Outputs are classified as self-churn if the cluster of their destination
+address equals the cluster of their input addresses. %
+
+% Clustering addresses is has been done in various studies %
+% (compare \cite{meiklejohn2013fistful}, \cite{spagnuolo2014bitiodine}, %
+% \cite{herrera2014research} and many others). %
+
+As our empirical analysis builds on a blockchain parser proposed
+by~\cite{kalodner2017blocksci}, we follow their choice of heuristics. %
+They employ one heuristic first proposed by~\cite{meiklejohn2013fistful} and
+one accounting for \textit{peeling chains}. %
+Peeling chains are transaction patterns where large unspent transaction
+outputs are split into smaller amounts in a chain of transactions. %
+Upon manual inspection \cite{kalodner2017blocksci} concluded that outputs
+created and spent within a relatively short time period often belong to the
+same user cluster. %
+The heuristics used are thus:%
+\begin{enumerate}\setlength{\itemsep}{0pt}
+\item All inputs in a transaction stem presumably from one person.
+  \footnote{%
+    Note that \cite{kalodner2017blocksci} added the additional restriction
+    that this heuristic is not applied to coinjoin transactions which are
+    used to obfuscate transaction paths. %
+    Coinjoin transaction are classified as in \cite{goldfeder2018cookie}.%
+  } %
+  % \item Addresses are only classified as change addresses if they are never reused as receipient. %
+\item Outputs created and spent within 4 blocks are classified as self-churn
+  transactions. %
+\end{enumerate}%
+
+%\subsection{Practical adjustment methods to deflate transaction volumes}\label{sec:particularities_txvol:adjustment_txvol}% 
+%
+% As our empirical analysis builds on a blockchain parser proposed %
+% in~\cite{kalodner2017blocksci}, we simply adopt the default choice %
+% % \footnote{\url{https://github.com/citp/BlockSci/wiki#toc-clustering-default-heuristic}} %
+% of their package and form %
+% clusters using the \emph{multi-input} heuristic proposed first %
+% in~\cite{meiklejohn2013fistful} and an adjusted form of the \emph{optimal-change} heuristic introduced in
+% \cite{nick2015data}. %
+% %
+% \par The multi-input heuristic assumes, that all inputs of a certain transaction can be assumed to belong to a certain user cluster. %
+% While simple, the method enjoyed considerable coverage in research \citep{harrigan2016unreasonable, androulaki2013evaluating, herrera2014research} and is seen as effective measure of deanonymization \citep{frowis2019safeguarding, conti2018survey}. %
+% However, the multi-input heuristic leads to unreasonable large clusters as of coinjoin transactions which are used to obfuscate transaction paths \citep{moser2017anonymous}. %
+% \cite{kalodner2017blocksci} added additional restrictions %
+% that this heuristic is not applied to coinjoin transactions. %
+% Coinjoin transaction are classified as in \cite{goldfeder2018cookie}. %
+% %
+% \par The optimal-change heuristic assumes that if there is an output smaller than any of the inputs, this output can be classified as change \citep{nick2015data}. % 
+% \cite{kalodner2017blocksci}, however, add the restriction that the output needs to be the first output sent to the respective address as Cryptocurrency Wallets generate fresh change addresses for change outputs. %
+
+% As our emprical analysis builds on a blockchain parser proposed %
+% in~\cite{kalodner2017blocksci}, we follow their approach to form %
+% clusters using one heuristic that has been proposed first %
+% in~\cite{meiklejohn2013fistful} and one heuristic accounting for %
+% \textit{peeling chains}. %
+% According to \cite{kalodner2017blocksci}, peeling chains are transaction %
+% patterns that split large unspent transaction outputs into smaller amounts %
+% in a chain of transactions. %
+% Manual inspection lead \cite{kalodner2017blocksci} to the conclusion that outputs %
+% that are created and spent during a relatively short time period are often %
+% belonging to the same user cluster. %
+% The heuristics used are thus:%
+% \begin{enumerate}%
+% 	\item All inputs used in a transaction are most likely from one %
+%           person.%
+%           \footnote{%
+% 		As the basic idea leads to unreasonable large clusters, %
+% 		\cite{kalodner2017blocksci} added additional restrictions %
+% 		that this heuristic is not applied to coinjoin transactions %
+%                 which are used to obfuscate transaction paths. %
+%     	Coinjoin transaction are classified as in \cite{goldfeder2018cookie}.%
+%     } %
+% 	%\item Addresses are only classified as change addresses if they are never reused as receipient. %
+% 	\item Outputs that are created and spent within 4 blocks, are classified as %
+% 	self-churn transactions. %
+% \end{enumerate}%
+% Having formed user-clusters of addresses, outputs are classified as self-churn %
+% if the cluster of their destination address equals the cluster of %
+% their input addresses. %
+
+\section{Velocity based on total money supply}
+\label{sec:oldmeas}%
+% Equipped with all necessary basics from both realms---economics and
+% computer science---recently suggested methods of velocity measurement for
+% cryptocurrencies are to be summarized. %
+% Both approaches utilize the total coin supply as measure of the money supply
+% $\Mp$ in equation \eqref{eq:fisher}. %
+The quantity equation \eqref{eq:fisher} requires a measure of the money
+supply $\Mp$. %
+To our knowledge, all prior work has employed the sum total of ever-mined
+coins as its measure. %
+We denote this money-supply measure $\MTotalP$ and calculate it at the
+beginning of each period $\perd$. %
+\footnote{%
+  As discussed in \refsec{concepts}, we simplify by assuming a fixed money
+  supply over period $\perd$, using the amount at the beginning of the
+  period. %
+  Neither \cite{kalodner2017blocksci} nor \cite{athey2016bitcoin} clearly
+  specify their adopted choice.} %
+% %%% --- PLS ADD FORMULA:  (and delete "." prior to \footnote)
+% as
+% \begin{align}%
+%   $\MTotalP$ = FORMULA.
+% \end{align}
+% %%% ---END PLS ADD formula.
+In all common UTXO-based cryptocurrencies it is a deterministic function of
+block height. %
+Technically, $\MTotalP$ can be calculated as the aggregate of outputs from the set of coinbase transactions \( \TxC \) belonging to the set \( \mathbb{P} \) of all periods with a maximum block time smaller \(\perd_\Start\) and thus
+\begin{align}%
+  \MTotalP = \sum_{t \in \TxC} \valO(o).%
+\end{align}%
+
+Based on the quantity equation \eqref{eq:fisher}, the simplest measure of
+velocity arises from dividing total transaction volume
+$\langle \Pp'\Tp' \rangle$ by total coin supply $\MTotalP$, which was
+described in~\cite{bolt2016value} and adopted by~\cite{ciaian2018price}. %
+%
+Formally,
+\begin{align}%
+  \VNaiveEstP = \frac{\langle\Pp',\Tp'\rangle}{\MTotalP}.%
+\end{align}%
+%
+$\VNaiveEstP$ offers the advantages of providing a theoretically sound
+interpretation and extremely simple calculation. %
+Moreover, data for calculating $\VNaiveEstP$ (raw on-chain transaction volume
+and total coin supply) are widely available. %
+\footnote{Time-series data can be downloaded for free from %
+  \url{www.blockchair.com}, \url{www.blockchain.com}, \url{www.btc.com}. %
+  Also \url{www.blockwatch.cc} and many other data brokers provide the data.}
+However, the result is biased: Self-churn transactions lead to an
+overestimation of transaction volume. %
+ 
+\cite{athey2016bitcoin} and \cite{kalodner2017blocksci} propose a similar
+velocity measure. %
+However, they clean the price sum from self-churn and get %
+% For every period $\perd$ it is thus calculated as the ratio of price %
+% sum~$\langle\Pp,\Tp\rangle$ divided by the complete money supply
+% $\MTotalP$. %
+%
+% Velocity $\VTotalEst$ can thus be estimated as%
+%
+\begin{align}%
+  \VTotalEst = \frac{\langle\Pp,\Tp\rangle}{\MTotalP}.%
+\end{align}%
+%
+In line with \refsec{concepts}, both measures can interpreted as the turnover
+of coins during period $\perd$ averaged over the total coin supply. %
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

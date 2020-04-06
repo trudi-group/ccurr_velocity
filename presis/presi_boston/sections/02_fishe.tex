@@ -1,0 +1,94 @@
+
+\begin{frame}{``Velocity'' of money}
+  \begin{align*}%
+    &\textbf{Before}\text{ the loss: } &\underbrace{2\,\coins}_{\text{\textbf{M}oney in circ.}} \, \cdot \, \underbrace{1}_{\text{Avg. turnovers}} = %
+    \text{\textbf{T}ransaction volume} = 2\,\coins\\%
+    &\textbf{After}\text{ the loss: }  &\underbrace{1\,\coins}_{\text{\textbf{M}oney in circ.}} \, \cdot \, \underbrace{2}_{\text{Avg. turnovers}} = %
+    \text{\textbf{T}ransaction volume} = 2\,\coins%
+  \end{align*} %
+	%\vspace{1em}
+	%\textbf{$\Longrightarrow$ }
+	\begin{alertblockc}[N]{}{jwigreige!100!white}
+		Velocity is the ``average number of turnovers during a period of time''.
+	\end{alertblockc}
+	%\vspace{1em}
+	%\textbf{$\Longrightarrow\ $$\dots$ and calculated as:}
+	\begin{align*}
+	  \text{\textbf{V}elocity} = \frac{\text{\textbf{T}ransaction volume}}{\text{\textbf{M}oney in circulation}}
+	\end{align*}
+\end{frame}
+
+\begin{frame}{``Velocity'' a bit more formal:}
+	\centering
+	\begin{align*}%
+	  \Vp=\frac{
+	  \overbrace{\langle\Pp,\Tp\rangle}^{\text{\textbf{T}ransaction volume (in coins)}}
+	  }{
+	  \underbrace{\Mp}_{\text{\textbf{M}oney in circulation (in coins)}}
+	  }
+	  \text{ with}\ \Mp, \Vp \in \mathbb{R}_{\ge 0},\ 
+	  \text{and}\ \Pp,\Tp \in \mathbb{R}_{\ge 0}^{n}.%
+	\end{align*}
+	\vspace{1em}
+	\begin{alertblockc}[]{}{jwigreige!100!white}
+		\textbf{Velocity can be measured for UTXO-based cryptocurrencies like Bitcoin.}
+	\end{alertblockc}
+	\footnotetextNN{[Fisher, Irving: {T}he Equation of Exchange. 1911.]}
+\end{frame}
+
+\begin{frame}{Well now---which measures can we build on?}
+	\begin{align*}
+		\text{\textbf{V}elocity} = \frac{\text{\textbf{T}ransaction volume}}{\text{\textbf{M}oney in circulation}}
+	\end{align*}
+%	\vspace{1em}
+	\begin{enumerate}\setlength{\itemsep}{0.5em}
+		\item Just using \textbf{raw on-chain transaction volume} and \textbf{total coin supply}\\\deemphtext{---Literature: Bolt and Van Oord (2016), Ciaian et al. (2018)}%\cite{bolt2016value}, \cite{ciaian2018price}}
+		\item Adjusting the on-chain transaction volume for \textbf{change transactions}\\\deemphtext{---Literature: Athey et al. (2016), Kalodner et al. (2017)}%\cite{kalodner2017blocksci}, \cite{athey2016bitcoin}} 
+	\end{enumerate}
+	\vspace{2em}
+	\textit{"What is desired is the rate at which money is used for purchasing goods, not for making change."}---Fisher (1911)
+\end{frame}
+
+% \begin{frame}[t]{Empirical studies resort to approximations!}%
+% 	\only<1>{%
+% 		\begin{figure}%
+% 			\centering%
+% 			\includegraphics[scale=0.11]{./pics/used/paper-trail.png}%
+% 		\end{figure}%
+% 	}%
+% 	\only<2>{%
+% 		\begin{itemize}%
+% 			% \item \cite{deleo2014does}% \visible<2->{\deemphtext{-- Yes, but negative!}}
+% 			\item \cite{kancs2015digital}% \visible<2->{\deemphtext{-- Yes!}}
+% 			\item \cite{georgoula2015using}% \visible<2->{\deemphtext{-- No.}}
+% 			\item \cite{bouoiyour2015does}% \visible<2->{\deemphtext{-- No.}}
+% 			\item \cite{ciaian2016digital}% \visible<2->{\deemphtext{-- Yes!}}
+% 			\item \cite{ciaian2016economics}% \visible<2->{\deemphtext{-- No.}}
+% 			\item \cite{luis2019drivers}% \visible<2->{\deemphtext{-- No!}}
+% 			\item $\dots$%  
+% 		\end{itemize}%
+% 	}%
+% %\visible<2->{\Large \centering{Hypothesis -- \emphtext{Proxy} -- Result}}
+% \end{frame}%
+
+% -------------------------------------------------
+
+% \begin{frame}{Research Questions}
+
+%   \begin{itemize}
+%   \item Can we improve recently suggested \textbf{measures}? 
+%   \item How well do simple \textbf{proxy-variables} used so far approximate the measures?
+%   \end{itemize}
+
+%   \vspace{2em}
+
+%   \begin{block}{Teaser:}
+%     We clean not only
+%     \begin{itemize}
+%     \item the transaction volume, but also 
+%     \item the money supply
+%     \end{itemize}
+%     from artefacts.
+%   \end{block}
+
+% \end{frame}

@@ -1,0 +1,27 @@
+\ifdefined\varInputAlgos%
+\renewcommand{\arraystretch}{1.5}%
+\begin{algorithm*}[!h]%
+	\DontPrintSemicolon
+	\caption{Whole-bill-approach: Measurement of $\protect\MCircWb$ within period $\perd$ with look-back window $\wndw$.}\label{algo:code_mcirc_wb}%
+	\KwData{$\wndw_\Start$                                    	    \tcc*{Beginn of look-back window $w$}}%
+	\KwData{$\TxP$                                              	\tcc*{Set of transactions in period $\perd$}}%
+%	\KwResult{$\MCircWb$                                           \tcc*{Money supply to be estimated within period $\perd$}}%
+%
+	$ \MCircWb \gets {0} $											\tcc*{Money supply to be estimated within period $\perd$}%
+%
+	\ForEach {$ t \in \TxP $                                      	\tcc*[]{Loop through transactions $t$ of period $\perd$}}%
+	{%
+		\ForEach {$ i \in \InpT $                                 	\tcc*[]{Loop through inputs $i$ of transaction $t$}}%
+		{%
+			\If{%
+				$\dateGen(i)<\wndw_\Start$\ or\ $\genByCoinbase(i)$\label{algo:code_mcirc_wbCond}\tcc*{Was $i$ generated before $\wndw_\Start$/from a coinbase transaction?}%
+			}{%
+				$\MCircWb \gets{\MCircWb + \valI(i)}$				\tcc*{Update money supply}%
+			}%
+		}%
+	}%
+	return $\MCircWb$                                             	\tcc*{Result: Return estimated money in circulation within period $\perd$ for \ac*{wba}}%
+\end{algorithm*}%
+\else%
+\fi%
+%

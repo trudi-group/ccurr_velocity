@@ -1,0 +1,94 @@
+* org mode pls
+* $PERIOD is element of {1d,2d,..}
+
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+| ID | _Variable Name_                   | _*_simple.csv_                            | _*_daily.csv_                                                          |
+|    |                                   | one row = 1 TX (in a block)               | one row = 1 calendar day (UTC)                                         |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+|  1 | date                              | timestamp in format "YYYY-MM-DD HH:MM:SS" | day in format "YYYY-MM-DD"                                             |
+|    |                                   | in UTC of the TX (ie multiple rows per    | Aggregated data over 00:00:01 until                                    |
+|    |                                   | block)                                    | 23:59:59; for pointwise data value                                     |
+|    |                                   |                                           | at 23:59:59.  /CAN THIS EASILY BE                                      |
+|    |                                   |                                           | BEGINNING-OF-DAY DATA?/                                                |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+|  2 | tx_vol                            | sum of *all* the inputs of each TX        | sum over all TX of that day                                            |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+|  3 | tx_vol_changeouts                 | The sum of each TX outputs to a public    | sum over all TX of that day                                            |
+|    |                                   | key belonging to the same cluster as the  |                                                                        |
+|    |                                   | inputs (as outputs of the preceding TX)   |                                                                        |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+|  4 | tx_vol_peeling                    | The sum of TX outputs that are spent      | sum over all TX of that day                                            |
+|    |                                   | (again?) with age less than 4 blocks.     |                                                                        |
+|    |                                   | -- /IS THIS FWD LOOKING??/                |                                                                        |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+|  5 | m_total_beg_of_day                | NA                                        | total sum of BTC ever mined by last block of previous day              |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+|  5 | m_total_end_of_last_day           | NA                                        | total sum of BTC ever mined by first block of current day              |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+|  6 | m_circ_wb_$PERIOD                 | NA (potentially possible,                 | Notion of whole bill: Over all                                         |
+|    |                                   | but not with our current setup)           | transactions and blocks for a certain                                  |
+|    |                                   |                                           | $PERIOD, the sum of inputs that have been                              |
+|    |                                   |                                           | created at an earlier date or stem from                                |
+|    |                                   |                                           | coinbase transactions within that $PERIOD.                             |
+|    |                                   |                                           | Measured as of the end of that $PERIOD.                                |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+|  7 | m_circ_mc_fifo_$PERIOD            | NA (potentially possible,                 | Notion of moved coins - Fifo: Over all                                 |
+|    |                                   | but not with our current setup)           | transactions and blocks for a certain                                  |
+|    |                                   |                                           | $PERIOD, the sum of inputs that have (a) not                           |
+|    |                                   |                                           | converted to change-outputs and that (b)                               |
+|    |                                   |                                           | have been created in an earlier period stem from                       |
+|    |                                   |                                           | coinbase transactions. To determine the input conversion               |
+|    |                                   |                                           | to change-outputs, FIFO has been assumed.                              |
+|    |                                   |                                           | Additionally, we assume that inputs are first converted to             |
+|    |                                   |                                           | outputs controlled by third parties, rather than to change-outputs.    |
+|    |                                   |                                           | Measured as of the end of that $PERIOD.                                |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+|  8 | m_circ_mc_lifo_$PERIOD            | NA (potentially possible,                 | Notion of moved coins - Fifo: Over all                                 |
+|    |                                   | but not with our current setup)           | transactions and blocks for a certain                                  |
+|    |                                   |                                           | $PERIOD, the sum of inputs that have (a) not                           |
+|    |                                   |                                           | converted to change-outputs and that (b)                               |
+|    |                                   |                                           | have been created in an earlier period stem from                       |
+|    |                                   |                                           | coinbase transactions. To determine the input conversion               |
+|    |                                   |                                           | to change-outputs, LIFO has been assumed.                              |
+|    |                                   |                                           | Additionally, we assume that inputs are first converted to             |
+|    |                                   |                                           | outputs controlled by third parties, rather than to change-outputs.    |
+|    |                                   |                                           | Measured as of the end of that $PERIOD.                                |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+|  9 | tx_fees                           | Difference between sum of outputs and     | sum over all TX of that day                                            |
+|    |                                   | inputs.                                   |                                                                        |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+| 10 | tx_count                          | NA                                        | The accumulated number of transactions                                 |
+|    |                                   |                                           | over all blocks for a certain day                                      |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+| 11 | block_height                      | which block each TX is in (in case there  | NA                                                                     |
+|    |                                   | are subsequent blocks with the same time  |                                                                        |
+|    |                                   | stamp this ensures we can match each TX   |                                                                        |
+|    |                                   | to its respective block) -- /DROP?/       |                                                                        |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+| 12 | v_m_total_based                   | NA (potentially possible,                 | (tx_vol - tx_peeling - tx_changeouts)/(m_total)                        |
+|    |                                   | but not with our current setup)           |                                                                        |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+| 13 | v_based_on_m_circ_wb_$PERIOD      | NA (potentially possible,                 | (tx_vol - tx_peeling - tx_changeouts)/(m_circ_wb_$PERIOD)              |
+|    |                                   | but not with our current setup)           |                                                                        |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+| 14 | v_based_on_m_circ_mc_fifo_$PERIOD | NA (potentially possible,                 | (tx_vol - tx_peeling - tx_changeouts)/(m_circ_mc_fifo_$PERIOD)         |
+|    |                                   | but not with our current setup)           |                                                                        |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+| 15 | v_based_on_m_circ_mc_lifo_$PERIOD | NA (potentially possible,                 | (tx_vol - tx_peeling - tx_changeouts)/(m_circ_mc_lifo_$PERIOD)         |
+|    |                                   | but not with our current setup)           |                                                                        |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+| 16 | prices                            | NA                                        | CMC collects USD/BTC spot price data from 400 exchanges and            |
+|    |                                   |                                           | weights the prices wrt. traded volume. The integrated prices           |
+|    |                                   |                                           | seem to diverge quite a bit. There is no clear answer on whether the   |
+|    |                                   |                                           | integrated prices are eod, bod or vwap. A better source would be nice. |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+| 17 | returns                           | NA                                        | (return (at day t) / return (at day t-1))-1                            |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+| 18 | volatility                        | NA                                        | (return)^2, therefore very crude, realized volatility should be        |
+|    |                                   |                                           | integrated at some point in time.                                      |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+| 19 | volume                            | NA                                        | See prices. Aggregated USD/BTC daily trading volume                    |
+|    |                                   |                                           | from 400 exchanges.                                                    |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|
+| 20 |                                   |                                           |                                                                        |
+|----+-----------------------------------+-------------------------------------------+------------------------------------------------------------------------|

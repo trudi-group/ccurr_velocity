@@ -1,0 +1,459 @@
+\ProvidesPackage{beamerthemeDietzel}
+
+\RequirePackage{etoolbox}
+\RequirePackage{tikz}
+\RequirePackage{pgfplots}
+\usetikzlibrary{calc,fit}
+
+\newif\if@brightCopyright
+\newif\if@dateNewLine
+\newif\if@sources
+\@brightCopyrightfalse
+\@sourcesfalse
+\DeclareOption{brightcopyright}{\@brightCopyrighttrue}
+\DeclareOption{datenewline}{\@dateNewLinetrue}
+\DeclareOption{sources}{\@sourcestrue}
+\ProcessOptions
+
+\beamer@compresstrue
+\ProcessOptionsBeamer
+
+\mode<presentation>
+
+\definecolor{iblack}{RGB}{20,20,20}
+
+\definecolor{hublue} {RGB}{  0, 55,108}
+\definecolor{hured}  {RGB}{138, 15, 20}
+\definecolor{hugreen}{RGB}{  0, 87, 44}
+\definecolor{husand} {RGB}{210,192,103}
+\definecolor{hugraygreen}{RGB}{209,209,194}
+\definecolor{hugrayblue} {RGB}{189,202,211}
+\definecolor{wibrown} {RGB}{166,157,130}
+
+% Set copyrightcolor
+\colorlet{copyrightcolor}{gray!80!black}
+\if@brightCopyright
+    \colorlet{copyrightcolor}{husand}
+\fi
+
+\IfFileExists{sourcesanspro.sty}{% load nice fonts if available
+    \RequirePackage[semibold,lining,default,type1]{sourcesanspro}
+    \setbeamerfont{title}{size=\LARGE,series=\bfseries}
+    \setbeamerfont{subtitle}{size=\large,series=\bfseries}
+    \setbeamerfont{author}{size=\normalsize}
+}{% else set alternative fonts
+    \PackageWarning{beamerthemeDietzel}
+                   {*** WARNING: Please install sourcesanspro package! ***}
+    \setbeamerfont{title}{size=\LARGE}
+    \setbeamerfont{subtitle}{size=\large,shape=\itshape}
+    \setbeamerfont{author}{size=\large}
+}
+
+\newcommand\@ccicontext{}
+
+\IfFileExists{ccicons.sty}{% use CC icons if available
+\RequirePackage{ccicons}
+\renewcommand\@ccicontext{\ccbyncsaeu}
+}{% else
+\PackageWarning{beamerthemeDietzel}
+               {*** WARNING: Please install ccicons package! ***}
+\renewcommand\@ccicontext{CC BY-NC-SA}
+}
+
+\RequirePackage{ifxetex,ifluatex}
+\ifxetex
+\else
+	\ifluatex
+	\else
+        \RequirePackage[T1]{fontenc}
+        \RequirePackage[utf8]{inputenc}
+	\fi
+\fi
+
+\setbeamercolor{normal text}{fg=iblack}
+\setbeamercolor{titlelike}{fg=hublue}
+\setbeamercolor{structure}{fg=hublue}
+\setbeamercolor{footer}{fg=hugraygreen!50!black,bg=hugraygreen}
+
+\setbeamercolor{alerted text}{fg=hublue}
+
+\setbeamercolor{block title}{fg=white,bg=hublue}
+\setbeamerfont{block title}{series=\bfseries}
+
+\setbeamercolor{block body}{parent=normal text,bg=hugraygreen!40!white}
+
+\setbeamertemplate{enumerate items}[default]
+\setbeamercolor{item projected}{fg=hugrayblue,bg=white}
+\setbeamerfont{item projected}{series=\bfseries}
+\setbeamertemplate{section in toc}[circle]
+
+\setbeamercolor{title}{fg=black}
+\setbeamercolor{author}{fg=black}
+\setbeamercolor{date}{fg=black}
+
+\setbeamertemplate{itemize items}[triangle]
+
+\usenavigationsymbolstemplate{}
+\setbeamercovered{invisible}
+
+% Footer (except on title page)
+\defbeamertemplate*{footline}{dietzel theme} {%
+\ifnum \insertpagenumber=1
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth,ht=2.25ex,dp=1ex,center]{}%
+        % empty environment to raise height
+    \end{beamercolorbox}}%
+    \vskip0pt%
+\else
+    \leavevmode%
+    \hbox{%
+    % Insert source cites if specified
+    \ifbool{frame@source@defined}{%
+    \frame@source@cite{\frame@source}%
+    }{}%
+    \begin{beamercolorbox}[ht=2.5ex,dp=1.125ex,%
+        leftskip=.3cm,rightskip=.3cm plus1fil]{footer}%
+        \insertshorttitle
+        \hfill 
+        \insertshortauthor
+        \hfill
+        \insertframenumber{}
+    \end{beamercolorbox}%
+    }%
+    \vskip0pt%
+\fi
+}
+
+% Disable hyphenation
+\hyphenpenalty10000
+
+% Design for title slide
+\defbeamertemplate*{title page}{dietzel theme} {
+\pgfutil@ifundefined{tikzexternalrealjob}{%
+}{%
+    \tikzexternaldisable
+}%
+\pgfdeclarelayer{shadow}
+\pgfdeclarelayer{bg}
+\pgfsetlayers{bg,shadow,main}
+\tikz[overlay, remember picture]{%
+
+\begin{pgfonlayer}{bg}
+\node[%
+    anchor=west,
+    inner sep=0pt,
+    yshift=-14pt]
+    at (current page.west)
+{%
+% \IfFileExists{titleimage.jpg}{%
+%     \includegraphics[width=1.2\paperwidth]{titleimage}%
+% }{% else
+    \includegraphics[width=1\paperwidth]{themes/wi_lines}%
+% }%
+};
+\end{pgfonlayer}
+
+\node[%
+    anchor=north east,
+    inner sep=3ex
+]
+at (current page.north east)
+{%
+    \includegraphics[height=8ex]{themes/hu_logo}
+};
+
+\node[%
+    anchor=north west,
+    inner sep=4ex
+]
+at (current page.north west)
+{%
+    \includegraphics[height=6ex]{themes/wi_logo}
+};
+% \IfFileExists{titleimage.jpg}{}{% assume titleimage.jpg is self-shot
+% \node[%
+%     text=copyrightcolor,
+%     font=\tiny,
+%     anchor=south east,
+%     inner sep=0pt]
+%     at ($(current page.south east) - (3ex,-2pt)$)
+% {%
+%     Photo \@ccicontext\ 
+%     \href{https://www.flickr.com/photos/markturner/4016850003/}{Mark Turner}
+% };
+% }
+
+\usebeamercolor{title}
+\node[%
+    anchor=west,
+    text width=\textwidth,
+    text=fg,
+    font=\usebeamerfont{title},
+    yshift=-16ex,
+    xshift=-10pt
+]
+(title)
+{%
+    \inserttitle
+};
+
+\usebeamercolor{subtitle}
+\node[%
+    anchor=north west,
+    text=fg,
+    font=\usebeamerfont{subtitle},
+    text width=\textwidth,
+    ]
+(subtitle) at (title.south west) 
+{%
+    \insertsubtitle
+};
+
+\usebeamercolor{author}
+\node[%
+    anchor=north west,
+    text=fg,
+    font=\usebeamerfont{author},
+    text width=\textwidth,
+    ]
+(authordate) at (subtitle.south west) 
+{%
+  \if@dateNewLine
+    \insertauthor \\%
+  \else
+    \insertauthor$\enspace\cdot\enspace$%
+  \fi
+    \usebeamercolor{date}\color{fg}{\insertdate}
+};
+
+% \begin{pgfonlayer}{shadow}
+% \usebeamercolor{title}
+% % \IfFileExists{titleimage.jpg}{%
+% % 	\node[fill=hublue!50!bg,opacity=.66,fit=(title)(subtitle)(authordate),minimum width=50em,inner sep=1em] {};
+% % }{%
+% 	\node[fill=bg,opacity=.33,fit=(title)(subtitle)(authordate),minimum width=50em,inner sep=1em] {};
+% % }
+% \end{pgfonlayer}
+
+}% tikz
+}% title page
+
+\AtBeginSection{%
+\begingroup
+\setbeamertemplate{footline}{}
+% \setbeamercolor{background canvas}{bg=husand!20}
+\frame{\sectionpage}
+\endgroup
+}
+
+\setbeamerfont{section title}{size=\Huge,series={\normalfont\scshape}}
+\setbeamercolor{section title}{fg=hublue}
+\setbeamertemplate{section page}
+{
+    \vfill
+    \usebeamerfont{section title}%
+    \usebeamercolor{section title}%
+    \raggedright\color{fg}\insertsection\\
+    \tikz{\draw[very thick,hugrayblue] (0,0) -- (\linewidth,0);}
+    \vfill
+    \vfill
+} % section page
+
+
+% Default TikZ styles
+\tikzset{
+    box/.style={inner sep=1ex, fill=#1!40, draw=#1!60!black, thick},
+    box/.default={hugraygreen},
+    %
+    light box/.style={inner sep=1ex, fill=#1!20, draw=#1!50!black, thick},
+    light box/.default={hublue},
+    %
+    dark box/.style={
+        inner sep=1ex, fill=#1, draw=none, text=#1!20!white,
+        font=\bfseries,
+    },
+    dark box/.default={hublue},
+    %
+    hu/circle/.style={box={#1},circle,inner sep=0.5ex},
+    hu/circle/.default={hugraygreen},
+    hu/light circle/.style={light box={#1},circle,inner sep=0.5ex},
+    hu/light circle/.default={hublue},
+    hu/dark circle/.style={dark box={#1},circle,inner sep=0.5ex},
+    hu/dark circle/.default={hublue},
+    %
+    every picture/.append style={
+        thick,
+        cap=round,
+    },
+    %
+    brace/.style={
+        decorate,decoration={brace,amplitude=1ex,raise=1pt,#1},
+        semithick,
+    },
+    brace/.default={},
+    %
+    invisible/.style={opacity=0},
+    visible on/.style={alt={#1{}{invisible}}},
+    alt/.code args={<#1>#2#3}{%
+      \alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}} % \pgfkeysalso doesn't change the path
+    },
+}
+
+% Plot styles, adopted from Metropolis theme and Paul Tol's tech. note
+\definecolor{TolDarkPurple}{HTML}{332288}
+\definecolor{TolDarkBlue}{HTML}{4477AA}
+\definecolor{TolMidBlue}{HTML}{6699CC}
+\definecolor{TolLightBlue}{HTML}{88CCEE}
+\definecolor{TolLightGreen}{HTML}{44AA99}
+\definecolor{TolDarkGreen}{HTML}{117733}
+\definecolor{TolDarkBrown}{HTML}{999933}
+\definecolor{TolLightBrown}{HTML}{DDCC77}
+\definecolor{TolDarkRed}{HTML}{661100}
+\definecolor{TolLightRed}{HTML}{CC6677}
+\definecolor{TolLightPink}{HTML}{AA4466}
+\definecolor{TolDarkPink}{HTML}{882255}
+\definecolor{TolLightPurple}{HTML}{AA4499}
+
+\pgfplotscreateplotcyclelist{tolbarplot cycle}{%
+  {draw=TolMidBlue,    fill=TolDarkBlue!70},
+  {draw=TolLightBrown,  fill=TolLightBrown!70},
+  {draw=TolLightGreen,  fill=TolLightGreen!70},
+  {draw=TolDarkPink,    fill=TolDarkPink!70},
+  {draw=TolDarkPurple,  fill=TolDarkPurple!70},
+  {draw=TolDarkRed,     fill=TolDarkRed!70},
+  {draw=TolDarkBrown,   fill=TolDarkBrown!70},
+  {draw=TolLightRed,    fill=TolLightRed!70},
+  {draw=TolLightPink,   fill=TolLightPink!70},
+  {draw=TolLightPurple, fill=TolLightPurple!70},
+  {draw=TolLightBlue,   fill=TolLightBlue!70},
+  {draw=TolDarkGreen,   fill=TolDarkGreen!70},
+}
+
+\pgfplotscreateplotcyclelist{tollineplot cycle}{%
+  {TolDarkBlue, mark=*, mark size=1.5pt},
+  {TolLightRed, mark=pentagon*, mark size=1.5pt},
+  {TolLightBrown, mark=diamond*, mark size=1.5pt},
+  {TolDarkGreen, mark=triangle*, mark size=1.5pt},
+  {TolLightBlue, mark=square*, mark size=1.3pt},
+}
+
+\pgfplotsset{
+  compat=1.9,
+  tollineplot/.style={
+    tolbaseplot,
+    xmajorgrids=true,
+    ymajorgrids=true,
+    major grid style={dotted},
+    axis x line=bottom,
+    axis y line=left,
+    legend style={
+      cells={anchor=west},
+      draw=none
+    },
+    cycle list name=tollineplot cycle,
+  },
+  tolbarplot base/.style={
+    tolbaseplot,
+    bar width=6pt,
+    axis y line*=none,
+  },
+  tolbarplot/.style={
+    tolbarplot base,
+    ybar,
+    xmajorgrids=false,
+    ymajorgrids=true,
+    area legend,
+    legend image code/.code={%
+      \draw[#1] (0cm,-0.1cm) rectangle (0.15cm,0.1cm);
+    },
+    cycle list name=tolbarplot cycle,
+  },
+  horizontal tolbarplot/.style={
+    tolbarplot base,
+    xmajorgrids=true,
+    ymajorgrids=false,
+    xbar stacked,
+    area legend,
+    legend image code/.code={%
+      \draw[#1] (0cm,-0.1cm) rectangle (0.15cm,0.1cm);
+    },
+    cycle list name=tolbarplot cycle,
+  },
+  tolbaseplot/.style={
+    legend style={
+      draw=none,
+      fill=none,
+      cells={anchor=west},
+    },
+    x tick label style={
+      font=\footnotesize
+    },
+    y tick label style={
+      font=\footnotesize
+    },
+    legend style={
+      font=\footnotesize
+    },
+    major grid style={
+      dotted,
+    },
+    axis x line*=bottom,
+  },
+  disable thousands separator/.style={
+    /pgf/number format/.cd,
+      1000 sep={}
+  },
+}
+
+\newenvironment{wider}{%
+\begin{columns}%
+\column{\dimexpr\paperwidth-0.6cm}%
+}{%
+\end{columns}%
+}
+
+\newcommand\frame@source@cite[1]{%
+\usebeamercolor{background canvas}%
+\begin{tikzpicture}[overlay,remember picture]
+\node[font=\tiny,anchor=south west,fill=bg,
+      yshift=2.5ex,text width=\linewidth,inner sep=0.3cm]
+    at (current page.south west) {\textbf{\iflanguage{ngerman}{Quelle}{Source}:} \cite{#1}};
+\end{tikzpicture}%
+}
+
+\providebool{frame@source@defined}
+\providebool{frame@source@used}
+\def\frame@source{}
+\define@key{beamerframe}{source}[true]{%
+    \if@sources
+    \else
+        \PackageError{beamerthemeDietzel}
+                       {sources option must be set to use frame source option.}
+    \fi
+    \def\frame@source{#1}
+    \booltrue{frame@source@defined}
+    \booltrue{frame@source@used}
+}
+
+\apptocmd{\beamer@reseteecodes}{%
+\def\frame@source{}%
+\boolfalse{frame@source@defined}%
+}{}{}
+
+\if@sources
+\PassOptionsToPackage{
+    citestyle=authoryear,
+    style=authoryear,
+    giveninits=true,
+}{biblatex}
+\RequirePackage{biblatex}
+
+\renewcommand*\bibfont{\footnotesize}
+
+\AtEndDocument{\ifbool{frame@source@used}{%
+\begin{frame}{\iflanguage{ngerman}{Quellen}{Sources}}
+\printbibliography[heading=none]
+\end{frame}
+}{}}
+\fi % sources
