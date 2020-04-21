@@ -145,7 +145,6 @@ class Velo:
 
     #0: [ CLASSLEVEL | SessionSetup & precaching of global data struct ]========
 
-
     def loadSession(
         path_data_input,
         path_cluster,
@@ -563,8 +562,6 @@ class Velo:
                 Velo.txes_valout_agg_daily[day][t_w] = txes_valout_agg_for_t_w
 
         #--Call remaining subfunctions------------------------------------------
-
-
         get_coin_supply_agg()
 
         return
@@ -995,7 +992,6 @@ class Velo:
 
         # instance-wise interfunctional temporary helper stuctures
         self.__txes_daily  = None
-        self.__txes_chouts = None
         self.__txes_number = s_p_d[date_id][3]
 
         # data structures conveyed by subprocess queues
@@ -1035,93 +1031,6 @@ class Velo:
             - transaction peeling: value of all transactions that where spend
               very soon
             """
-            def retrieve_per_tx_daily(
-                i_day,
-                tx,
-            ):
-                """
-                """
-                try:
-                    txes_daily[i_day].append(tx)
-                except IndexError as error:
-                    Velo.logger.error(
-                        "{}{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}".format(
-                            "{}[{}{}/{:03}{}]".format(
-                                cs.RES,
-                                cs.WHI,
-                                self.process_name,
-                                Velo.process_cnt-1,
-                                cs.RES,
-                            ),
-                            cs.WHI,
-                            "        i_day             = {}".format(i_day),
-                            "        day_diff_to_start = {}".format(day_diff_to_start),
-                            "        day_index         = {}".format(day_index),
-                            "        date_period_start = {}".format(self.__date_period_start),
-                            "        block_time        = {}".format(tx.block_time),
-                            "        tx.hash           = {}".format(tx.hash),
-                            "        is coinbase?      = {}".format(tx.is_coinbase),
-                            error,
-                        )
-                    )
-                    exit(-1)
-
-                return
-
-            def retrieve_per_tx_dummy(tx):
-                if tx.block_height >= len(Velo.index_block_day):
-                    return
-
-                txes_block_heights.append(tx.block_height)
-                index_txes.append(tx.index)
-                txes_valout.append(tx.output_value)
-                txes_block_time.append( str(tx.block_time) )
-
-                return
-
-            def retrieve_per_tx(tx):
-                """
-                Does the basic retrieval of data, but only for one tx.
-                """
-                if tx.block_height >= len(Velo.index_block_day):
-                    return
-
-                txes_block_heights.append(tx.block_height)
-                index_txes.append(tx.index)
-                txes_valout.append(tx.output_value)
-                txes_block_time.append( str(tx.block_time) )
-
-                val_chouts = 0
-                for out in Velo.heur_select[Velo.heur_input].change(tx):
-                    if False == in_max_cluster(out):
-                        val_chouts += int(out.value)
-                        # out_addr   = out.address
-                        # out_cls    = Velo.cluster_mgr.cluster_with_address(out_addr)
-                        # out_cls_id = out_cls.index
-                        # Velo.logger.info("out_cls_id = {:9} added".format(out_cls_id))
-
-
-                txes_chouts.append(val_chouts)
-
-                # Calculate transaction numbers---------------------------------
-                txes_number.append(1)
-
-                # Caclulate fees------------------------------------------------
-                txes_fees.append(tx.fee)
-
-                # Calculate fees & aggr. input valuesof dust transactions-------
-                dustfees   = 0
-                dustinpval = 0
-
-                if tx.output_value <= tx.fee:
-                    dustfees   = tx.fee
-                    dustinpval = tx.input_value
-
-                txes_dustfees.append(dustfees)
-                txes_dustinpval.append(dustinpval)
-
-                return
-
             def retrieve_per_block(
                 i_day,
                 block,
@@ -1129,6 +1038,82 @@ class Velo:
                 """
                 Blockwise wrapper for retrieve_per_tx
                 """
+                def retrieve_per_tx_daily(
+                    i_day,
+                    tx,
+                ):
+                    """
+                    """
+                    try:
+                        txes_daily[i_day].append(tx)
+                    except IndexError as error:
+                        Velo.logger.error(
+                            "{}{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}".format(
+                                "{}[{}{}/{:03}{}]".format(
+                                    cs.RES,
+                                    cs.WHI,
+                                    self.process_name,
+                                    Velo.process_cnt-1,
+                                    cs.RES,
+                                ),
+                                cs.WHI,
+                                "        i_day             = {}".format(i_day),
+                                "        day_diff_to_start = {}".format(day_diff_to_start),
+                                "        day_index         = {}".format(day_index),
+                                "        date_period_start = {}".format(self.__date_period_start),
+                                "        block_time        = {}".format(tx.block_time),
+                                "        tx.hash           = {}".format(tx.hash),
+                                "        is coinbase?      = {}".format(tx.is_coinbase),
+                                error,
+                            )
+                        )
+                        exit(-1)
+
+                    return
+
+                def retrieve_per_tx(tx):
+                    """
+                    Does the basic retrieval of data, but only for one tx.
+                    """
+                    if tx.block_height >= len(Velo.index_block_day):
+                        return
+
+                    txes_block_heights.append(tx.block_height)
+                    index_txes.append(tx.index)
+                    txes_valout.append(tx.output_value)
+                    txes_block_time.append( str(tx.block_time) )
+
+                    val_chouts = 0
+                    for out in Velo.heur_select[Velo.heur_input].change(tx):
+                        if False == in_max_cluster(out):
+                            val_chouts += int(out.value)
+                            # out_addr   = out.address
+                            # out_cls    = Velo.cluster_mgr.cluster_with_address(out_addr)
+                            # out_cls_id = out_cls.index
+                            # Velo.logger.info("out_cls_id = {:9} added".format(out_cls_id))
+
+
+                    txes_chouts.append(val_chouts)
+
+                    # Calculate transaction numbers---------------------------------
+                    txes_number.append(1)
+
+                    # Caclulate fees------------------------------------------------
+                    txes_fees.append(tx.fee)
+
+                    # Calculate fees & aggr. input valuesof dust transactions-------
+                    dustfees   = 0
+                    dustinpval = 0
+
+                    if tx.output_value <= tx.fee:
+                        dustfees   = tx.fee
+                        dustinpval = tx.input_value
+
+                    txes_dustfees.append(dustfees)
+                    txes_dustinpval.append(dustinpval)
+
+                    return
+
                 for tx in block:
                     retrieve_per_tx(tx)
 
@@ -1344,25 +1329,25 @@ class Velo:
             )
 
             #--append results to queue dictionary-------------------------------
-            self.__queue_dict["txes_number"]      = txes_number
-            self.__queue_dict["txes_fees"]        = txes_fees
-            self.__queue_dict["txes_dustfees"]    = txes_dustfees
-            self.__queue_dict["txes_dustinpval"]  = txes_dustinpval
-            self.__queue_dict["index_day"]        = index_day
-            self.__queue_dict["txes_valout"]      = txes_valout
-            self.__queue_dict["txes_csupply_agg"] = txes_csupply_agg
-            self.__queue_dict["txes_block_time"]  = pd.to_datetime(
+            self.__queue_dict["txes_number"]         = txes_number
+            self.__queue_dict["txes_fees"]           = txes_fees
+            self.__queue_dict["txes_dustfees"]       = txes_dustfees
+            self.__queue_dict["txes_dustinpval"]     = txes_dustinpval
+            self.__queue_dict["index_day"]           = index_day
+            self.__queue_dict["txes_valout"]         = txes_valout
+            self.__queue_dict["txes_csupply_agg"]    = txes_csupply_agg
+            self.__queue_dict["txes_block_time"]     = pd.to_datetime(
                 txes_block_time
             )
-            self.__queue_dict["index_txes"]       = index_txes
+            self.__queue_dict["index_txes"]          = index_txes
+            self.__queue_dict["issues_in_tx_chouts"] = txes_chouts
 
             #--used by following instance level functions-----------------------
-            self.__txes_chouts = txes_chouts
             self.__txes_daily  = txes_daily
 
             #--test and normal returns------------------------------------------
             if Velo.test_level > 0:
-                s_txes_chouts = str(self.__txes_chouts)
+                s_txes_chouts = str(txes_chouts)
                 self.__queue_dict["txes_chouts"] = s_txes_chouts
 
             if 2 <= Velo.test_level and Velo.test_level <=9:
@@ -1667,30 +1652,6 @@ class Velo:
 
             return False
 
-        def get_issues_in_tx_chouts():
-            """
-            """
-            Velo.logger.info(
-                "{}[{}{}/{:03}{}]{}  get issues in changeouts".format(
-                    cs.RES,
-                    cs.PRGnBD,
-                    self.process_name,
-                    Velo.process_cnt-1,
-                    cs.RES,
-                    cs.WHI,
-                )
-            )
-
-            self.__queue_dict["issues_in_tx_chouts"] = self.__txes_chouts
-
-            del self.__txes_chouts
-
-            if Velo.test_level == 14:
-                self.__queue.put([self.process_id, self.__queue_dict])
-                return True
-
-            return False
-
         def get_comp_meas_summands():
             """
             We use this weighted average to calculate (1) the summands necessary
@@ -1853,9 +1814,6 @@ class Velo:
         if get_m_circ() == True: return
 
         if get_comp_meas_summands() == True: return
-
-        # 1.2: [ Main Script - TP adjustments ]---------------------------------
-        if get_issues_in_tx_chouts() == True: return
 
         #put all necessary data to parent process through multiprocess queue
         Velo.logger.debug("{}[{}{}/{:03}{}]{}  Sending results".format(
