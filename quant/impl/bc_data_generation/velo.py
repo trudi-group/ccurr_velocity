@@ -1,5 +1,5 @@
 from logging             import INFO
-from pandas              import DataFrame, to_datetime 
+from pandas              import DataFrame, to_datetime
 from blocksci            import Blockchain
 from blocksci.cluster    import ClusterManager
 from blocksci.heuristics import change
@@ -903,7 +903,7 @@ class Velo:
                 l = list(results_raw["sdd_raw"]),
                 window = 1,
             )
-                
+
             #-- C2--------------------------------------------------------------
             for i in range(time_windows_len):
                 dormancy_tw = "dormancy_{}".format(time_windows[i])
@@ -1068,9 +1068,9 @@ class Velo:
             - index_day:           index list of day ids
             - txes_count:          list of counted transactions per day
             - txes_fees:           list of aggregated transaction fees per day
-            - txes_dust_fees:      list of aggregated transaction dust fees 
+            - txes_dust_fees:      list of aggregated transaction dust fees
                                    per day
-            - txes_dust_inpval:    list of aggregated transaction dust 
+            - txes_dust_inpval:    list of aggregated transaction dust
                                    input values per day
             - txes_vol:            transaction volume per day
                                    (output values of transactions per day)
@@ -1671,7 +1671,7 @@ class Velo:
                     self.__queue_dict[
                         "m_circ_{}_{}".format(
                             type,
-                            time_windows[i], 
+                            time_windows[i],
                         )
                     ] = m_circ[i]
 
@@ -1870,7 +1870,7 @@ class Velo:
                 "--stage_id = {}--".format(self.stage_id)
             )
         )
-        
+
         return
 
 if __name__ == "__main__":
