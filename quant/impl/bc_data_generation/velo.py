@@ -1342,7 +1342,7 @@ class Velo:
             self.__queue_dict["index_txes"]          = index_txes
             self.__queue_dict["issues_in_tx_chouts"] = txes_chouts
 
-            #--used by following instance level functions-----------------------
+            #--used by subsequent instance level functions----------------------
             self.__txes_daily  = txes_daily
 
             #--test and normal returns------------------------------------------
