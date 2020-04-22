@@ -973,7 +973,6 @@ class Velo:
         self.process_id   = process_id
         self.process_name = process_name
         self.__queue      = queue
-        self.wait         = True
 
         # next day to include date_period_end. Otherwise, it won't be regarded
         # due to the blocksci chainrange being computed as the daily difference.
