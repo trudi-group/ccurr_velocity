@@ -8,7 +8,7 @@ from colorstrings        import ColorStrings as cs
 from datetime            import date, datetime, timedelta
 from math                import floor, ceil
 from numpy               import cumsum
-from itertools           import chain as it_chain
+from iter<tools           import chain as it_chain
 from more_itertools      import sort_together
 
 lock = Lock()
