@@ -615,7 +615,7 @@ class Velo:
 
                      used:             |       freed:
               Velo.txes_csupply_agg    |  Velo.txes_csupply_agg
-              Velo.issues_in_tx_chouts |  Velo.issues_in_tx_chouts
+              Velo.txes_chouts         |  Velo.txes_chouts
               Velo.index_txes          |  Velo.index_txes
               Velo.txes_block_time     |  ----------------------
 
@@ -624,13 +624,12 @@ class Velo:
 
             df_txes = pd.DataFrame(
                 {
-                    #{}"index_txes"           : Velo.queue_dict["index_txes"],
-                    "block_day_index"      : Velo.queue_dict["index_txes_day"],
+                    "tx_day_index"         : Velo.queue_dict["index_txes_day"],
                     "block_time"           : Velo.queue_dict["txes_block_time"],
                     "tx_vol"               : Velo.queue_dict["txes_valout"],
                     "tx_number"            : Velo.queue_dict["txes_number"],
                     "tx_fees"              : Velo.queue_dict["txes_fees"],
-                    "tx_vol_issues_chouts" : Velo.queue_dict["issues_in_tx_chouts"],
+                    "tx_vol_issues_chouts" : Velo.queue_dict["txes_chouts"],
                     "m_total"              : Velo.queue_dict["txes_csupply_agg"],
                 }
                 ,index=Velo.queue_dict["index_txes"]
@@ -836,7 +835,7 @@ class Velo:
             ddf_txes["block_time"] = ddf_txes["block_time"].dt.date
 
             df_txes_agg_by_sum = ddf_txes.groupby(
-                ['block_day_index']
+                ['tx_day_index']
             ).agg({
                 'block_time'           : 'first',
                 'tx_vol'               : 'sum',
@@ -846,7 +845,7 @@ class Velo:
                 'm_total'              : 'first',
             })
 
-            # Translating block_day_index to date to have the same index as
+            # Translating tx_day_index to date to have the same index as
             # in the dataframes to merge in.
             index_new = [Velo.queue_dict["index_day"][i]
             for i in df_txes_agg_by_sum.index]
@@ -1328,18 +1327,18 @@ class Velo:
             )
 
             #--append results to queue dictionary-------------------------------
-            self.__queue_dict["txes_number"]         = txes_number
-            self.__queue_dict["txes_fees"]           = txes_fees
-            self.__queue_dict["txes_dustfees"]       = txes_dustfees
-            self.__queue_dict["txes_dustinpval"]     = txes_dustinpval
-            self.__queue_dict["index_day"]           = index_day
-            self.__queue_dict["txes_valout"]         = txes_valout
-            self.__queue_dict["txes_csupply_agg"]    = txes_csupply_agg
-            self.__queue_dict["txes_block_time"]     = pd.to_datetime(
+            self.__queue_dict["txes_number"]      = txes_number
+            self.__queue_dict["txes_fees"]        = txes_fees
+            self.__queue_dict["txes_dustfees"]    = txes_dustfees
+            self.__queue_dict["txes_dustinpval"]  = txes_dustinpval
+            self.__queue_dict["index_day"]        = index_day
+            self.__queue_dict["txes_valout"]      = txes_valout
+            self.__queue_dict["txes_csupply_agg"] = txes_csupply_agg
+            self.__queue_dict["txes_block_time"]  = pd.to_datetime(
                 txes_block_time
             )
-            self.__queue_dict["index_txes"]          = index_txes
-            self.__queue_dict["issues_in_tx_chouts"] = txes_chouts
+            self.__queue_dict["index_txes"]       = index_txes
+            self.__queue_dict["txes_chouts"]      = txes_chouts
 
             #--used by subsequent instance level functions----------------------
             self.__txes_daily  = txes_daily
