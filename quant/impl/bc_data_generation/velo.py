@@ -161,31 +161,7 @@ class Velo:
         Initialize session and with that, the main blockchain object used by
         each instance of the Velo class.
         """
-        def coin_supply_renumeration(block_height):
-            """
-            supply calculation of BTC inspired by:
-            [...] https://www.coindesk.com/making-sense-bitcoins-halving/
-            """
 
-            # the mining reward will be halved each 210000 blocks
-            halving_interval = 210000
-            #initial reward
-            reward = 50*100000000
-
-            if block_height < halving_interval:
-                return(reward)
-
-            halvings = floor(block_height / halving_interval)
-
-            # if to much halvings (when using 64 bit integer since then,
-            # right shifting (>>) will be undefined)
-            if halvings >= 64:
-                return(0)
-
-            #using right shifts to devide by 2
-            reward >>= halvings
-
-            return(reward)
 
         def loadSession_heuristics():
             """
@@ -251,6 +227,32 @@ class Velo:
             """
             Precompute cumulated/aggregated coin supply for full chain
             """
+            def coin_supply_renumeration(block_height):
+                """
+                supply calculation of BTC inspired by:
+                [...] https://www.coindesk.com/making-sense-bitcoins-halving/
+                """
+
+                # the mining reward will be halved each 210000 blocks
+                halving_interval = 210000
+                #initial reward
+                reward = 50*100000000
+
+                if block_height < halving_interval:
+                    return(reward)
+
+                halvings = floor(block_height / halving_interval)
+
+                # if to much halvings (when using 64 bit integer since then,
+                # right shifting (>>) will be undefined)
+                if halvings >= 64:
+                    return(0)
+
+                #using right shifts to devide by 2
+                reward >>= halvings
+
+                return(reward)
+
             coin_supply_agg_str_a = "Calculating cumulative coin supply"
             coin_supply_agg_str_b = "for each Tx over full chain"
             Velo.logger.info("{}[{}coin_supply_agg{}]{}  {} {}".format(
@@ -415,6 +417,9 @@ class Velo:
             "date of last block  = {}".format(Velo.chain[-1].time)
         )
 
+        #--Call remaining subfunctions------------------------------------------
+        get_coin_supply_agg()
+
         #--load index_block_day, index_txes_day & daily_outputs with time_window
 
         Velo.logger.info("{}[{}daily txesIndex{}]{}  Loading".format(
@@ -456,7 +461,6 @@ class Velo:
         day_date_next = day_date
 
         sub_proc_tx_num_max  = ceil(cnt_txes/(multiprocessing.cpu_count()))
-        #sub_proc_tx_num_max  = 4000000
         sub_proc_tx_counter  = 0
         sub_proc_date_start  = day_date
         sub_proc_date_end    = day_date + timedelta(days=1)
@@ -487,7 +491,6 @@ class Velo:
                 Velo.index_block_day.append(day)
                 block = Velo.chain[i_bh]
 
-                # block_tx_count = 0
                 block_tx_count = block.tx_count
                 txes_valout_agg_daily_sum += block.output_value
 
@@ -560,9 +563,6 @@ class Velo:
                     ][0]
 
                 Velo.txes_valout_agg_daily[day][t_w] = txes_valout_agg_for_t_w
-
-        #--Call remaining subfunctions------------------------------------------
-        get_coin_supply_agg()
 
         return
 
