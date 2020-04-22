@@ -847,8 +847,10 @@ class Velo:
 
             # Translating tx_day_index to date to have the same index as
             # in the dataframes to merge in.
-            index_new = [Velo.queue_dict["index_day"][i]
-            for i in df_txes_agg_by_sum.index]
+            index_new = [
+                Velo.queue_dict["index_day"][i]
+                for i in df_txes_agg_by_sum.index
+            ]
             df_txes_agg_by_sum.index = index_new
 
             queue.put(df_txes_agg_by_sum)
