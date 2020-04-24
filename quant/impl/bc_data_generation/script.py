@@ -98,115 +98,8 @@ def retrieveMoneyVelocityMeasurements(
     #--retrieving data from all processes---------------------------------------
     Velo.get_results_of_processes(results)
 
-#Let x \in {2, 3}
-#x: [ Data Frame: retrieve, transform and write_to_csv  data frames ]-----------
-    logger.info("{}{}[{}build&write csv{}{}]".format(
-        cs.RES,
-        cs.WHI,
-        cs.PRGnBI,
-        cs.RES,
-        cs.WHI,
-    ))
-
-    #--setting time to identify when csv were created---------------------------
-    now_date        = datetime.now()
-    end_date_d      = datetime.strptime(end_date, "%m/%d/%Y").date()
-    now_date_str    = now_date.strftime("%Y%m%d_%H%M")
-    end_date_str    = end_date_d.strftime("%Y%m%d")
-    filepath        = "{}_csv/".format(path_data_output)
-    filename_dates  = "{}{}_e_{}".format(filepath, now_date_str, end_date_str)
-    filename_simple = "{}_{}.csv".format(filename_dates, "velo_simple")
-    filename_daily  = "{}_{}.csv".format(filename_dates, "velo_daily")
-    queue_df        = {}
-    process_df      = {}
-
-    #--setup circulating money and agg_by_sum subprocesses----------------------
-    df_type = "mc"
-    queue_df[df_type]   = JoinableQueue()
-    process_df[df_type] = Process(target=Velo.get_df, args=(
-        df_type,
-        queue_df[df_type],
-    ))
-
-    df_type = "agg"
-    queue_df[df_type]   = JoinableQueue()
-    process_df[df_type] = Process(target=Velo.get_df, args=(
-        df_type,
-        queue_df[df_type],
-    ))
-
-    #--start circulating money subprocess---------------------------------------
-    process_df["mc"].start()
-
-    #--use main process as designated "subprocess" for get_df("txes")-----------
-    Velo.get_df(type = "txes")
-
-    #--wait for get_df("txes") (no join required, since its run in main process)
-    #--setup csv conversion subprocess------------------------------------------
-    process_df["csv"] = Process(target=Velo.get_df, args=(
-        "csv",
-        None,
-        Velo.df_dict["txes"],
-        "ungrouped ",
-        filename_simple,
-        "date",
-    ))
-
-    #--start remaining subprocesses---------------------------------------------
-    # process_df["csv"].start()
-    process_df["agg"].start()
-
-    #--handle circulating money call--------------------------------------------
-    df_type = "mc"
-    while True:
-        msg_from_queue = queue_df[df_type].get()
-
-        Velo.df_dict["m_circ_wh_bill"] = msg_from_queue["m_circ_wh_bill"]
-        del Velo.queue_dict["m_circ_wh_bill"]
-
-        Velo.df_dict["m_circ_mc_lifo"] = msg_from_queue["m_circ_mc_lifo"]
-        del Velo.queue_dict["m_circ_mc_lifo"]
-
-        Velo.df_dict["m_circ_mc_fifo"] = msg_from_queue["m_circ_mc_fifo"]
-        del Velo.queue_dict["m_circ_mc_fifo"]
-
-        Velo.df_dict["dormancy_daily"] = msg_from_queue["dormancy_daily"]
-        Velo.df_dict["sdd_daily"]      = msg_from_queue["sdd_daily"]
-
-        queue_df[df_type].task_done()
-        break
-
-    process_df[df_type].join()
-
-    #--handle agg_by_sum call---------------------------------------------------
-    df_type = "agg"
-    while True:
-        msg_from_queue = queue_df[df_type].get()
-
-        Velo.df_dict["txes_agg_by_sum"] = msg_from_queue
-        del Velo.df_dict["txes"]
-        del Velo.queue_dict["txes_block_time"]
-        del Velo.queue_dict["index_day"]
-
-        queue_df[df_type].task_done()
-        break
-
-    process_df[df_type].join()
-
-    #--merge results form get_df_coin_supply_circ and get_df_agg_by_sum---------
-    Velo.get_df(type = "merge")
-
-    #--get csv of result form merging step--------------------------------------
-    Velo.get_df(
-        "csv",
-        None,
-        Velo.df_dict["txes_agg_by_sum"],
-        "grouped timeseries ",
-        filename_daily,
-        "date",
-    )
-
-    # process_df["csv"].join()
+    #--get csv of final pandas data frame---------------------------------------
+    Velo.get_results_finalized()
 
     print ("Exiting program")
     return
@@ -250,6 +143,7 @@ def main():
     if test >= 0:
         Velo.loadSession(
             path_data_input=path_data_input,
+            path_data_output=path_data_output,
             path_cluster=path_cluster,
             logger=logger,
             heur_input=heur_input,
