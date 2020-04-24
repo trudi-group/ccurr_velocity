@@ -53,10 +53,10 @@ def retrieveMoneyVelocityMeasurements(
     path_data_output,
 ):
     """
-    Insert Description here
+    Insert Desc:wription here
     """
 
-#1: [ Main Script - Retrieval of basic blockchain data for data frames ]--------
+    #--Retrieval of basic blockchain data for data frames-----------------------
     results = mp.get_data_for_df(
         start_date,
         end_date,
@@ -123,12 +123,13 @@ def main():
     cnt_cls_only     = args.count_clustering_only
 
 
-#--check is path_data_output exists---------------------------------------------
+    #--check is path_data_output exists-----------------------------------------
     if not os.path.exists("{}_csv".format(path_data_output)):
         os.makedirs("{}_csv".format(path_data_output))
     if not os.path.exists("{}_ds".format(path_data_output)):
         os.makedirs("{}_ds".format(path_data_output))
-# [ Logging setup ]-------------------------------------------------------------
+
+    #--Logging setup------------------------------------------------------------
     logging_setup(
         logging,
         logger,
@@ -138,24 +139,22 @@ def main():
     mp.logger   = logger
     Velo.logger = logger
 
-#0: [ Load main objects for using BlockSci ]------------------------------------
-    #init_Session
-    if test >= 0:
-        Velo.loadSession(
-            path_data_input=path_data_input,
-            path_data_output=path_data_output,
-            path_cluster=path_cluster,
-            logger=logger,
-            heur_input=heur_input,
-            test=test,
-            date_format=date_format,
-            start_date=start_date,
-            end_date=end_date,
-            windows_for_competing_msrs=time_windows,
-            cnt_cls_only=cnt_cls_only,
-        )
+    #-- initialize program:[Load main objects for using BlockSci ]--------------
+    Velo.loadSession(
+        path_data_input=path_data_input,
+        path_data_output=path_data_output,
+        path_cluster=path_cluster,
+        logger=logger,
+        heur_input=heur_input,
+        test=test,
+        date_format=date_format,
+        start_date=start_date,
+        end_date=end_date,
+        windows_for_competing_msrs=time_windows,
+        cnt_cls_only=cnt_cls_only,
+    )
 
-#   [ Start test or normal application ]----------------------------------------
+    #--Start test or normal application-----------------------------------------
     retrieveMoneyVelocityMeasurements(
         start_date=start_date,
         end_date=end_date,
