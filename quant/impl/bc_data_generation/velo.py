@@ -113,7 +113,8 @@ class Velo:
     This class provides calculation functionality to measure
     the money velocity on the bitcoin blockchain.
     """
-    start_date_gen    = "01/03/2009"    # date of bitcoin genesis
+    date_format    = "%Y-%m-%d %H:%M:%S"
+    start_date_gen = "01/03/2009"       # date of bitcoin genesis
 
     # class attribute representing blocksci chain object used by all instances
     chain                 = None        # the mainly blockcain object
@@ -145,14 +146,13 @@ class Velo:
     process_cnt       = 0
 
     #==[ CLASSLEVEL | SessionSetup & precaching of global data struct ]=========
-    def loadSession(
+    def setup(
         path_data_input,
         path_data_output,
         path_cluster,
         logger,
         heur_input,
         test,
-        date_format,
         start_date,
         end_date,
         windows_for_competing_msrs,
@@ -162,7 +162,7 @@ class Velo:
         Initialize session and with that, the main blockchain object used by
         each instance of the Velo class.
         """
-        def loadSession_heuristics():
+        def setup_heuristics():
             """
             compare
             https://citp.github.io/BlockSci/reference/heuristics/change.html
@@ -386,7 +386,6 @@ class Velo:
         Velo.logger           = logger
         Velo.heur_input       = heur_input
         Velo.test_level       = test
-        Velo.date_format      = date_format
         Velo.start_date       = start_date
         Velo.end_date         = end_date
         Velo.time_windows     = list(
@@ -410,7 +409,7 @@ class Velo:
         )
 
         #--load heurictics object-----------------------------------------------
-        loadSession_heuristics()
+        setup_heuristics()
 
         #--load clustering object-----------------------------------------------
         count_clustering(
