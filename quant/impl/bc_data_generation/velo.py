@@ -113,14 +113,14 @@ class Velo:
     This class provides calculation functionality to measure
     the money velocity on the bitcoin blockchain.
     """
-    # date of bitcoin genesis
-    start_date_gen    = "01/03/2009"
+    start_date_gen    = "01/03/2009"    # date of bitcoin genesis
+
     # class attribute representing blocksci chain object used by all instances
-    chain                 = None
-    cluster_mgr           = None
-    cluster_cnt           = None
+    chain                 = None        # the mainly blockcain object
+    cluster_mgr           = None        # manager for clustering addresses
+    cluster_cnt           = None        # number of address clusters
     cluster_range         = None
-    cluster_max_id        = None
+    cluster_max_id        = None        # id of cluster with max address count
     block_times           = None
     heur_select           = None
     heur_input            = None
@@ -132,18 +132,19 @@ class Velo:
     txes_valout_agg_daily = []
     txes_number_daily     = []
     sub_proc_dates        = []
+
     # data structures conveyed by subprocess queues/used by data frame functions
     csupply_agg_cache = None
     queue_dict        = {}
-    # remaining class attributes
+
+    #--remaining class attributes-----------------------------------------------
     path_data_output  = None
     log_level         = logging.INFO
     logger            = None
     test_level        = 0
     process_cnt       = 0
 
-    #0: [ CLASSLEVEL | SessionSetup & precaching of global data struct ]========
-
+    #==[ CLASSLEVEL | SessionSetup & precaching of global data struct ]=========
     def loadSession(
         path_data_input,
         path_data_output,
@@ -161,8 +162,6 @@ class Velo:
         Initialize session and with that, the main blockchain object used by
         each instance of the Velo class.
         """
-
-
         def loadSession_heuristics():
             """
             compare
@@ -382,7 +381,7 @@ class Velo:
 
             return
 
-        #--Setting globally used static variables-------------------------------
+        #--Setting static variables on class level------------------------------
         Velo.path_data_output = path_data_output
         Velo.logger           = logger
         Velo.heur_input       = heur_input
@@ -393,6 +392,7 @@ class Velo:
         Velo.time_windows     = list(
             map(int, str(windows_for_competing_msrs).split(","))
         )
+
         time_windows_len  = len(Velo.time_windows)
 
         if test > 0:
@@ -401,6 +401,14 @@ class Velo:
         #--load chain object----------------------------------------------------
         Velo.chain = bs.Blockchain(path_data_input)
 
+        #--print basic data in debug mode---------------------------------------
+        Velo.logger.debug(
+            "date of first block = {}".format(Velo.chain[0].time)
+        )
+        Velo.logger.debug(
+            "date of last block  = {}".format(Velo.chain[-1].time)
+        )
+
         #--load heurictics object-----------------------------------------------
         loadSession_heuristics()
 
@@ -408,14 +416,6 @@ class Velo:
         count_clustering(
             skip=True,
             overwrite=False
-        )
-
-        #--print basic data in debug mode---------------------------------------
-        Velo.logger.debug(
-            "date of first block = {}".format(Velo.chain[0].time)
-        )
-        Velo.logger.debug(
-            "date of last block  = {}".format(Velo.chain[-1].time)
         )
 
         #--Call remaining subfunctions------------------------------------------
@@ -435,7 +435,7 @@ class Velo:
             columns = ["date"],
         )
         Velo.block_times["height"] = Velo.block_times.index
-        Velo.block_times.index = Velo.block_times["date"]
+        Velo.block_times.index     = Velo.block_times["date"]
         del Velo.block_times["date"]
 
         cnt_blocks = Velo.block_times[
@@ -446,6 +446,7 @@ class Velo:
             pd.to_datetime(Velo.end_date) - pd.to_datetime(Velo.start_date_gen)
         ).days
 
+        #--get minimum and maximum block_height according to start/end_date-----
         block_height_min = Velo.block_times[
             Velo.block_times.index >= pd.to_datetime(Velo.start_date_gen)
         ].iloc[0][0]
@@ -454,13 +455,13 @@ class Velo:
             Velo.block_times.index >= pd.to_datetime(Velo.end_date)
         ].iloc[0][0]
 
+        #--count transactions between start/end_date blocks---------------------
         cnt_txes = 0
         for i_bh in range(block_height_min, block_height_max):
             cnt_txes += Velo.chain[i_bh].tx_count
 
-        day_date      = pd.to_datetime(Velo.start_date_gen)
-        day_date_next = day_date
-
+        day_date             = pd.to_datetime(Velo.start_date_gen)
+        day_date_next        = day_date
         sub_proc_tx_num_max  = ceil(cnt_txes/(multiprocessing.cpu_count()))
         sub_proc_tx_counter  = 0
         sub_proc_date_start  = day_date
@@ -469,14 +470,13 @@ class Velo:
 
         for day in range(cnt_days):
             # transform date variables------------------------------------------
-            # day_date_net_prev = day_date_next
             day_date = day_date_next
             day_date_next += relativedelta(days=1)
 
             # initialize daily aggregated valouts per time_window---------------
             Velo.txes_valout_agg_daily.append([])
             txes_valout_agg_daily_sum = 0
-            txes_number_per_day = 0
+            txes_number_per_day       = 0
 
             # get minimum and maximum block_height according to actual day------
             block_height_min = Velo.block_times[
@@ -567,7 +567,7 @@ class Velo:
 
         return
 
-    # [ CLASSLEVEL | Get combined results of all subprocesses ]=================
+    #==[ CLASSLEVEL | Get combined results of all subprocesses ]================
     def get_results_of_processes(results_from_processes):
         """
         Get the multiprocessed results and set them to globally used
@@ -583,7 +583,7 @@ class Velo:
 
         return
 
-    #  [ CLASSLEVEL | Retrieval & transform-functions for data frames ]=========
+    #==[ CLASSLEVEL | finalize results and get final data frames and csv ]======
     def get_results_finalized(
         export_filename  = "",
         index_label      = "",
@@ -592,11 +592,7 @@ class Velo:
         Builds a pandas data frame and csv from pre-computed data.
         """
 
-        def get_comp_meas_from_summands(
-            sdd_summands,
-            dormancy_summands,
-            min_frac = 1,
-        ):
+        def get_comp_meas_from_summands(min_frac = 1):
             """
             Function using the results form get_comp_meas_summands to
             aggregate them after their results have been joined after the
@@ -617,32 +613,38 @@ class Velo:
                 backwards and not in the future, so that we get missing values
                 in the earliest dates.
                 """
-                # reverse the list, as we need to start with the latest date
+
+                #--reverse the list, as we need to start with the latest date---
                 l.reverse()
-                # set minimum periods necessary for cumsum
+
+                #--set minimum periods necessary for cumsum---------------------
                 min_periods = int(window*min_frac)
-                # convert list to pandas df
+
+                #--convert list to pandas df------------------------------------
                 df = pd.DataFrame(l)
-                # calculate cumsum with lookback window
+
+                #--calculate cumsum with lookback window------------------------
                 df = df.rolling(
                     window = window,
                     min_periods = min_periods,
                 ).sum().shift(-(window-1))
-                # convert pandas df back to list
+
+                #--convert pandas df back to list-------------------------------
                 l = list(chain(*df.values.tolist()))
 
-                # reverse the list again, as we have to put back the list...
-                # starting with the earliest date
+                #--reverse the list to be starting with the earliest date-------
                 l.reverse()
                 return l
 
-            time_windows     = Velo.time_windows
-            time_windows_len = len(time_windows)
+            sdd_summands      = Velo.queue_dict["summands_dsls_daily"]
+            dormancy_summands = Velo.queue_dict["summands_dsls_daily_wghtd"]
+            time_windows      = Velo.time_windows
+            time_windows_len  = len(time_windows)
 
-            # (C1 & C2:)
+            #--(C1 & C2:)------------------------------------------------------
             dormancy_summands = list(zip(*dormancy_summands))
-            sdd_daily      = []
-            dormancy_daily = []
+            sdd_daily         = []
+            dormancy_daily    = []
             for i in range(time_windows_len):
                 # (C1):
                 sdd_daily.append(
@@ -661,6 +663,10 @@ class Velo:
 
             Velo.queue_dict["sdd"]      = list(zip(*sdd_daily))
             Velo.queue_dict["dormancy"] = list(zip(*dormancy_daily))
+
+            #--free used data structures----------------------------------------
+            del Velo.queue_dict["summands_dsls_daily"]
+            del Velo.queue_dict["summands_dsls_daily_wghtd"]
 
             return
 
@@ -706,7 +712,7 @@ class Velo:
             ))
 
             return df_merge_target
-
+        #--Start of get_results_finalized()---------------------------------
         Velo.logger.info("{}{}[{}build&write csv{}{}]".format(
             cs.RES,
             cs.WHI,
@@ -715,18 +721,10 @@ class Velo:
             cs.WHI,
         ))
 
-        #--prepare measures to be compared with velocity
-        get_comp_meas_from_summands(
-            sdd_summands = Velo.queue_dict["summands_dsls_daily"],
-            dormancy_summands = Velo.queue_dict["summands_dsls_daily_wghtd"],
-            min_frac = 1,
-        )
+        #--prepare measures to be compared with velocity--------------------
+        get_comp_meas_from_summands(min_frac = 1)
 
-        #--free used data structures----------------------------------------
-        del Velo.queue_dict["summands_dsls_daily"]
-        del Velo.queue_dict["summands_dsls_daily_wghtd"]
-
-        #--create final pandas data frame-----------------------------------
+        #--create first part of final pandas data frame-------------------------
         df_txes = pd.DataFrame(
             {
                 "block_time"           : Velo.queue_dict["txes_block_time"],
@@ -741,18 +739,27 @@ class Velo:
 
         df_txes["block_time"] = df_txes["block_time"].dt.date
 
-        #--handle m_circ df_types-------------------------------------------
+        #--handle m_circ df_types and merge to final data frame-------------
         m_circ_dict = {}
         m_circ_dict["m_circ_wh_bill"] = df_prepare_time_window("m_circ_wh_bill")
         m_circ_dict["m_circ_mc_lifo"] = df_prepare_time_window("m_circ_mc_lifo")
         m_circ_dict["m_circ_mc_fifo"] = df_prepare_time_window("m_circ_mc_fifo")
-        m_circ_dict["dormancy"]       = df_prepare_time_window("dormancy")
-        m_circ_dict["sdd"]            = df_prepare_time_window("sdd")
 
         for df in m_circ_dict:
             df_txes = df_merge(
                 df_txes,
                 m_circ_dict[df],
+            )
+
+        #--handle measurements from literature------------------------------
+        comp_meas = {}
+        comp_meas["dormancy"] = df_prepare_time_window("dormancy")
+        comp_meas["sdd"]      = df_prepare_time_window("sdd")
+
+        for df in comp_meas:
+            df_txes = df_merge(
+                df_txes,
+                comp_meas[df],
             )
 
         Velo.logger.info("{}{}[{}built dataframe{}{}]  {}".format(
@@ -793,11 +800,8 @@ class Velo:
 
         return
 
-
-
-
     #--PUBLIC INSTANCE-LEVEL METHODS--##########################################
-    #0: [ INSTALEVEL | Initialize instances ]===================================
+    #==[ INSTALEVEL | Initialize instances ]====================================
     def __init__ (
         self,
         process_id,
@@ -831,7 +835,7 @@ class Velo:
         # data structures conveyed by subprocess queues
         self.__queue_dict = {}
 
-    #1: [ INSTALEVEL | Main Script - Standard info, M & TP and TP adjustments ]=
+    #==[ INSTALEVEL | Retrieve of desired data ]================================
     def run(self):
         """
         Run the thread
