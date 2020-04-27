@@ -31,11 +31,7 @@ from pandas import DatetimeIndex
 from multiprocessing import Process, Queue, JoinableQueue
 from colorstrings import colorStrings as cs
 
-#===[ Logging setup ]===========================================================
-logger = logging.getLogger(__name__)
-logging_set_log_level_formatting(logging)
-
-#===[ register signal_handler to kill all subprocesses ]========================
+#==[ register signal_handler to kill all subprocesses ]=========================
 def signal_handler(sig, frame):
     mp.processes_kill_all()
     sys.exit(0)
@@ -53,9 +49,7 @@ def retrieveMoneyVelocityMeasurements(
     path_data_output,
 ):
     """
-    Insert Desc:wription here
     """
-
     #--Retrieval of basic blockchain data for data frames-----------------------
     results = mp.get_data_for_df(
         start_date,
@@ -67,9 +61,7 @@ def retrieveMoneyVelocityMeasurements(
         path_data_output,
     )
 
-    if test>0:
-        return
-
+    if test > 0: return
     elif test == -1:
         ress = results["process_id"]
         last_e = -1
@@ -91,7 +83,7 @@ def retrieveMoneyVelocityMeasurements(
 
             last_e += 1
 
-        logger.info(prt)
+        Velo.logger.info(prt)
         print("Exiting multiprocessing test")
         exit(0)
 
@@ -101,11 +93,14 @@ def retrieveMoneyVelocityMeasurements(
     #--get csv of final pandas data frame---------------------------------------
     Velo.get_results_finalized()
 
-    print ("Exiting program")
+    print("Exiting program")
     return
+
 #===============================================================================
 def main():
-# [ parse arguments ]-----------------------------------------------------------
+    """
+    """
+    #--parse arguments----------------------------------------------------------
     args             = parse_args()
     start_date       = args.start_date
     end_date         = args.end_date
@@ -118,18 +113,21 @@ def main():
     cpu_cnt_manual   = int(args.cpu_count)
     heur_input       = args.heur_input
     test             = int(args.test)
-    date_format      = "%Y-%m-%d %H:%M:%S"
     time_windows     = args.windows_for_competing_msrs
     cnt_cls_only     = args.count_clustering_only
 
+    date_format      = "%Y-%m-%d %H:%M:%S"
 
     #--check is path_data_output exists-----------------------------------------
     if not os.path.exists("{}_csv".format(path_data_output)):
         os.makedirs("{}_csv".format(path_data_output))
+
     if not os.path.exists("{}_ds".format(path_data_output)):
         os.makedirs("{}_ds".format(path_data_output))
 
     #--Logging setup------------------------------------------------------------
+    logger = logging.getLogger(__name__)
+    logging_set_log_level_formatting(logging)
     logging_setup(
         logging,
         logger,
@@ -139,7 +137,7 @@ def main():
     mp.logger   = logger
     Velo.logger = logger
 
-    #-- initialize program:[Load main objects for using BlockSci ]--------------
+    #--initialize program: Load main objects for using BlockSci-----------------
     Velo.loadSession(
         path_data_input=path_data_input,
         path_data_output=path_data_output,
