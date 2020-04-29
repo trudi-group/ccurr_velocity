@@ -25,78 +25,8 @@ from numpy        import cumsum
 from itertools    import compress
 from colorstrings import colorStrings as cs
 
-#===============================================================================
-def logging_set_log_level_formatting(logging):
-    """
-    logging setup of log level formattings.
-    """
-    logging.addLevelName(
-        logging.ERROR,   "{}{}  {}".format(
-            cs.RED,
-            logging.getLevelName(logging.ERROR),
-            cs.BES,
-        )
-    )
-    logging.addLevelName(
-        logging.WARNING, "{}{}{}".format(
-            cs.MAG,
-            logging.getLevelName(logging.WARNING),
-            cs.BES,
-        )
-    )
-    logging.addLevelName(
-        logging.INFO,    "{}       {}".format(
-            cs.CYB,
-            cs.BES,
-        )
-    )
-    logging.addLevelName(
-        logging.DEBUG,   "{}{}  {}".format(
-            cs.CYA,
-            logging.getLevelName(logging.DEBUG),
-            cs.BES,
-        )
-    )
-
-    return
-
-def logging_setup(
-    logging,
-    logger,
-    path_log,
-    log_level,
-):
-    out_hdlr = logging.StreamHandler(sys.stdout)
-    out_hdlr.setFormatter(
-        logging.Formatter(
-              ''
-            + '%(levelname)s'
-            + ' '
-            + cs.WHI
-            + '%(message)s'
-            + cs.RES
-        )
-    )
-    out_hdlr.setLevel(log_level)
-    logger.setLevel(log_level)
-    logger.addHandler(out_hdlr)
-    logging.basicConfig(
-        filename=path_log,
-        level=log_level
-    )
-    logging.basicConfig(
-        format=
-              '%(asctime)s'
-            + '  %(levelname)-10s'
-            + ' %(processName)s'
-            + '  %(name)s'
-            + ' %(message)s',
-        datefmt="%Y-%m-%d-%H-%M-%S"
-    )
-
-    return
-#===============================================================================
-def parse_args (
+#==[ parse arguments ]==========================================================
+def setup_parse_args (
 ):
     """
     Parse commandline arguments
@@ -202,67 +132,94 @@ def parse_args (
         )
     args = parser.parse_args()
     return(args)
+
+#==[ logging and output helpers ]===============================================
+def setup_logging(
+    logging,
+    path_log,
+    log_level,
+):
+    """
+    Setup logging functionality.
+    """
+    def setup_logging_formating_per_log_level(logging):
+        """
+        Setup of log level formattings.
+        """
+        logging.addLevelName(
+            logging.ERROR,   "{}{}  {}".format(
+                cs.RED,
+                logging.getLevelName(logging.ERROR),
+                cs.BES,
+            )
+        )
+        logging.addLevelName(
+            logging.WARNING, "{}{}{}".format(
+                cs.MAG,
+                logging.getLevelName(logging.WARNING),
+                cs.BES,
+            )
+        )
+        logging.addLevelName(
+            logging.INFO,    "{}       {}".format(
+                cs.CYB,
+                cs.BES,
+            )
+        )
+        logging.addLevelName(
+            logging.DEBUG,   "{}{}  {}".format(
+                cs.CYA,
+                logging.getLevelName(logging.DEBUG),
+                cs.BES,
+            )
+        )
+
+        return
+    #--set formatting per log level---------------------------------------------
+    setup_logging_formating_per_log_level(logging)
+
+    #--setup logging------------------------------------------------------------
+    logger = logging.getLogger(__name__)
+    out_hdlr = logging.StreamHandler(sys.stdout)
+    out_hdlr.setFormatter(
+        logging.Formatter(
+              ''
+            + '%(levelname)s'
+            + ' '
+            + cs.WHI
+            + '%(message)s'
+            + cs.RES
+        )
+    )
+    out_hdlr.setLevel(log_level)
+    logger.setLevel(log_level)
+    logger.addHandler(out_hdlr)
+    logging.basicConfig(
+        filename=path_log,
+        level=log_level
+    )
+    logging.basicConfig(
+        format=
+              '%(asctime)s'
+            + '  %(levelname)-10s'
+            + ' %(processName)s'
+            + '  %(name)s'
+            + ' %(message)s',
+        datefmt="%Y-%m-%d-%H-%M-%S"
+    )
+
+    return logger
+
+def setup_output_path (path_data_output):
+    """
+    Check whether output directories exist and if not, create them.
+    """
+    if not os.path.exists("{}_csv".format(path_data_output)):
+        os.makedirs("{}_csv".format(path_data_output))
+
+    if not os.path.exists("{}_ds".format(path_data_output)):
+        os.makedirs("{}_ds".format(path_data_output))
 #===============================================================================
-# def flatten(
-#     lst
-# ):
-#     """
-#     From:
-#     https://stackoverflow.com/questions/44061355/flattening-list-of-lists
-#     """
-#     for el in lst:
-#         if isinstance(el, list):
-#             yield from el
-#         elif isinstance(el, set):
-#             yield from el
-#         else:
-#             yield el
-#===============================================================================
-# def ConcatElemToStr(
-#     l1,
-#     l2,
-#     join
-# ):
-#     """
-#     Concatenating the strings in lists of lists seperated by a "join"-symbol,
-#     e.g. "-"
-#     """
-#     concat = [
-#         m+join+n for m,
-#         n in zip(
-#             list(map(str, l1)),
-#             list(map(str, l2))
-#         )
-#     ]
-#     return concat
-#===============================================================================
-# class TestMethods(unittest.TestCase):
-#     def test_date_range(self):
-#         start_dt      = date.today().replace(day=1, month=1).toordinal()
-#         end_dt        = date.today().toordinal()
-#         start_dt_rand = date.fromordinal(random.randint(start_dt, end_dt))
-#         end_dt_rand   = start_dt_rand
-#         period_dt     = start_dt_rand
-#
-#         while True:
-#             end_dt_rand = date.fromordinal(random.randint(start_dt, end_dt))
-#
-#             if start_dt_rand < end_dt_rand:
-#                 start_date = str(start_dt_rand).replace("-", "/")
-#                 end_date   = str(end_dt_rand).replace("-", "/")
-#                 period_dt  = end_dt_rand - start_dt_rand
-#                 break
-#             if start_dt_rand > end_dt_rand:
-#                 start_date = str(end_dt_rand).replace("-", "/")
-#                 end_date   = str(start_dt_rand).replace("-", "/")
-#                 period_dt  = start_dt_rand - end_dt_rand
-#                 break
-#
-#         period = period_dt.days + 1
-#
-#         print(start_date)
-#         print(end_date)
-#         print(period)
-#===============================================================================
-# if __name__ == "__main__":
-#     unittest.main()
+if __name__ == "__main__":
+    print("{}This is only a file with helper functions!{}".format(cs.RED,cs.RES))
+    exit(0)
