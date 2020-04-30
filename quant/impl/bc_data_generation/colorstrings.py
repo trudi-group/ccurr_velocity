@@ -1,6 +1,6 @@
 # colors
 
-class colorStrings:
+class ColorStrings:
     RED = "\033[1;31m"
     REE = "\033[0;31m"
     BLU = "\033[1;34m"
