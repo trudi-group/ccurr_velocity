@@ -12,7 +12,7 @@ from datetime        import datetime
 from datetime        import timedelta
 from pandas          import DatetimeIndex
 from math            import ceil
-from colorstrings    import colorStrings as cs
+from colorstrings    import ColorStrings as cs
 
 class Multiprocess:
     """
@@ -369,7 +369,7 @@ class Multiprocess:
             This function provides some dummy commands in order to check the
             correct functioning of the multiprocessing of the chain.
             """
-            s_p_d = Velo.sub_proc_dates
+            s_p_d = Velo.f_dates_of_id_sub_proc
             date_period_start        = s_p_d[date_id][0]
             date_period_end          = s_p_d[date_id][1]
             date_period              = s_p_d[date_id][2]
@@ -662,7 +662,7 @@ class Multiprocess:
         #     end_date_o,
         #     period
         # ):
-        s_p_d = Velo.sub_proc_dates
+        s_p_d = Velo.f_dates_of_id_sub_proc
         for date in range(len(s_p_d)):
             date_period = s_p_d[date][2]
             if date_period <= 0:
