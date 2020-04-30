@@ -480,10 +480,10 @@ class Multiprocess:
                     cs.RES,
                     "--stage_id = {}--".format(msg_stage_id)
                 )
-               
+
                 Multiprocess.process_result[msg_process_id][
                     msg_stage_id
-                ] = msg_result 
+                ] = msg_result
 
                 Multiprocess.logger.info("{}{}  results retrieved".format(
                     msg_process_id_str,
@@ -693,7 +693,7 @@ class Multiprocess:
             if thread_subprocess_manage.is_alive():
                 Multiprocess.logger.warning("Exiting concat to early!")
                 sleep(2)
-            
+
             # return final results----------------------------------------------
             if stage_id == Multiprocess.stage_fin-1:
                 Multiprocess.process_result_cat_fin = process_result_cat
@@ -754,7 +754,7 @@ class Multiprocess:
                 continue;
 
             queue_evnt   = JoinableQueue()
-            process      = [] 
+            process      = []
             process_name = "process_{:03d}".format(process_id)
             process_inst = None
 
