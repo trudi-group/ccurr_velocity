@@ -1,29 +1,11 @@
 #!/usr/bin/env python3
 # -------> Note: Please start from the directory "crypto_velocity/quant/impl/"
-import operator
-import blocksci
-import os
-import pandas as pd
-import time
 import logging
-import argparse
-import unittest
-import random
-import io
-import sys
-from datetime     import datetime
-from datetime     import date
-from datetime     import timedelta
-from pandas       import read_csv
-from math         import ceil
-from math         import floor
-from numpy        import concatenate
-from numpy        import nditer
-from numpy        import nan
-from operator     import add
-from numpy        import cumsum
-from itertools    import compress
-from colorstrings import colorStrings as cs
+from os           import getcwd, makedirs
+from os.path      import exists
+from argparse     import ArgumentParser
+from sys          import stdout
+from colorstrings import ColorStrings as cs
 
 #==[ parse arguments ]==========================================================
 def setup_parse_args (
@@ -31,7 +13,7 @@ def setup_parse_args (
     """
     Parse commandline arguments
     """
-    parser = argparse.ArgumentParser(
+    parser = ArgumentParser(
         description=
         'This program computes the possesion change rate of coins on the'
         + ' bitcoin blockchain.'
@@ -81,7 +63,7 @@ def setup_parse_args (
     )
     parser.add_argument(
           '-he'
-        , '--heur_input'
+        , '--heur_choice'
         , action='store'
         , default="legacy_improved"
         , help="Sets Heuristic for change outputs"
@@ -109,7 +91,7 @@ def setup_parse_args (
     )
     parser.add_argument(
           '-wndw'
-        , '--windows_for_competing_msrs'
+        , '--time_window'
         , action='store'
         , default="1"
         #, default="1,30,90"
@@ -135,7 +117,6 @@ def setup_parse_args (
 
 #==[ logging and output helpers ]===============================================
 def setup_logging(
-    logging,
     path_log,
     log_level,
 ):
@@ -175,12 +156,13 @@ def setup_logging(
         )
 
         return
+
     #--set formatting per log level---------------------------------------------
     setup_logging_formating_per_log_level(logging)
 
     #--setup logging------------------------------------------------------------
     logger = logging.getLogger(__name__)
-    out_hdlr = logging.StreamHandler(sys.stdout)
+    out_hdlr = logging.StreamHandler(stdout)
     out_hdlr.setFormatter(
         logging.Formatter(
               ''
@@ -195,7 +177,7 @@ def setup_logging(
     logger.setLevel(log_level)
     logger.addHandler(out_hdlr)
     logging.basicConfig(
-        filename=path_log,
+        filename=getcwd() + path_log,
         level=log_level
     )
     logging.basicConfig(
@@ -214,11 +196,12 @@ def setup_output_path (path_data_output):
     """
     Check whether output directories exist and if not, create them.
     """
-    if not os.path.exists("{}_csv".format(path_data_output)):
-        os.makedirs("{}_csv".format(path_data_output))
+    if not exists("{}_csv".format(path_data_output)):
+        makedirs("{}_csv".format(path_data_output))
 
-    if not os.path.exists("{}_ds".format(path_data_output)):
-        os.makedirs("{}_ds".format(path_data_output))
+    if not exists("{}_ds".format(path_data_output)):
+        makedirs("{}_ds".format(path_data_output))
+
 #===============================================================================
 if __name__ == "__main__":
     print("{}This is only a file with helper functions!{}".format(cs.RED,cs.RES))

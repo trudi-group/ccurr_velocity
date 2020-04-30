@@ -1,42 +1,24 @@
 # !/usr/bin/env python3
 # -------> Note: Please start from the directory "crypto_velocity/quant/impl/"
-# --> own imports
-from helpers  import setup_parse_args
-from helpers  import setup_output_path
-from helpers  import setup_logging
-from velo     import Velo
+#==[ import from own modules ]==================================================
+from helpers                import setup_parse_args
+from helpers                import setup_output_path
+from helpers                import setup_logging
+from velo                   import Velo
 from multiprocess_framework import Multiprocess
-# <-- own imports
+from colorstrings           import ColorStrings as cs
 
-
-import blocksci
-import operator
-import time
-import os
-import pandas as pd
+#==[ all other imports ]========================================================
 import logging
-import argparse
-import sys
-import signal
-import csv
-import numpy as np
-import hashlib
-import multiprocessing
-import threading
-from datetime import date
-from datetime import datetime
-from datetime import timedelta
-from numpy import concatenate
-from pandas import DatetimeIndex
-from multiprocessing import Process, Queue, JoinableQueue
-from colorstrings import colorStrings as cs
+from signal          import signal, SIGINT
+from multiprocessing import Process
 
 #==[ register signal_handler to kill all subprocesses ]=========================
 def signal_handler(sig, frame):
-    mp.processes_kill_all()
-    sys.exit(0)
+    Multiprocess.processes_kill_all()
+    exit(0)
 
-signal.signal(signal.SIGINT, signal_handler)
+signal(SIGINT, signal_handler)
 
 #==[ main function ]============================================================
 def main():
@@ -47,8 +29,7 @@ def main():
 
     #--setup: logging and data output-------------------------------------------
     logger = setup_logging(
-        logging,
-        path_log=os.getcwd() + args.path_log + "velocity_data_log",
+        path_log=args.path_log + "velocity_data_log",
         log_level=args.log_level,
     )
     Multiprocess.logger = logger
@@ -57,20 +38,12 @@ def main():
 
     #--setup: main objects for using BlockSci-----------------------------------
     Velo.setup(
-        path_data_input=args.path_data_input,
-        path_data_output=args.path_data_output,
-        path_cluster=args.path_cluster,
         logger=logger,
-        heur_input=args.heur_input,
-        test=args.test,
-        start_date=args.start_date,
-        end_date=args.end_date,
-        windows_for_competing_msrs=args.windows_for_competing_msrs,
-        cnt_cls_only=args.count_clustering_only,
+        args=args,
     )
 
     #--Retrieval of basic blockchain data, money supply and velocity measures---
-    results = Multiprocess.get_data_for_df(
+    results_raw = Multiprocess.get_data_for_df(
         args.start_date,
         args.end_date,
         int(args.period),
@@ -82,7 +55,7 @@ def main():
 
     if args.test > 0: return
     elif args.test == -1:
-        ress = results["process_id"]
+        ress = results_raw["process_id"]
         last_e = -1
         prt = ""
         for e in ress:
@@ -106,11 +79,11 @@ def main():
         print("Exiting multiprocessing test")
         exit(0)
 
-    #--retrieving data from all processes---------------------------------------
-    Velo.get_results_of_processes(results)
-
     #--get csv of final pandas data frame---------------------------------------
-    Velo.get_results_finalized()
+    Velo.get_results_finalized(
+        results_raw=results_raw,
+        index_label="date"
+    )
 
     print("Exiting program")
     exit(0)
