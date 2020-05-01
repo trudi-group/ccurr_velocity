@@ -1385,15 +1385,14 @@ class Velo:
             self.__queue_dict["m_total"]           = m_total
 
             # append results to queue dictionary--------------------------------
-            self.__queue_dict["index_day"]           = index_day
-            self.__queue_dict["block_time"]          = to_datetime(block_time)
-            self.__queue_dict["txes_count"]          = txes_count
-            self.__queue_dict["txes_fees"]           = txes_fees
-            self.__queue_dict["txes_dust_fees"]      = txes_dust_fees
-            self.__queue_dict["txes_dust_inpval"]    = txes_dust_inpval
-            self.__queue_dict["txes_vol"]            = txes_vol
-            self.__queue_dict["txes_vol_self_churn"] = txes_vol_self_churn
-            self.__queue_dict["m_total"]             = m_total
+            self.__queue_dict["index_day"]         = index_day
+            self.__queue_dict["tx_count"]          = txes_count
+            self.__queue_dict["tx_fees"]           = txes_fees
+            self.__queue_dict["tx_dust_fees"]      = txes_dust_fees
+            self.__queue_dict["tx_dust_inpval"]    = txes_dust_inpval
+            self.__queue_dict["tx_vol"]            = txes_vol
+            self.__queue_dict["tx_vol_self_churn"] = txes_vol_self_churn
+            self.__queue_dict["m_total"]           = m_total
 
             #--test and normal returns------------------------------------------
             if Velo.test_level > 0:
