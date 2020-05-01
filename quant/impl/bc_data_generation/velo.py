@@ -690,19 +690,18 @@ class Velo:
         df_index = results_raw["index_day"]
 
         #--create first part of final pandas data frame-------------------------
-        df_final = DataFrame(
-            {
-                "block_time"        : results_raw["block_time"],
-                "tx_vol"            : results_raw["txes_vol"],
-                "tx_count"          : results_raw["txes_count"],
-                "tx_fees"           : results_raw["txes_fees"],
-                "tx_vol_self_churn" : results_raw["txes_vol_self_churn"],
-                "m_total"           : results_raw["m_total"],
-            },
-            index=df_index
-        )
+        results_raw_basic_types = [
+            "index_day",
+            "tx_count",
+            "tx_fees",
+            "tx_vol",
+            "tx_vol_self_churn",
+            "m_total",
+        ]
 
-        df_final["block_time"] = df_final["block_time"].dt.date
+        results_raw_basic = {k: results_raw[k] for k in results_raw_basic_types}
+        df_final = DataFrame.from_dict(results_raw_basic)
+        df_final = df_final.set_index("index_day")
 
         #--handle m_circ df_types and merge to final data frame-----------------
         m_circ_types = [
@@ -741,7 +740,7 @@ class Velo:
                 df_comp_meas,
             )
 
-        #--print status message------------------------------------------------
+        #--print status message-------------------------------------------------
         Velo.logger.info("{}{}[{}built dataframe{}{}]  {}".format(
             cs.RES,
             cs.WHI,
@@ -751,7 +750,7 @@ class Velo:
             "final dataframe"
         ))
 
-        #--remove row from January 4th 2009 to January 8th 2009----------------
+        #--remove row from January 4th 2009 to January 8th 2009-----------------
         df_final = df_final.drop([
             '09/01/04',
             '09/01/05',
@@ -760,7 +759,7 @@ class Velo:
             '09/01/08',
         ])
 
-        #--build final csv-----------------------------------------------------
+        #--build final csv------------------------------------------------------
         now_date       = datetime.now()
         end_date_d     = datetime.strptime(Velo.end_date, "%m/%d/%Y").date()
         now_date_str   = now_date.strftime("%Y%m%d_%H%M")
@@ -777,7 +776,7 @@ class Velo:
             index_label=index_label,
         )
 
-        #--print status message------------------------------------------------
+        #--print status message-------------------------------------------------
         Velo.logger.info(
             "{}{}[{}   wrote csv   {}{}]".format(
                 cs.RES,
@@ -850,7 +849,6 @@ class Velo:
             This function retrieves per subprocessing chunk:
             - txes_daily:          list of daily grouped txes
             - index_day:           index list of day ids
-            - block_time:          list of first block time of each day
             - txes_count:          list of counted transactions per day
             - txes_fees:           list of aggregated transaction fees per day
             - txes_dust_fees:      list of aggregated transaction dust fees 
@@ -1096,7 +1094,6 @@ class Velo:
             #--initialize data structures---------------------------------------
             txes_daily          = []         # all transactions of one day
             index_day           = []         # index list of day ids
-            block_time          = []         # first blocktime of a day
             txes_count          = []         # daily count of transactions
             txes_fees           = []         # daily agg. tx fees
             txes_dust_fees      = []         # daily agg. tx dust fees
@@ -1144,9 +1141,6 @@ class Velo:
                     Velo.block_times.index >= day_date_next
                 ].iloc[0][0]
 
-                # get block height of the first block height of this day--------
-                block_time.append( str(Velo.chain[block_height_min].time) )
-
                 # get list of aggregated coin supply per given block height-----
                 m_total.append(Velo.f_m_total_of_block_height[block_height_min])
 
@@ -1157,18 +1151,17 @@ class Velo:
                         retrieve_per_tx_daily(i_day, tx)
 
             #--used by subsequent instance level functions----------------------
-            self.__txes_daily  = txes_daily
+            self.__txes_daily = txes_daily
 
             # append results to queue dictionary--------------------------------
-            self.__queue_dict["index_day"]           = index_day
-            self.__queue_dict["block_time"]          = to_datetime(block_time)
-            self.__queue_dict["txes_count"]          = txes_count
-            self.__queue_dict["txes_fees"]           = txes_fees
-            self.__queue_dict["txes_dust_fees"]      = txes_dust_fees
-            self.__queue_dict["txes_dust_inpval"]    = txes_dust_inpval
-            self.__queue_dict["txes_vol"]            = txes_vol
-            self.__queue_dict["txes_vol_self_churn"] = txes_vol_self_churn
-            self.__queue_dict["m_total"]             = m_total
+            self.__queue_dict["index_day"]         = index_day
+            self.__queue_dict["tx_count"]          = txes_count
+            self.__queue_dict["tx_fees"]           = txes_fees
+            self.__queue_dict["tx_dust_fees"]      = txes_dust_fees
+            self.__queue_dict["tx_dust_inpval"]    = txes_dust_inpval
+            self.__queue_dict["tx_vol"]            = txes_vol
+            self.__queue_dict["tx_vol_self_churn"] = txes_vol_self_churn
+            self.__queue_dict["m_total"]           = m_total
 
             #--test and normal returns------------------------------------------
             if Velo.test_level > 0:
