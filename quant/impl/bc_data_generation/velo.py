@@ -751,6 +751,15 @@ class Velo:
             "final dataframe"
         ))
 
+        #--remove row from January 4th 2009 to January 8th 2009----------------
+        df_final = df_final.drop([
+            '09/01/04',
+            '09/01/05',
+            '09/01/06',
+            '09/01/07',
+            '09/01/08',
+        ])
+
         #--build final csv-----------------------------------------------------
         now_date       = datetime.now()
         end_date_d     = datetime.strptime(Velo.end_date, "%m/%d/%Y").date()
@@ -1139,7 +1148,7 @@ class Velo:
                 block_time.append( str(Velo.chain[block_height_min].time) )
 
                 # get list of aggregated coin supply per given block height-----
-                m_total.append(Velo.f_m_total_of_block_height[block_height_min]) 
+                m_total.append(Velo.f_m_total_of_block_height[block_height_min])
 
                 # retrieve daily txes and values per block in daily blockrange--
                 for i_bh in range(block_height_min, block_height_max):
