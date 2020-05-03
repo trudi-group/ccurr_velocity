@@ -879,10 +879,8 @@ class Velo:
 
                 return l
 
-            sdd_summands      = results_raw["summands_dsls_daily"]
-            dormancy_summands = results_raw["summands_dsls_daily_wghtd"]
-            time_windows      = Velo.time_windows
-            time_windows_len  = len(time_windows)
+            time_windows     = Velo.time_windows
+            time_windows_len = len(time_windows)
 
             # finalize dormancy per time window---------------------------------
             for day_i in range(len(Velo.tx_vol_agg)):
