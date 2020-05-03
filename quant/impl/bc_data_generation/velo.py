@@ -95,7 +95,7 @@ class Velo:
       currencies
     """
 
-    # class attribute representing blocksci chain object used by all instances--
+    #--class attribute representing blocksci chain object used by all instances-
     chain          = None                 # the mainly blockcain object
     cluster_mgr    = None                 # manager for clustering addresses
     cluster_cnt    = None                 # number of address clusters
@@ -106,7 +106,14 @@ class Velo:
     start          = None
     end            = None
 
-    #lookup functions-----------------------------------------------------------
+    #--chosen columnnames for final dataframe-----------------------------------
+    results_raw_types_basic        = None
+    results_raw_types_comp_meas    = None
+    results_raw_types_comp_meas_tw = []
+    results_raw_types_m_circ       = None
+    results_raw_types_m_circ_tw    = []
+
+    #--lookup functions---------------------------------------------------------
     f_index_day_of_block_height = []                 # f_index-day(block height)
     f_index_day_of_id_txes      = []                 # f_index-day(txes-id)
     f_block_height_of_id_day    = []                 # f_block-height(day-id)
@@ -133,6 +140,43 @@ class Velo:
         Initialize session and with that, the main blockchain object used by
         each instance of the Velo class.
         """
+        def setup_final_data_columns_choice():
+            Velo.results_raw_types_basic = [
+                "index_day",
+                "tx_count",
+                "tx_fees",
+                "tx_vol",
+                "tx_vol_self_churn",
+                "m_total",
+            ]
+
+            Velo.results_raw_types_m_circ = [
+                "m_circ_wh_bill",
+                "m_circ_mc_lifo",
+                "m_circ_mc_fifo",
+            ]
+
+            for type in Velo.results_raw_types_m_circ:
+                for t_w in Velo.time_windows:
+                    Velo.results_raw_types_m_circ_tw.append(
+                        "{}_{}".format(
+                            type,
+                            t_w,
+                        )
+                    )
+
+            Velo.results_raw_types_comp_meas = ["dormancy"]
+
+            Velo.results_raw_types_comp_meas_tw.append("sdd")
+            for type in Velo.results_raw_types_comp_meas:
+                for t_w in Velo.time_windows:
+                    Velo.results_raw_types_comp_meas_tw.append(
+                        "{}_{}".format(
+                            type,
+                            t_w,
+                        )
+                    )
+
         def setup_heuristics(heur_choice):
             """
             compare
@@ -357,6 +401,9 @@ class Velo:
         Velo.time_windows     = list(map(int, str(args.time_window).split(",")))
         Velo.cnt_cls_only     = args.count_clustering_only
 
+        #--setup names of resulting data----------------------------------------
+        setup_final_data_columns_choice()
+
         #--setup of locally used variables--------------------------------------
         time_windows_len = len(Velo.time_windows)
 
@@ -543,12 +590,12 @@ class Velo:
         Builds a pandas data frame and csv from pre-computed data.
         """
 
-        def get_comp_meas_from_summands(
+        def get_comp_meas_finalized(
             results_raw,
             min_frac = 1,
         ):
             """
-            Function using the results form get_comp_meas_summands to
+            Function using the results form get_comp_meas to
             aggregate them after their results have been joined after the
             threading. Here lastly the measures dormancy and
             satoshi days destroyed (ssd) are created.
@@ -588,88 +635,29 @@ class Velo:
 
                 #--reverse the list to be starting with the earliest date-------
                 l.reverse()
+
                 return l
 
-            sdd_summands      = results_raw["summands_dsls_daily"]
-            dormancy_summands = results_raw["summands_dsls_daily_wghtd"]
-            time_windows      = Velo.time_windows
-            time_windows_len  = len(time_windows)
+            time_windows     = Velo.time_windows
+            time_windows_len = len(time_windows)
 
-            #--(C1 & C2:)-------------------------------------------------------
-            dormancy_summands = list(zip(*dormancy_summands))
-            sdd_daily         = []
-            dormancy_daily    = []
+            #--C1---------------------------------------------------------------
+            results_raw["sdd"] = cumsum_with_window_reverse(
+                l = list(results_raw["sdd_raw"]),
+                window = 1,
+            )
+                
+            #-- C2--------------------------------------------------------------
             for i in range(time_windows_len):
-                # (C1):
-                sdd_daily.append(
-                    cumsum_with_window_reverse(
-                        l = list(sdd_summands),
-                        window = time_windows[i],
-                    )
+                dormancy_tw = "dormancy_{}".format(time_windows[i])
+                results_raw[dormancy_tw] = cumsum_with_window_reverse(
+                    l = list(results_raw["dormancy_raw_{}".format(
+                        time_windows[i]
+                    )]),
+                    window = time_windows[i],
                 )
-                # (C2):
-                dormancy_daily.append(
-                    cumsum_with_window_reverse(
-                        l = list(dormancy_summands[i]),
-                        window = time_windows[i],
-                    )
-                )
-
-            results_raw["sdd"]      = list(zip(*sdd_daily))
-            results_raw["dormancy"] = list(zip(*dormancy_daily))
-
-            #--free used data structures----------------------------------------
-            del results_raw["summands_dsls_daily"]
-            del results_raw["summands_dsls_daily_wghtd"]
 
             return
-
-        def df_prepare_time_window(
-            df_type,
-            df_data,
-            df_index,
-        ):
-            """
-            Prepare dataframe according to time window values.
-            """
-            df_time_window = DataFrame(
-                df_data,
-                columns = [
-                    "{}_{}".format(
-                        df_type,
-                        w,
-                    ) for w in Velo.time_windows
-                ],
-                index=df_index
-            )
-
-            return df_time_window
-
-        def df_merge(
-            df_merge_target,
-            df_to_be_merged
-        ):
-            """
-            Merge pandas dataframe together.
-            """
-
-            df_merge_target = df_merge_target.merge(
-                df_to_be_merged,
-                how='outer',
-                left_index=True,
-                right_index=True
-            )
-
-            Velo.logger.info("{}{}[{}built dataframe{}{}]  {}".format(
-                cs.RES,
-                cs.WHI,
-                cs.PRGnBI,
-                cs.RES,
-                cs.WHI,
-                df_to_be_merged.columns[0],
-            ))
-
-            return df_merge_target
 
         #--Start of get_results_finalized()-------------------------------------
         Velo.logger.info("{}{}[{}build&write csv{}{}]".format(
@@ -681,64 +669,26 @@ class Velo:
         ))
 
         #--prepare measures to be compared with velocity------------------------
-        get_comp_meas_from_summands(
+        get_comp_meas_finalized(
             results_raw=results_raw,
             min_frac = 1,
         )
 
-        #--basic data-----------------------------------------------------------
-        df_index = results_raw["index_day"]
-
         #--create first part of final pandas data frame-------------------------
-        results_raw_basic_types = [
-            "index_day",
-            "tx_count",
-            "tx_fees",
-            "tx_vol",
-            "tx_vol_self_churn",
-            "m_total",
-        ]
-
-        results_raw_basic = {k: results_raw[k] for k in results_raw_basic_types}
+        results_raw_basic = {
+            k: results_raw[k]
+            for k in Velo.results_raw_types_basic
+        }
         df_final = DataFrame.from_dict(results_raw_basic)
         df_final = df_final.set_index("index_day")
 
         #--handle m_circ df_types and merge to final data frame-----------------
-        m_circ_types = [
-            "m_circ_wh_bill",
-            "m_circ_mc_lifo",
-            "m_circ_mc_fifo",
-        ]
-
-        for m_circ_type in m_circ_types:
-            df_m_circ = df_prepare_time_window(
-                df_type=m_circ_type,
-                df_data=results_raw[m_circ_type],
-                df_index=df_index,
-            )
-
-            df_final = df_merge(
-                df_final,
-                df_m_circ,
-            )
+        for m_circ_type in Velo.results_raw_types_m_circ_tw:
+            df_final[m_circ_type] = results_raw[m_circ_type]
 
         #--handle measurements from literature and merge to finale data frame---
-        comp_meas_types = [
-            "dormancy",
-            "sdd",
-        ]
-
-        for comp_meas_type in comp_meas_types:
-            df_comp_meas = df_prepare_time_window(
-                df_type=comp_meas_type,
-                df_data=results_raw[comp_meas_type],
-                df_index=df_index
-            )
-
-            df_final = df_merge(
-                df_final,
-                df_comp_meas,
-            )
+        for comp_meas_type in Velo.results_raw_types_comp_meas_tw:
+            df_final[comp_meas_type] = results_raw[comp_meas_type]
 
         #--print status message-------------------------------------------------
         Velo.logger.info("{}{}[{}built dataframe{}{}]  {}".format(
@@ -1448,8 +1398,13 @@ class Velo:
                         m_circ[i].append(m_circ_per_day[i])
 
                 # put results into __queue_dict---------------------------------
-                m_circ_results = list(zip(*m_circ))
-                self.__queue_dict["m_circ_{}".format(type)] = m_circ_results
+                for i in range(time_windows_len):
+                    self.__queue_dict[
+                        "m_circ_{}_{}".format(
+                            type,
+                            time_windows[i], 
+                        )
+                    ] = m_circ[i]
 
                 # hande test_level cases----------------------------------------
                 if 10 <= Velo.test_level and Velo.test_level <= 12:
@@ -1471,7 +1426,7 @@ class Velo:
 
             return False
 
-        def get_comp_meas_summands():
+        def get_comp_meas():
             """
             We use this weighted average to calculate (1) the summands necessary
             to calculate SDD and (2) the (with the time window transaction
@@ -1493,39 +1448,38 @@ class Velo:
             no weighting with the tx value over the time window. It is helpful
             to look at the derivation of the equations in our paper.
 
-            *) Here, dust transaction shouldn't be included
-
+            *) Dust transaction shouldn't be included!
                If all inputs are zero, then the fee and the outputs are
                all zero. Thus, we ignore this transaction since only
                count "time since last spend", which does not occure here.
                Eventually, the weight of this transaction is zero, which
                means that we would not include it in our computation
-               anyway
+               anyway.
             """
-            def get_dsls_per_tx(tx):
+            def get_sdd_per_tx(tx):
                 """
-                dsls_per_input := "days since the input has been spent last"
+                Compute and return satoshi days desdroyed (sdd) per tx.
                 """
-                tx_time     = tx.block_time
-                val_inp_tx  = tx.input_value
-                dsls_per_tx = 0
+                tx_block_time          = tx.block_time
+                sdd_per_tx             = 0
+                secs_per_day           = 86400 # 24*60*60
+
+                if tx.is_coinbase:
+                    return 0
 
                 for input_i in tx.inputs:
-                    # gather time variables to calculate the "dsls per input"
-                    tx_time_of_input_origin = input_i.spent_tx.block_time
+                    time_sls_input_i = (
+                        tx_block_time - input_i.spent_tx.block_time
+                    )
 
-                    # calculate dsls
-                    dsls_per_input        = tx_time - tx_time_of_input_origin
-                    dsls_per_input_in_sec = dsls_per_input.total_seconds()
+                    secs_sls_input_i = time_sls_input_i.total_seconds()
+                    days_sls_input_i = secs_sls_input_i / secs_per_day
 
-                    # form a list of the dsls information over all inputs
-                    if not val_inp_tx == 0:
-                        dsls_per_tx += (
-                            dsls_per_input_in_sec * input_i.value/val_inp_tx
-                        )
+                    sdd_per_tx += days_sls_input_i * input_i.value
 
-                return dsls_per_tx
+                return sdd_per_tx
 
+            # print starting message--------------------------------------------
             Velo.logger.info(
                 "{}[{}{}/{:03}{}]{}  get competing measures".format(
                     cs.RES,
@@ -1537,94 +1491,58 @@ class Velo:
                 )
             )
 
-            time_windows              = Velo.time_windows
-            time_windows_len          = len(time_windows)
-            summands_dsls_daily       = []
-            summands_dsls_daily_wghtd = [[] for i in range(time_windows_len)]
-            sec_per_day               = 86400 # 24*60*60
+            # initialize basic variables----------------------------------------
+            time_windows     = Velo.time_windows
+            time_windows_len = len(time_windows)
+            sdd_per_day      = []
+            dormancy_per_day = [[] for i in range(time_windows_len)]
 
+
+            # retrieve daily values---------------------------------------------
             for daychunk in self.__txes_daily:
-                # if no transactions happened, append 0
+                # initialize daily values---------------------------------------
+                sdd_per_day.append(0)
+                for t_w in range(time_windows_len):
+                    dormancy_per_day[t_w].append(0)
+
+                # if no transactions happened, append 0-------------------------
                 if daychunk == []:
-                    # (B1):
-                    summands_dsls_daily.append(0.0)
-
-                    # (B2):
-                    for i in range(time_windows_len):
-                        summands_dsls_daily_wghtd[i].append(0.0)
-
                     continue
 
-                # initialize data structures per daychunk-----------------------
-                summands_dsls_per_day       = 0.0
-                summands_dsls_per_day_wghtd = [
-                    0.0 for i in range(time_windows_len)
-                ]
-
                 # initialize first block heights/day index of txes--------------
-                first_block_height = []
-                last_block_height  = daychunk[-1].block_height
+                first_block_height = daychunk[0].block_height
 
-                first_block_height.append(daychunk[0].block_height)
-                day_index = Velo.f_index_day_of_block_height[first_block_height[0]]
+                day_index = Velo.f_index_day_of_block_height[first_block_height]
+                
+                # initialize transaction volume per time window up to this day--
+                tx_vol_per_day = Velo.f_tx_vol_agg_of_id_day[day_index]
 
-                for i in range(1, time_windows_len):
-                    i_day = int(day_index - time_windows[i])
-
-                    if i_day < 0:
-                        i_day = 0
-
-                    first_block_height.append(
-                        Velo.f_block_height_of_id_day[i_day]
-                    )
-
-                # txes in daychunk----------------------------------------------
+                # retrive tx-wise values----------------------------------------
                 for tx in daychunk:
-                    # *)
+                    # Here, dust transaction shouldn't be included, see *)
                     if tx.output_value <= tx.fee:
                         continue
 
-                    val_inp_tx = tx.input_value
+                    # (A1) (b_i \cdot delta t_i in dormancy paper)--------------
+                    sdd_per_tx = get_sdd_per_tx(tx)
+                    sdd_per_day[-1] += sdd_per_tx
 
-                    txes_vol_agg_per_day_tw = Velo.f_tx_vol_agg_of_id_day[
-                        day_index
-                    ]
-
-                    # use the dsls info per tx to calc the weighted average
-                    dsls_per_tx           = get_dsls_per_tx(tx)
-                    dsls_per_tx_wghtd_avg = dsls_per_tx/sec_per_day
-
-                    # (A1): (b_i \cdot delta t_i in dormancy paper)
-                    summand_dsls_per_day   = dsls_per_tx_wghtd_avg * val_inp_tx
-                    summands_dsls_per_day += summand_dsls_per_day
-
-                    # (A2):
+                    # (A2)------------------------------------------------------
                     for t_w in range(time_windows_len):
-                        summand_dsls_per_tx_wghtd = 0
-                        if not txes_vol_agg_per_day_tw[t_w] == 0:
-                            summand_dsls_per_tx_wghtd = (
-                                summand_dsls_per_day
-                                /txes_vol_agg_per_day_tw[t_w]
-                            )
-                        summands_dsls_per_day_wghtd[t_w] += (
-                            summand_dsls_per_tx_wghtd
+                        if tx_vol_per_day == 0:
+                            break
+
+                        dormancy_per_day[t_w][-1] += (
+                            sdd_per_tx / tx_vol_per_day[t_w]
                         )
 
-                # (B1):
-                summands_dsls_daily.append(summands_dsls_per_day)
-
-                # (B2):
-                for i in range(time_windows_len):
-                    summands_dsls_daily_wghtd[i].append(
-                        summands_dsls_per_day_wghtd[i]
-                    )
-
-            # output needs to be in tuples for correct rebuild after threading
             # put results into __queue_dict-------------------------------------
-            self.__queue_dict["summands_dsls_daily"]       = summands_dsls_daily
-            self.__queue_dict["summands_dsls_daily_wghtd"] = list(
-                zip(*summands_dsls_daily_wghtd)
-            )
+            self.__queue_dict["sdd_raw"] = sdd_per_day
+
+            for t_w in range(time_windows_len):
+                self.__queue_dict[
+                    "dormancy_raw_{}".format(time_windows[t_w])
+                ] = dormancy_per_day[t_w]
 
             return False
 
@@ -1634,7 +1552,7 @@ class Velo:
 
         if get_m_circ() == True: return
 
-        if get_comp_meas_summands() == True: return
+        if get_comp_meas() == True: return
 
         #put all necessary data to parent process through multiprocess queue
         Velo.logger.debug("{}[{}{}/{:03}{}]{}  Sending results".format(
