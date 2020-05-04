@@ -44,40 +44,9 @@ def main():
 
     #--Retrieval of basic blockchain data, money supply and velocity measures---
     results_raw = Multiprocess.get_data_for_df(
-        args.start_date,
-        args.end_date,
-        int(args.period),
-        args.test,
-        args.log_level,
-        int(args.cpu_count),
+        args.cpu_count,
         args.path_data_output,
     )
-
-    if args.test > 0: return
-    elif args.test == -1:
-        ress = results_raw["process_id"]
-        last_e = -1
-        prt = ""
-        for e in ress:
-            if e != last_e +1:
-                # Velo.logger.warning(
-                #     "Out of order! (last_e, e) = ({:03}, {:03})".format(
-                #         last_e,
-                #         e,
-                #     )
-                # )
-                break
-
-            if e % 6 == 0 and e > 0:
-                Velo.logger.info(prt)
-                prt = ""
-            prt += "Result of {:03} | ".format(ress[e])
-
-            last_e += 1
-
-        Velo.logger.info(prt)
-        print("Exiting multiprocessing test")
-        exit(0)
 
     #--get csv of final pandas data frame---------------------------------------
     Velo.get_results_finalized(

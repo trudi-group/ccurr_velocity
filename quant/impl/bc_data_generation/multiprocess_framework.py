@@ -1,10 +1,10 @@
 import time
 import random
 import logging
-import threading
 import hashlib
 import multiprocessing
 import numpy as np
+from threading       import Thread
 from multiprocessing import Process, Queue, JoinableQueue
 from velo            import Velo
 from datetime        import date
@@ -23,8 +23,9 @@ class Multiprocess:
     of each subprocess into a total result.
     """
 
-    logger           = None
-    log_level        = logging.INFO
+    logger     = None
+    log_level  = logging.INFO
+    test_level = 0
 
     # class attribute for concatenation
     cat_nxt = 0
@@ -54,45 +55,12 @@ class Multiprocess:
         return
 
     def get_data_for_df(
-        start_date,
-        end_date,
-        period,
-        test,
-        log_level,
         cpu_cnt_manual,
         path_data_output = "",
     ):
         """
         This function retrieves required data in a multiprocessed fashion.
         """
-        def date_range(
-            start_date,
-            end_date,
-            period,
-        ):
-            """
-            for further explanation, see
-            https://stackoverflow.com/questions/1060279/
-            iterating-through-a-range-of-dates-in-python
-            """
-            yield_date_start  = start_date
-            yield_date_end    = start_date
-            yield_date_period = 0
-
-            date_range = int((end_date - start_date).days/period + 1)
-            for n in range(date_range):
-                #print ("n =", n)
-                if n > 0:
-                    yield_date_start = yield_date_end + timedelta(1)
-
-                yield_date_end = start_date + timedelta((n+1)*period)
-                if yield_date_end > end_date:
-                    yield_date_end = end_date
-
-                yield_date_period = (yield_date_end - yield_date_start).days + 1
-
-                yield yield_date_start, yield_date_end, yield_date_period
-
         def concat_test(
             test,
             path_data_output,
@@ -104,7 +72,6 @@ class Multiprocess:
             def get_data_for_df_test(
                 start_date,
                 end_date,
-                period,
                 test,
             ):
                 """
@@ -115,17 +82,19 @@ class Multiprocess:
                 velo_instances_ret = []
                 queue              = JoinableQueue()
                 date_format        = "%m/%d/%Y"
-                for i in range(3):
+
+                for date in range(3):
                     end_date_o = datetime.strptime(
-                        end_date[i],
+                        end_date[date],
                         date_format,
                     ).date()
                     start_date_o = datetime.strptime(
-                        start_date[i],
+                        start_date[date],
                         date_format,
                     ).date()
 
                     process_name = "process_{:03d}".format(process_id)
+
                     velo_inst = Velo(
                         process_id=process_id,
                         process_name=process_name,
@@ -135,7 +104,7 @@ class Multiprocess:
 
                     process = Process(target=velo_inst.run)
 
-                    process_id += 1
+                    process_id  += 1
                     process_cnt += 1
                     velo_instances.append(velo_inst)
                     Multiprocess.processes.append(process)
@@ -299,28 +268,24 @@ class Multiprocess:
                     cs.RES,
                 )
 
-                Multiprocess.logger.debug(ret_str)
+                Multiprocess.logger.info(ret_str)
                 return
 
             Multiprocess.logger.info("Starting mode: Test[Concatenation]")
             #start_date_a_a = "01/01/2010"
             #end_date_a_a   = "02/01/2011"
-            #period_a_a     = 397
 
             #start_date_a_b = "02/02/2011"
             #end_date_a_b   = "03/01/2012"
-            #period_a_b     = 394
 
             #start_date_b   = "01/01/2010"
             #end_date_b     = "03/01/2012"
 
             start_date_a_a = "01/01/2010"
             end_date_a_a   = "02/01/2010"
-            period_a_a     = 32
 
             start_date_a_b = "02/02/2010"
             end_date_a_b   = "03/01/2010"
-            period_a_b     = 28
 
             start_date_b   = "01/01/2010"
             end_date_b     = "03/01/2010"
@@ -328,8 +293,7 @@ class Multiprocess:
             ret = get_data_for_df_test(
                 start_date=[start_date_a_a, start_date_a_b, start_date_b],
                 end_date=[end_date_a_a, end_date_a_b, end_date_b],
-                period=[period_a_a, period_a_b, period_a_a + period_a_b],
-                test=test,
+                test=Multiprocess.test_level,
             )
 
             processes_test = []
@@ -614,9 +578,12 @@ class Multiprocess:
 
             return ds_new
 
-        if test > 0:
+        Multiprocess.log_level  = Velo.log_level
+        Multiprocess.test_level = Velo.test_level
+
+        if Multiprocess.test_level > 0:
             concat_test(
-                test,
+                Multiprocess.test_level,
                 path_data_output,
             )
             return False
@@ -631,38 +598,28 @@ class Multiprocess:
         start_allowed      = True
         cat_finished       = False
         queue              = JoinableQueue()
-        start_date_o       = datetime.strptime(start_date, "%m/%d/%Y").date()
-        end_date_o         = datetime.strptime(end_date, "%m/%d/%Y").date()
+        start_date_o       = datetime.strptime(
+            Velo.start_date,
+            "%m/%d/%Y"
+        ).date()
+        end_date_o         = datetime.strptime(
+            Velo.end_date,
+            "%m/%d/%Y"
+        ).date()
 
-        #Set cpu count manually for debugging
+        #--Set cpu count manually for debugging---------------------------------
         if cpu_cnt_manual >= 0:
             cpu_cnt      = cpu_cnt_manual
             cpu_cnt_test = cpu_cnt_manual
 
-        if test == -1:
+        if Multiprocess.test_level == -1:
             Multiprocess.logger.info("Starting mode: Test[Multiprocess]")
             cpu_cnt = cpu_cnt_test
         else:
             Multiprocess.logger.info("Starting mode: Production")
 
-        #check if period is so high that less than cpu_cnt cores would be used
-        num_days = (end_date_o - start_date_o).days
-        period_max = ceil(num_days/ cpu_cnt)
-        if period > period_max:
-            period = period_max
-
-        Multiprocess.logger.debug(
-            "Determine velocity based on blocksci with period = {} days".format(
-                period
-            )
-        )
-
-        # for date_period_start, date_period_end, date_period in date_range(
-        #     start_date_o,
-        #     end_date_o,
-        #     period
-        # ):
         s_p_d = Velo.f_dates_of_id_sub_proc
+
         for date in range(len(s_p_d)):
             date_period = s_p_d[date][2]
             if date_period <= 0:
@@ -678,10 +635,10 @@ class Multiprocess:
             )
 
             process = None
-            if   test ==  0:
+            if Multiprocess.test_level ==  0:
                 process = Process(target=velo_inst.run)
 
-            elif test == -1:
+            elif Multiprocess.test_level == -1:
                 process = Process(target=multiprocess_test, args = (
                     process_id,
                     process_name,
@@ -691,14 +648,14 @@ class Multiprocess:
 
             process_id  += 1
             process_cnt += 1
-            velo_instances.append(velo_inst)
+            velo_instances        .append(velo_inst)
             Multiprocess.processes.append(process)
-            process_result.append(None)
+            process_result        .append(None)
 
         Multiprocess.process_cnt = process_cnt
         Velo.process_cnt         = process_cnt
 
-        thread_subprocess_manage = threading.Thread(
+        thread_subprocess_manage = Thread(
             target = subprocess_manage,
             args = (
                 process_cnt,
@@ -710,7 +667,7 @@ class Multiprocess:
         )
         thread_subprocess_manage.start()
 
-        #concatenate all consecutive results
+        #--concatenate all consecutive results----------------------------------
 
         time_to_wait_is_alive = 0.1
         time_to_wait_is_none  = 0.1
@@ -724,12 +681,12 @@ class Multiprocess:
                 process_cnt-1,
                 cs.RES,
             )
-            #process that would produced the next results to be concatenated ...
-            #...was not started yet => continue
+            #-process that would produce the next results to be concatenated...-
+            #-...was not started yet => continue--------------------------------
             if cat_nxt > Multiprocess.process_last_started:
                 continue
 
-            #...was started and is still running => continue
+            #-...was started and is still running => continue-------------------
             if Multiprocess.processes[cat_nxt].is_alive():
                 time_sleep = time_to_wait_is_alive + 2
                 time.sleep(time_sleep)
@@ -746,8 +703,7 @@ class Multiprocess:
                 continue
             time_to_wait_is_alive = 0.1
 
-            #...finished, but did not produce a result => Thats an major error
-
+            #-...finished, but did not produce a result => Thats an major error-
             if process_result[cat_nxt] is None:
                 time.sleep(time_to_wait_is_none)
                 time_to_wait_is_none *= 2
@@ -765,9 +721,10 @@ class Multiprocess:
                 continue
             time_to_wait_is_none = 0.1
 
-            # concatenate
-            if test == -1:
+            #-concatenate-------------------------------------------------------
+            if Multiprocess.test_level == -1:
                 time.sleep(0.2)
+
             process_result_cat = ds_cat(
                 process_result_cat,
                 cat_nxt,
@@ -778,12 +735,38 @@ class Multiprocess:
             process_result[cat_nxt] = None
             velo_instances[cat_nxt] = None
 
-        #give thread_subprocess_manage time to return
+        #--give thread_subprocess_manage time to return-------------------------
         time.sleep(2)
 
         if thread_subprocess_manage.is_alive():
-            Multiprocess.logger.warning("Exiting concat while to early!")
+            Multiprocess.logger.warning("Exiting concat to early!")
 
         thread_subprocess_manage.join()
+
+
+        if Multiprocess.test_level == -1:
+            ress = process_result_cat["process_id"]
+            last_e = -1
+            prt = ""
+            for e in ress:
+                if e != last_e +1:
+                    Multiprocess.logger.warning(
+                        "Out of order! (last_e, e) = ({:03}, {:03})".format(
+                            last_e,
+                            e,
+                        )
+                    )
+                    break
+
+                if e % 6 == 0 and e > 0:
+                    Multiprocess.logger.info(prt)
+                    prt = ""
+
+                prt    += "Result of {:03} | ".format(ress[e])
+                last_e += 1
+
+            Multiprocess.logger.info(prt)
+            print("Exiting multiprocessing test")
+            exit(0)
 
         return process_result_cat

@@ -69,13 +69,6 @@ def setup_parse_args (
         , help="Sets Heuristic for change outputs"
     )
     parser.add_argument(
-          '-p'
-        , '--period'
-        , action='store'
-        , default=25
-        , help="Set partitioning period in days"
-    )
-    parser.add_argument(
           '-t'
         , '--test'
         , action='store'

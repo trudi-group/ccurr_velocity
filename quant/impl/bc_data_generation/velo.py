@@ -394,8 +394,9 @@ class Velo:
 
         #--setup of static variables on class level-----------------------------
         Velo.logger           = logger
+        Velo.log_level        = args.log_level
         Velo.path_data_output = args.path_data_output
-        Velo.test_level       = args.test
+        Velo.test_level       = int(args.test)
         Velo.start_date       = args.start_date
         Velo.end_date         = args.end_date
         Velo.time_windows     = list(map(int, str(args.time_window).split(",")))
