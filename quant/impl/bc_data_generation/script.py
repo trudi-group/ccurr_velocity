@@ -32,7 +32,6 @@ def main():
         path_log=args.path_log + "velocity_data_log",
         log_level=args.log_level,
     )
-    Multiprocess.logger = logger
 
     setup_output_path(args.path_data_output)
 
@@ -42,16 +41,18 @@ def main():
         args=args,
     )
 
-    #--Retrieval of basic blockchain data, money supply and velocity measures---
-    results_raw = Multiprocess.get_data_for_df(
-        args.cpu_count,
-        args.path_data_output,
+    Multiprocess.setup(
+        logger=logger,
+        args=args
     )
+
+    #--Retrieval of basic blockchain data, money supply and velocity measures---
+    results_raw = Multiprocess.run()
 
     #--get csv of final pandas data frame---------------------------------------
     Velo.get_results_finalized(
         results_raw=results_raw,
-        index_label="date"
+        index_label="date",
     )
 
     print("Exiting program")

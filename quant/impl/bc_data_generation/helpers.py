@@ -70,7 +70,7 @@ def setup_parse_args (
     )
     parser.add_argument(
           '-t'
-        , '--test'
+        , '--test_level'
         , action='store'
         , default=0
         , help="Set testing mode level"
