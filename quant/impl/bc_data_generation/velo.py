@@ -396,7 +396,7 @@ class Velo:
         Velo.logger           = logger
         Velo.log_level        = args.log_level
         Velo.path_data_output = args.path_data_output
-        Velo.test_level       = int(args.test)
+        Velo.test_level       = int(args.test_level)
         Velo.start_date       = args.start_date
         Velo.end_date         = args.end_date
         Velo.time_windows     = list(map(int, str(args.time_window).split(",")))
@@ -749,6 +749,9 @@ class Velo:
         queue,
         date_id,
     ):
+        """
+        Initialize subprocess.
+        """
         self.process_id   = process_id
         self.process_name = process_name
         self.__queue      = queue
