@@ -501,73 +501,164 @@ class Multiprocess:
             Multiprocess.logger.debug("Returning from subprocess_manage()")
             return
 
-        def ds_cat(
-            ds_res,
-            ds_nxt_id,
-            ds_nxt,
-            process_name
+        def concatenate(
         ):
             """
-            This function concatenates two given data structures.
+            This function serves as a framework to concatenate results
+            from subprocesses in order correctly.
             """
-            if ds_nxt_id != Multiprocess.cat_nxt:
-                Multiprocess.logger.error(
-                    "{}[{}{}/{:03}{}]{}  ds_nxt_id != Multiprocess.cat_nxt".format(
+            def ds_cat(
+                ds_res,
+                ds_nxt_id,
+                ds_nxt,
+                process_name
+            ):
+                """
+                This function concatenates two given data structures.
+                """
+                if ds_nxt_id != Multiprocess.cat_nxt:
+                    Multiprocess.logger.error(
+                        "{}[{}{}/{:03}{}]{}  "
+                        "ds_nxt_id != Multiprocess.cat_nxt".format(
+                            cs.RES,
+                            cs.PRGnBE,
+                            process_name,
+                            process_cnt-1,
+                            cs.RES,
+                            cs.PRGnBE,
+                        )
+                    )
+                    return
+
+                Multiprocess.cat_nxt += 1
+
+                #initial setup
+                if ds_nxt_id == 0:
+                    Multiprocess.logger.info(
+                        "{}[{}{}/{:03}{}]{}  data appended".format(
+                            cs.RES,
+                            cs.PRGnBH,
+                            process_name,
+                            Multiprocess.process_cnt-1,
+                            cs.RES,
+                            cs.PRGnBH,
+                        )
+                    )
+
+                    return ds_nxt
+
+                ds_new = {}
+
+                for i, v in ds_res.items():
+
+                    if type(ds_nxt[i]) == list:
+                        ds_new[i] = ds_res[i] + ds_nxt[i]
+
+                    elif type(ds_nxt[i]) == DatetimeIndex:
+                        ds_new[i] = ds_res[i].append(ds_nxt[i])
+
+                    else:
+                        ds_new[i] = np.concatenate([
+                            ds_res[i],
+                            ds_nxt[i]
+                        ])
+
+                Multiprocess.logger.info(
+                    "{}[{}{}/{:03}{}]{}  data appended".format(
                         cs.RES,
-                        cs.PRGnBE,
+                        cs.PRGnBH,
                         process_name,
-                        process_cnt-1,
+                        Multiprocess.process_cnt-1,
                         cs.RES,
-                        cs.PRGnBE,
+                        cs.PRGnBH,
                     )
                 )
-                return
 
-            Multiprocess.cat_nxt += 1
+                return ds_new
 
-            #initial setup
-            if ds_nxt_id == 0:
-                Multiprocess.logger.info("{}[{}{}/{:03}{}]{}  data appended".format(
+            #-------------------------------------------------------------------
+            process_result_cat = []
+            time_to_wait_if_alive = 0.1
+            time_to_wait_if_none  = 0.1
+            while Multiprocess.cat_nxt < process_cnt:
+                cat_nxt = Multiprocess.cat_nxt
+                process_name_nxt     = process_instances[cat_nxt].process_name
+                process_name_nxt_str = "{}[{}{}/{:03}{}]".format(
                     cs.RES,
-                    cs.PRGnBH,
-                    process_name,
-                    Multiprocess.process_cnt-1,
+                    cs.PRGnBE,
+                    process_name_nxt,
+                    process_cnt-1,
                     cs.RES,
-                    cs.PRGnBH,
-                ))
-                return ds_nxt
+                )
+                #-process that would produce the next results to be concatenated
+                #-...was not started yet => continue----------------------------
+                if cat_nxt > Multiprocess.process_last_started:
+                    continue
 
-            ds_new = {}
+                #-...was started and is still running => continue---------------
+                if Multiprocess.processes[cat_nxt].is_alive():
+                    time_sleep = time_to_wait_if_alive + 2
+                    time.sleep(time_sleep)
+                    if time_sleep <= 20:
+                        time_to_wait_if_alive *= 2
+                    elif time_sleep <= 60:
+                        time_to_wait_if_alive += 10
 
-            for i, v in ds_res.items():
+                    if time_to_wait_if_alive > 3.2:
+                        Multiprocess.logger.info("{}{}  still running".format(
+                            process_name_nxt_str,
+                            cs.PRGnBE,
+                        ))
+                    continue
 
-                if type(ds_nxt[i]) == list:
-                    ds_new[i] = ds_res[i] + ds_nxt[i]
+                #-...finished, but did not produce a result => major error------
+                time_to_wait_if_alive = 0.1
+                if process_result[cat_nxt] is None:
+                    time.sleep(time_to_wait_if_none)
+                    time_to_wait_if_none *= 2
 
-                elif type(ds_nxt[i]) == DatetimeIndex:
-                    ds_new[i] = ds_res[i].append(ds_nxt[i])
+                    if time_to_wait_if_none > 3.2:
+                        Multiprocess.logger.warning(
+                            "{}  no results yet!".format(
+                                process_name_nxt_str,
+                            )
+                        )
+                    elif time_to_wait_if_none > 6.4:
+                        Multiprocess.logger.critical("{}  no results!".format(
+                            process_name_nxt_str,
+                        ))
+                        processes_kill_all()
+                        exit(-1)
 
-                else:
-                    ds_new[i] = np.concatenate([
-                        ds_res[i],
-                        ds_nxt[i]
-                    ])
+                    continue
 
-            Multiprocess.logger.info("{}[{}{}/{:03}{}]{}  data appended".format(
-                cs.RES,
-                cs.PRGnBH,
-                process_name,
-                Multiprocess.process_cnt-1,
-                cs.RES,
-                cs.PRGnBH,
-            ))
 
-            return ds_new
+                #-concatenate---------------------------------------------------
+                time_to_wait_if_none = 0.1
+                if Multiprocess.test_level == -1:
+                    time.sleep(0.2)
+
+                process_result_cat = ds_cat(
+                    process_result_cat,
+                    cat_nxt,
+                    process_result[cat_nxt],
+                    process_name_nxt,
+                )
+
+                process_result[cat_nxt]    = None
+                process_instances[cat_nxt] = None
+
+            #--give thread_subprocess_manage time to return---------------------
+            time.sleep(2)
+
+            if thread_subprocess_manage.is_alive():
+                Multiprocess.logger.warning("Exiting concat to early!")
+
+            return process_result_cat
 
         #-----------------------------------------------------------------------
         process_instances  = []
         process_result     = []
-        process_result_cat = []
         process_id         = 0
         process_cnt        = 0
         cpu_cnt            = multiprocessing.cpu_count()
@@ -634,78 +725,7 @@ class Multiprocess:
         thread_subprocess_manage.start()
 
         #--concatenate all consecutive results----------------------------------
-        time_to_wait_if_alive = 0.1
-        time_to_wait_if_none  = 0.1
-        while Multiprocess.cat_nxt < process_cnt:
-            cat_nxt = Multiprocess.cat_nxt
-            process_name_nxt     = process_instances[cat_nxt].process_name
-            process_name_nxt_str = "{}[{}{}/{:03}{}]".format(
-                cs.RES,
-                cs.PRGnBE,
-                process_name_nxt,
-                process_cnt-1,
-                cs.RES,
-            )
-            #-process that would produce the next results to be concatenated...-
-            #-...was not started yet => continue--------------------------------
-            if cat_nxt > Multiprocess.process_last_started:
-                continue
-
-            #-...was started and is still running => continue-------------------
-            if Multiprocess.processes[cat_nxt].is_alive():
-                time_sleep = time_to_wait_if_alive + 2
-                time.sleep(time_sleep)
-                if time_sleep <= 20:
-                    time_to_wait_if_alive *= 2
-                elif time_sleep <= 60:
-                    time_to_wait_if_alive += 10
-
-                if time_to_wait_if_alive > 3.2:
-                    Multiprocess.logger.info("{}{}  still running".format(
-                        process_name_nxt_str,
-                        cs.PRGnBE,
-                    ))
-                continue
-
-            #-...finished, but did not produce a result => Thats an major error-
-            time_to_wait_if_alive = 0.1
-            if process_result[cat_nxt] is None:
-                time.sleep(time_to_wait_if_none)
-                time_to_wait_if_none *= 2
-
-                if time_to_wait_if_none > 3.2:
-                    Multiprocess.logger.warning("{}  no results yet!".format(
-                        process_name_nxt_str,
-                    ))
-                elif time_to_wait_if_none > 6.4:
-                    Multiprocess.logger.critical("{}  no results!".format(
-                        process_name_nxt_str,
-                    ))
-                    processes_kill_all()
-                    exit(-1)
-                continue
-
-
-            #-concatenate-------------------------------------------------------
-            time_to_wait_if_none = 0.1
-            if Multiprocess.test_level == -1:
-                time.sleep(0.2)
-
-            process_result_cat = ds_cat(
-                process_result_cat,
-                cat_nxt,
-                process_result[cat_nxt],
-                process_name_nxt,
-            )
-
-            process_result[cat_nxt]    = None
-            process_instances[cat_nxt] = None
-
-        #--give thread_subprocess_manage time to return-------------------------
-        time.sleep(2)
-
-        if thread_subprocess_manage.is_alive():
-            Multiprocess.logger.warning("Exiting concat to early!")
+        process_result_cat = concatenate()
 
         thread_subprocess_manage.join()
 
