@@ -374,6 +374,17 @@ class Velo:
             Velo.cluster_max_size = 0
             Velo.cluster_max_id   = 0
 
+            #--print status message---------------------------------------------
+            Velo.logger.info(
+                "{}[{}     SETUP     {}]{}  "
+                "clustering: get id of maximum cluster".format(
+                    cs.RES,
+                    cs.PRGnBA,
+                    cs.RES,
+                    cs.PRGnBA,
+                )
+            )
+
             # load blocksci clustering manager----------------------------------
             Velo.cluster_mgr = ClusterManager(
                 path_cluster,
