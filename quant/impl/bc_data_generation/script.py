@@ -32,7 +32,6 @@ def main():
         path_log=args.path_log + "velocity_data_log",
         log_level=args.log_level,
     )
-    Multiprocess.logger = logger
 
     setup_output_path(args.path_data_output)
 
@@ -42,47 +41,18 @@ def main():
         args=args,
     )
 
-    #--Retrieval of basic blockchain data, money supply and velocity measures---
-    results_raw = Multiprocess.get_data_for_df(
-        args.start_date,
-        args.end_date,
-        int(args.period),
-        args.test,
-        args.log_level,
-        int(args.cpu_count),
-        args.path_data_output,
+    Multiprocess.setup(
+        logger=logger,
+        args=args
     )
 
-    if args.test > 0: return
-    elif args.test == -1:
-        ress = results_raw["process_id"]
-        last_e = -1
-        prt = ""
-        for e in ress:
-            if e != last_e +1:
-                # Velo.logger.warning(
-                #     "Out of order! (last_e, e) = ({:03}, {:03})".format(
-                #         last_e,
-                #         e,
-                #     )
-                # )
-                break
-
-            if e % 6 == 0 and e > 0:
-                Velo.logger.info(prt)
-                prt = ""
-            prt += "Result of {:03} | ".format(ress[e])
-
-            last_e += 1
-
-        Velo.logger.info(prt)
-        print("Exiting multiprocessing test")
-        exit(0)
+    #--Retrieval of basic blockchain data, money supply and velocity measures---
+    results_raw = Multiprocess.run()
 
     #--get csv of final pandas data frame---------------------------------------
     Velo.get_results_finalized(
         results_raw=results_raw,
-        index_label="date"
+        index_label="date",
     )
 
     print("Exiting program")
