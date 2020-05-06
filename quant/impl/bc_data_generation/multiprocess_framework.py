@@ -1,17 +1,14 @@
-import time
-import random
 import logging
-import hashlib
-import multiprocessing
-import numpy as np
+from numpy           import ndarray, concatenate
+from time            import sleep
+from random          import randint
+from hashlib         import md5
 from threading       import Thread
-from multiprocessing import Process, Queue, JoinableQueue
-from velo            import Velo
-from datetime        import date
-from datetime        import datetime
-from datetime        import timedelta
+from multiprocessing import Process, JoinableQueue, cpu_count
+from datetime        import date, datetime, timedelta
 from pandas          import DatetimeIndex
 from math            import ceil
+from velo            import Velo
 from colorstrings    import ColorStrings as cs
 
 class Multiprocess:
@@ -45,7 +42,7 @@ class Multiprocess:
         Multiprocess.logger           = logger
         Multiprocess.log_level        = args.log_level
         Multiprocess.test_level       = int(args.test_level)
-        Multiprocess.cpu_cnt          = multiprocessing.cpu_count()
+        Multiprocess.cpu_cnt          = cpu_count()
         Multiprocess.path_data_output = args.path_data_output
 
         #--Set cpu count manually for debugging---------------------------------
@@ -83,12 +80,12 @@ class Multiprocess:
         ):
             """
             """
-            process_id         = 0
-            process_cnt        = 0
+            process_id            = 0
+            process_cnt           = 0
             process_instances     = []
             process_instances_ret = []
-            queue              = JoinableQueue()
-            date_format        = "%m/%d/%Y"
+            queue                 = JoinableQueue()
+            date_format           = "%m/%d/%Y"
 
             for date in range(3):
                 end_date_o = datetime.strptime(
@@ -152,7 +149,7 @@ class Multiprocess:
                 l_ds = None
                 if isinstance(ds, list):
                     l_ds = ds
-                elif isinstance(ds, type(np.ndarray)):
+                elif isinstance(ds, type(ndarray)):
                     Multiprocess.logger.debug(
                         "test #[{}]:  ds_a_a type = {}".format(
                             test_number,
@@ -192,8 +189,8 @@ class Multiprocess:
                 This function compute the md5 hashes of two given data structures
                 in form of strings and compares them.
                 """
-                hash_a = hashlib.md5()
-                hash_b = hashlib.md5()
+                hash_a = md5()
+                hash_b = md5()
 
                 hash_a.update(str.encode(s_ds_a))
                 hash_b.update(str.encode(s_ds_b))
@@ -222,7 +219,7 @@ class Multiprocess:
                 ds_a = "{}, {}".format(ds_a_a[0:-1], ds_a_b[1:])
 
             else:
-                ds_a = np.concatenate( [ ds_a_a, ds_a_b ])
+                ds_a = concatenate( [ ds_a_a, ds_a_b ])
 
             s_da_a_a = None
             s_da_a_b = None
@@ -558,7 +555,7 @@ class Multiprocess:
                         ds_new[i] = ds_res[i].append(ds_nxt[i])
 
                     else:
-                        ds_new[i] = np.concatenate([
+                        ds_new[i] = concatenate([
                             ds_res[i],
                             ds_nxt[i]
                         ])
@@ -577,7 +574,7 @@ class Multiprocess:
                 return ds_new
 
             #-------------------------------------------------------------------
-            process_result_cat = []
+            process_result_cat    = []
             time_to_wait_if_alive = 0.1
             time_to_wait_if_none  = 0.1
             while Multiprocess.cat_nxt < process_cnt:
@@ -598,7 +595,7 @@ class Multiprocess:
                 #-...was started and is still running => continue---------------
                 if Multiprocess.processes[cat_nxt].is_alive():
                     time_sleep = time_to_wait_if_alive + 2
-                    time.sleep(time_sleep)
+                    sleep(time_sleep)
                     if time_sleep <= 20:
                         time_to_wait_if_alive *= 2
                     elif time_sleep <= 60:
@@ -614,7 +611,7 @@ class Multiprocess:
                 #-...finished, but did not produce a result => major error------
                 time_to_wait_if_alive = 0.1
                 if process_result[cat_nxt] is None:
-                    time.sleep(time_to_wait_if_none)
+                    sleep(time_to_wait_if_none)
                     time_to_wait_if_none *= 2
 
                     if time_to_wait_if_none > 3.2:
@@ -627,29 +624,29 @@ class Multiprocess:
                         Multiprocess.logger.critical("{}  no results!".format(
                             process_name_nxt_str,
                         ))
-                        processes_kill_all()
+                        Multiprocess.processes_kill_all()
                         exit(-1)
 
                     continue
 
-
-                #-concatenate---------------------------------------------------
+                #-...is finished and results are ready for concatenating--------
                 time_to_wait_if_none = 0.1
                 if Multiprocess.test_level == -1:
-                    time.sleep(0.2)
+                    sleep(0.2)
 
-                process_result_cat = ds_cat(
-                    process_result_cat,
-                    cat_nxt,
-                    process_result[cat_nxt],
-                    process_name_nxt,
-                )
+                if True:
+                    process_result_cat = ds_cat(
+                        process_result_cat,
+                        cat_nxt,
+                        process_result[cat_nxt],
+                        process_name_nxt,
+                    )
 
-                process_result[cat_nxt]    = None
-                process_instances[cat_nxt] = None
+                    process_result[cat_nxt]    = None
+                    process_instances[cat_nxt] = None
 
             #--give thread_subprocess_manage time to return---------------------
-            time.sleep(2)
+            sleep(2)
 
             if thread_subprocess_manage.is_alive():
                 Multiprocess.logger.warning("Exiting concat to early!")
@@ -661,7 +658,7 @@ class Multiprocess:
         process_result     = []
         process_id         = 0
         process_cnt        = 0
-        cpu_cnt            = multiprocessing.cpu_count()
+        cpu_cnt            = cpu_count()
         start_allowed      = True
         cat_finished       = False
         queue              = JoinableQueue()
@@ -744,8 +741,6 @@ class Multiprocess:
             Multiprocess.logger.info("Starting mode: Test[Multiprocess]")
             Multiprocess.test_multiprocessing()
             exit(0)
-
-        Multiprocess.logger.info("Starting mode: Production")
 
         results_raw = Multiprocess.run_with_multiprocessing()
 
@@ -830,7 +825,7 @@ class MultiprocessTest:
         )
 
         # emulate working time randomly-----------------------------------------
-        time.sleep(random.randint(2,4))
+        time.sleep(randint(2,4))
 
         # create and send testing result from process_id------------------------
         self.__queue_dict["process_id"] = [self.process_id]
