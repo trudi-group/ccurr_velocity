@@ -27,12 +27,12 @@ class Multiprocess:
     cpu_cnt          = 0
 
     # class attribute for concatenation
-    cat_nxt = 0
+    cat_nxt = [0]
 
     #subprocessing related
-    processes            = []
-    process_last_started = -1
-    process_cnt          = 0 #to print max number of started subprocesses
+    processes            = [[]]
+    process_last_started = [-1]
+    process_cnt          = [0] #to print max number of started subprocesses
 
     #==[ CLASSLEVEL ]===========================================================
     def setup(
@@ -55,17 +55,24 @@ class Multiprocess:
         """
         Kills all subprocesses.
         """
-        def processes_kill(process_id):
+        def processes_kill(
+                stage_id,
+                process_id,
+            ):
             """
             Kills a subprocess by its process_id.
             """
-            process_to_terminate = Multiprocess.processes[process_id]
+            process_to_terminate = Multiprocess.processes[stage_id][process_id]
             if process_to_terminate is not None:
                 process_to_terminate.terminate()
             return
 
-        for i in range(0,len(Multiprocess.processes)):
-            processes_kill(i)
+        for stage_id in range(0,len(Multiprocess.processes)):
+            for process_id in range(0,len(Multiprocess.processes[stage_id])):
+                processes_kill(
+                    stage_id,
+                    process_id,
+                )
         return
 
     def test_concat():
@@ -111,10 +118,10 @@ class Multiprocess:
                 process_id  += 1
                 process_cnt += 1
                 process_instances.append(process_inst)
-                Multiprocess.processes.append(process)
+                Multiprocess.processes[0].append(process)
 
             for i in range(process_cnt):
-                Multiprocess.processes[i].start()
+                Multiprocess.processes[0][i].start()
 
             for i in range(process_cnt):
                 msg_process_id = None
@@ -126,7 +133,7 @@ class Multiprocess:
                     queue.task_done()
                     break
 
-                Multiprocess.processes[msg_process_id].join()
+                Multiprocess.processes[0][msg_process_id].join()
 
             return process_instances_ret
 
@@ -370,6 +377,7 @@ class Multiprocess:
         This function retrieves required data in a multiprocessed fashion.
         """
         def subprocess_manage(
+            stage_id,
             process_cnt,
             processes,
             cpu_cnt,
@@ -386,9 +394,10 @@ class Multiprocess:
             #--Start first cpu_cnt subprocesses---------------------------------
             if cpu_cnt > process_cnt:
                 cpu_cnt = process_cnt
+
             for i in range(cpu_cnt):
                 processes[i].start()
-                Multiprocess.process_last_started += 1
+                Multiprocess.process_last_started[stage_id] += 1
 
                 if not processes[i].is_alive():
                     Multiprocess.logger.error(
@@ -438,7 +447,7 @@ class Multiprocess:
                     process_id = cpu_cnt - 1
                     continue
 
-                #retrieve result from queue
+                # retrieve result from queue-----------------------------------
                 while True:
                     process_xxx_str = "{}[{}process_xxx/{:03}{}]".format(
                         cs.RES,
@@ -468,9 +477,7 @@ class Multiprocess:
                     ))
                     queue.task_done()
 
-                    #processes[msg_process_id].terminate()
                     processes[msg_process_id].join()
-                    #processes[msg_process_id].terminate()
                     Multiprocess.logger.info("{}{}  terminated/joined".format(
                         msg_process_id_str,
                         cs.PRGnBF,
@@ -484,7 +491,7 @@ class Multiprocess:
                     process_tmp = processes[process_id]
 
                     process_tmp.start()
-                    Multiprocess.process_last_started += 1
+                    Multiprocess.process_last_started[stage_id] += 1
 
                     if not process_tmp.is_alive():
                         Multiprocess.logger.error("{}  Not running".format(
@@ -498,8 +505,7 @@ class Multiprocess:
             Multiprocess.logger.debug("Returning from subprocess_manage()")
             return
 
-        def concatenate(
-        ):
+        def concatenate(stage_id):
             """
             This function serves as a framework to concatenate results
             from subprocesses in order correctly.
@@ -513,7 +519,7 @@ class Multiprocess:
                 """
                 This function concatenates two given data structures.
                 """
-                if ds_nxt_id != Multiprocess.cat_nxt:
+                if ds_nxt_id != Multiprocess.cat_nxt[stage_id]:
                     Multiprocess.logger.error(
                         "{}[{}{}/{:03}{}]{}  "
                         "ds_nxt_id != Multiprocess.cat_nxt".format(
@@ -527,7 +533,7 @@ class Multiprocess:
                     )
                     return
 
-                Multiprocess.cat_nxt += 1
+                Multiprocess.cat_nxt[stage_id] += 1
 
                 #initial setup
                 if ds_nxt_id == 0:
@@ -536,7 +542,7 @@ class Multiprocess:
                             cs.RES,
                             cs.PRGnBH,
                             process_name,
-                            Multiprocess.process_cnt-1,
+                            Multiprocess.process_cnt[stage_id]-1,
                             cs.RES,
                             cs.PRGnBH,
                         )
@@ -565,7 +571,7 @@ class Multiprocess:
                         cs.RES,
                         cs.PRGnBH,
                         process_name,
-                        Multiprocess.process_cnt-1,
+                        Multiprocess.process_cnt[stage_id]-1,
                         cs.RES,
                         cs.PRGnBH,
                     )
@@ -577,8 +583,8 @@ class Multiprocess:
             process_result_cat    = []
             time_to_wait_if_alive = 0.1
             time_to_wait_if_none  = 0.1
-            while Multiprocess.cat_nxt < process_cnt:
-                cat_nxt = Multiprocess.cat_nxt
+            while Multiprocess.cat_nxt[stage_id] < process_cnt:
+                cat_nxt = Multiprocess.cat_nxt[stage_id]
                 process_name_nxt     = process_instances[cat_nxt].process_name
                 process_name_nxt_str = "{}[{}{}/{:03}{}]".format(
                     cs.RES,
@@ -589,11 +595,11 @@ class Multiprocess:
                 )
                 #-process that would produce the next results to be concatenated
                 #-...was not started yet => continue----------------------------
-                if cat_nxt > Multiprocess.process_last_started:
+                if cat_nxt > Multiprocess.process_last_started[stage_id]:
                     continue
 
                 #-...was started and is still running => continue---------------
-                if Multiprocess.processes[cat_nxt].is_alive():
+                if Multiprocess.processes[stage_id][cat_nxt].is_alive():
                     time_sleep = time_to_wait_if_alive + 2
                     sleep(time_sleep)
                     if time_sleep <= 20:
@@ -654,6 +660,7 @@ class Multiprocess:
             return process_result_cat
 
         #-----------------------------------------------------------------------
+        stage_id           = 0
         process_instances  = []
         process_result     = []
         process_id         = 0
@@ -702,18 +709,19 @@ class Multiprocess:
 
             process_id  += 1
             process_cnt += 1
-            Multiprocess.processes.append(process)
-            process_instances     .append(process_inst)
-            process_result        .append(None)
+            Multiprocess.processes[stage_id].append(process)
+            process_instances               .append(process_inst)
+            process_result                  .append(None)
 
-        Multiprocess.process_cnt = process_cnt
-        Velo.process_cnt         = process_cnt
+        Multiprocess.process_cnt[stage_id] = process_cnt
+        Velo.process_cnt            = process_cnt
 
         thread_subprocess_manage = Thread(
             target = subprocess_manage,
             args   = (
+                stage_id,
                 process_cnt,
-                Multiprocess.processes,
+                Multiprocess.processes[stage_id],
                 cpu_cnt,
                 process_result,
                 queue,
@@ -722,7 +730,7 @@ class Multiprocess:
         thread_subprocess_manage.start()
 
         #--concatenate all consecutive results----------------------------------
-        process_result_cat = concatenate()
+        process_result_cat = concatenate(stage_id)
 
         thread_subprocess_manage.join()
 
@@ -806,7 +814,7 @@ class MultiprocessTest:
             cs.RES,
             cs.PRGnBA,
             self.process_name,
-            Multiprocess.process_cnt-1,
+            Multiprocess.process_cnt[0]-1,
             cs.RES,
             cs.RES,
 
@@ -836,7 +844,6 @@ class MultiprocessTest:
         ))
 
         self.__queue.put([self.process_id, self.__queue_dict])
-        #sefl.__queue.close()
 
         # print termination message---------------------------------------------
         Multiprocess.logger.debug("{}{}  terminating".format(
