@@ -385,6 +385,11 @@ class Velo:
                 )
             )
 
+            #-------------------------------------------------------------------
+            path_cluster          = Velo.args.path_cluster
+            Velo.cluster_max_size = 0
+            Velo.cluster_max_id   = 0
+
             # load blocksci clustering manager----------------------------------
             Velo.cluster_mgr = ClusterManager(
                 path_cluster,
@@ -1012,6 +1017,7 @@ class Velo:
 
     #--PUBLIC INSTANCE-LEVEL METHODS--##########################################
     #==[ INSTALEVEL | Initialize instances ]====================================
+
     def __init__ (
         self,
         process_id,

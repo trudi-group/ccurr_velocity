@@ -85,11 +85,14 @@ class Multiprocess:
         """
         Kills all subprocesses.
         """
-        def processes_kill(process_id):
+        def processes_kill(
+                stage_id,
+                process_id,
+            ):
             """
             Kills a subprocess by its process_id.
             """
-            process_to_terminate = Multiprocess.processes[process_id]
+            process_to_terminate = Multiprocess.processes[stage_id][process_id]
             if process_to_terminate is not None:
                 process_to_terminate.terminate()
 
@@ -157,7 +160,7 @@ class Multiprocess:
                     queue.task_done()
                     break
 
-                Multiprocess.processes[msg_process_id].join()
+                Multiprocess.processes[0][msg_process_id].join()
 
             return process_instances_ret
 
@@ -558,7 +561,7 @@ class Multiprocess:
                             cs.RES,
                             cs.PRGnBH,
                             process_name,
-                            Multiprocess.process_cnt-1,
+                            Multiprocess.process_cnt[stage_id]-1,
                             cs.RES,
                             cs.PRGnBH,
                             "--stage_id = {}-- ".format(stage_id),
@@ -588,7 +591,7 @@ class Multiprocess:
                         cs.RES,
                         cs.PRGnBH,
                         process_name,
-                        Multiprocess.process_cnt-1,
+                        Multiprocess.process_cnt[stage_id]-1,
                         cs.RES,
                         cs.PRGnBH,
                         "--stage_id = {}-- ".format(stage_id),
@@ -629,11 +632,11 @@ class Multiprocess:
                 )
                 #-process that would produce the next results to be concatenated
                 #-...was not started yet => continue----------------------------
-                if cat_nxt > Multiprocess.process_last_started:
+                if cat_nxt > Multiprocess.process_last_started[stage_id]:
                     continue
 
                 #-...was started and is still running => continue---------------
-                if Multiprocess.processes[cat_nxt].is_alive():
+                if Multiprocess.processes[stage_id][cat_nxt].is_alive():
                     time_sleep = time_to_wait_if_alive + 2
                     sleep(time_sleep)
                     if time_sleep <= 20:
