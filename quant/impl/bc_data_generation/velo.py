@@ -1020,6 +1020,7 @@ class Velo:
 
     def __init__ (
         self,
+        stage_id,
         process_id,
         process_name,
         queue,
