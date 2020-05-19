@@ -135,6 +135,7 @@ class Velo:
                                                # analyzed-----------------------
     block_height_max  = 0                      # maximum block height regarding-
                                                # given end date for analysis----
+    stage_id          = 0                      # stage_id-----------------------
 
     #==[ CLASSLEVEL | SessionSetup & precaching of global data struct ]=========
     def setup(
@@ -478,6 +479,7 @@ class Velo:
                 sub_proc_date_end,
                 sub_proc_date_period,
                 cnt_txes_per_day,
+                sub_proc_printed,
             ):
                 """
                 Setup transactions chunks for multiprocessing per day.
@@ -487,10 +489,16 @@ class Velo:
                 # txes numbers of all other days
                 txes_counter_next = sub_proc_txes_counter + cnt_txes_per_day
 
+                #if txes_counter_next < sub_proc_tx_cnt_max or sub_proc_printed == cpu_count()-1:
+                sub_proc_date_end    += timedelta(days = 1)
+                sub_proc_date_period += 1
+                sub_proc_txes_counter = txes_counter_next
+
                 if txes_counter_next < sub_proc_tx_cnt_max:
-                    sub_proc_date_end    += timedelta(days = 1)
-                    sub_proc_date_period += 1
-                    sub_proc_txes_counter = txes_counter_next
+                    #sub_proc_date_end    += timedelta(days = 1)
+                    #sub_proc_date_period += 1
+                    #sub_proc_txes_counter = txes_counter_next
+                    pass
 
                 else:
                     sub_proc_date = [
@@ -500,14 +508,24 @@ class Velo:
                         sub_proc_txes_counter
                     ]
                     Velo.f_dates_of_id_sub_proc.append(sub_proc_date)
-                    Velo.logger.debug("{}: {}".format(day, sub_proc_date))
-
+                    Velo.logger.debug(
+                            "{:2}[{:4}]: ({})--({}), {:5}, {:10}".format(
+                            sub_proc_printed,
+                            day,
+                            sub_proc_date_start,
+                            sub_proc_date_end,
+                            sub_proc_date_period,
+                            sub_proc_txes_counter,
+                        )
+                    )
+                    sub_proc_printed     += 1
                     sub_proc_date_start   = sub_proc_date_end
                     sub_proc_date_end     = sub_proc_date_start
-                    sub_proc_date_end    += timedelta(days=1)
-                    sub_proc_date_period  = 1
-                    sub_proc_txes_counter = cnt_txes_per_day
+                    sub_proc_date_period  = 0
+                    sub_proc_txes_counter = 0
+                    #sub_proc_txes_counter = cnt_txes_per_day
 
+                # treat last day seperately-------------------------------------
                 if day == (Velo.cnt_days-1):
                     sub_proc_date = [
                         sub_proc_date_start,
@@ -517,10 +535,19 @@ class Velo:
                     ]
                     Velo.f_dates_of_id_sub_proc.append(sub_proc_date)
                     Velo.logger.debug(
-                        "{}: {} (last)".format(day, sub_proc_date)
+                        "{:2}[{:4}]: ({})--({}), {:5}, {:10} (last)".format(
+                            sub_proc_printed,
+                            day,
+                            sub_proc_date_start,
+                            sub_proc_date_end,
+                            sub_proc_date_period,
+                            sub_proc_txes_counter,
+                        )
                     )
 
+
                 return (
+                    sub_proc_printed,
                     sub_proc_txes_counter,
                     sub_proc_date_start,
                     sub_proc_date_end,
@@ -550,6 +577,7 @@ class Velo:
             Velo.cnt_days = (
                 to_datetime(Velo.end_date) - to_datetime(Velo.start_date_gen)
             ).days
+            Velo.logger.debug("cnt_days = {}".format(Velo.cnt_days))
 
             #--get minimum and maximum block_height according to start/end_date-
             block_height_min = Velo.block_times[
@@ -567,6 +595,8 @@ class Velo:
             for i_bh in range(block_height_min, block_height_max):
                 cnt_txes += Velo.chain[i_bh].tx_count
 
+            Velo.logger.debug("cnt_txes = {}".format(cnt_txes))
+
             #-initialie data for subprocessing----------------------------------
             day_date              = to_datetime(Velo.start_date_gen)
             day_date_next         = day_date
@@ -575,6 +605,7 @@ class Velo:
             sub_proc_date_start   = day_date
             sub_proc_date_end     = day_date + timedelta(days=1)
             sub_proc_date_period  = 1
+            sub_proc_printed      = 0
 
             for day in range(Velo.cnt_days):
                 # update for-loop date variables--------------------------------
@@ -615,11 +646,14 @@ class Velo:
                         sub_proc_date_end,
                         sub_proc_date_period,
                         cnt_txes_per_day,
+                        sub_proc_printed,
                     )
-                    sub_proc_txes_counter = ret[0]
-                    sub_proc_date_start   = ret[1]
-                    sub_proc_date_end     = ret[2]
-                    sub_proc_date_period  = ret[3]
+
+                    sub_proc_printed      = ret[0]
+                    sub_proc_txes_counter = ret[1]
+                    sub_proc_date_start   = ret[2]
+                    sub_proc_date_end     = ret[3]
+                    sub_proc_date_period  = ret[4]
 
             return
 
@@ -872,6 +906,7 @@ class Velo:
 
     def __init__ (
         self,
+        stage_id,
         process_id,
         process_name,
         queue,
@@ -880,6 +915,7 @@ class Velo:
         """
         Initialize subprocess.
         """
+        self.stage_id     = stage_id
         self.process_id   = process_id
         self.process_name = process_name
         self.__queue      = queue
@@ -1695,7 +1731,7 @@ class Velo:
             cs.RES,
             cs.WHI,
         ))
-        self.__queue.put([self.process_id, self.__queue_dict])
+        self.__queue.put([self.stage_id, self.process_id, self.__queue_dict])
         Velo.logger.debug("{}[{}{}/{:03}{}]{}  terminating".format(
             cs.RES,
             cs.PRGnBE,
