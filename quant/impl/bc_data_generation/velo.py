@@ -135,7 +135,6 @@ class Velo:
                                                # analyzed-----------------------
     block_height_max  = 0                      # maximum block height regarding-
                                                # given end date for analysis----
-    stage_id          = 0                      # stage_id-----------------------
 
     #==[ CLASSLEVEL | SessionSetup & precaching of global data struct ]=========
     def setup(
@@ -903,22 +902,22 @@ class Velo:
 
     #--PUBLIC INSTANCE-LEVEL METHODS--##########################################
     #==[ INSTALEVEL | Initialize instances ]====================================
-
     def __init__ (
         self,
-        stage_id,
         process_id,
         process_name,
         queue,
+        queue_evnt,
         date_id,
     ):
         """
         Initialize subprocess.
         """
-        self.stage_id     = stage_id
+        self.stage_id     = 0
         self.process_id   = process_id
         self.process_name = process_name
         self.__queue      = queue
+        self.__queue_evnt = queue_evnt
 
         # next day to include date_period_end. Otherwise, it won't be regarded
         # due to the blocksci chainrange being computed as the daily difference.
@@ -940,7 +939,8 @@ class Velo:
         self.__txes_count = s_p_d[date_id][3]
 
         # data structures conveyed by subprocess queues-------------------------
-        self.__queue_dict = {}
+        self.__queue_dict      = {}
+        self.__queue_evnt_dict = {}
 
     #==[ INSTALEVEL | Retrieve of desired data ]================================
     def run(self):
@@ -1104,6 +1104,7 @@ class Velo:
                     if date_period >= 100:
                         colorChoice = cs.CYB
 
+
                     Velo.logger.info(
                         "{}{}  [day_{:04d}/{:04d}]  {}".format(
                             "{}[{}{}/{:03}{}]".format(
@@ -1229,6 +1230,7 @@ class Velo:
             ).days
 
             for i_day in range(self.__date_period):
+
                 # print a liveliness message if criteria are matched------------
                 print_liveliness_message(i_day)
 
@@ -1713,34 +1715,75 @@ class Velo:
                 ] = dormancy_per_day[t_w]
 
             return False
-
-        # 1.1: [ Main Script - Standard info, M & TP ]--------------------------
-        # Setup instance-wise part of chain
-        if get_basic_tx_data() == True: return
-
-        if get_m_circ() == True: return
-
-        if get_comp_meas() == True: return
-
-        #put all necessary data to parent process through multiprocess queue
-        Velo.logger.debug("{}[{}{}/{:03}{}]{}  Sending results".format(
+        # print starting message------------------------------------------------
+        process_name_str = "{}[{}{}/{:03}{}]{}  {}".format(
             cs.RES,
-            cs.PRGnBE,
+            cs.PRGnBA,
             self.process_name,
             Velo.process_cnt-1,
             cs.RES,
             cs.WHI,
+            "--stage_id = {}--".format(self.stage_id)
+        )
+
+        Velo.logger.info("{}{}  Starting".format(
+            process_name_str,
+            cs.WHI,
         ))
+        #-----------------------------------------------------------------------
+        if self.stage_id == 0:
+            if get_basic_tx_data() == True: return
+
+            self.__queue.put([
+                self.stage_id,
+                self.process_id,
+                self.__queue_evnt_dict
+            ])
+            self.__queue_evnt_dict = {}
+
+            if get_m_circ() == True: return
+
+            while True:
+                msg_from_queue = self.__queue_evnt.get()
+                msg_stage_id   = msg_from_queue[0]
+                msg_process_id = msg_from_queue[1]
+                self.__queue_evnt.task_done()
+
+                if msg_stage_id == self.stage_id and msg_process_id == self.process_id:
+                    break
+
+            self.stage_id += 1
+
+        if self.stage_id == 1:
+            if get_comp_meas() == True: return
+
+        # put all necessary data to parent process through multiprocess queue---
+        Velo.logger.debug(
+            "{}[{}{}/{:03}{}]{}  {} Sending results".format(
+                cs.RES,
+                cs.PRGnBE,
+                self.process_name,
+                Velo.process_cnt-1,
+                cs.RES,
+                cs.WHI,
+                "--stage_id = {}--".format(self.stage_id)
+            )
+        )
+
         self.__queue.put([self.stage_id, self.process_id, self.__queue_dict])
-        Velo.logger.debug("{}[{}{}/{:03}{}]{}  terminating".format(
-            cs.RES,
-            cs.PRGnBE,
-            self.process_name,
-            Velo.process_cnt-1,
-            cs.RES,
-            cs.WHI,
-        ))
 
+        Velo.logger.debug(
+            "{}[{}{}/{:03}{}]{}  {} terminating".format(
+                cs.RES,
+                cs.PRGnBE,
+                self.process_name,
+                Velo.process_cnt-1,
+                cs.RES,
+                cs.WHI,
+                "--stage_id = {}--".format(self.stage_id)
+            )
+        )
+        
         return
 
 if __name__ == "__main__":
