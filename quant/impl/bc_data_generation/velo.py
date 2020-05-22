@@ -1017,10 +1017,8 @@ class Velo:
 
     #--PUBLIC INSTANCE-LEVEL METHODS--##########################################
     #==[ INSTALEVEL | Initialize instances ]====================================
-
     def __init__ (
         self,
-        stage_id,
         process_id,
         process_name,
         queue,
@@ -1857,6 +1855,47 @@ class Velo:
             self.__queue_evnt_dict = {}
 
             if get_m_circ() == True: return
+
+            while True:
+                msg_from_queue = self.__queue_evnt.get()
+                msg_stage_id   = msg_from_queue[0]
+                msg_process_id = msg_from_queue[1]
+                self.__queue_evnt.task_done()
+
+                if msg_stage_id == self.stage_id and msg_process_id == self.process_id:
+                    break
+
+            self.stage_id += 1
+
+        if self.stage_id == 1:
+            if get_comp_meas() == True: return
+
+        # put all necessary data to parent process through multiprocess queue---
+        Velo.logger.debug(
+            "{}[{}{}/{:03}{}]{}  {} Sending results".format(
+                cs.RES,
+                cs.PRGnBE,
+                self.process_name,
+                Velo.process_cnt-1,
+                cs.RES,
+                cs.WHI,
+                "--stage_id = {}--".format(self.stage_id)
+            )
+        )
+
+        self.__queue.put([self.stage_id, self.process_id, self.__queue_dict])
+
+        Velo.logger.debug(
+            "{}[{}{}/{:03}{}]{}  {} terminating".format(
+                cs.RES,
+                cs.PRGnBE,
+                self.process_name,
+                Velo.process_cnt-1,
+                cs.RES,
+                cs.WHI,
+                "--stage_id = {}--".format(self.stage_id)
+            )
+        )
 
             while True:
                 msg_from_queue = self.__queue_evnt.get()
