@@ -673,85 +673,6 @@ class Velo:
 
             return
 
-        def setup_tx_vol_agg_time_windowed():
-            """
-            Compute aggregates for given times in Velo.time_windows.
-            """
-            def tx_vol_agg_time_windowed_per_day(tx_vol_agg_nxt_day):
-                """
-                Compute daily aggregates for given times in Velo.time_windows.
-                """
-                for t_w in range(1, len(Velo.time_windows)):
-                    tx_vol_agg_last = 0
-
-                    if day > 0:
-                        tx_vol_agg_last = Velo.f_tx_vol_agg_of_id_day[day-1][t_w]
-
-                    #-add the current daily calculations---------------------------
-                    tx_vol_agg_t_w = tx_vol_agg_last + tx_vol_agg_nxt_day
-
-                    #-substract the calculations right before the current window---
-                    if day >= Velo.time_windows[t_w]:
-                        tx_vol_agg_t_w -=  Velo.f_tx_vol_agg_of_id_day[
-                            day - Velo.time_windows[t_w]
-                        ][0]
-
-                    Velo.f_tx_vol_agg_of_id_day[day].append(tx_vol_agg_t_w)
-
-                return
-
-            #--print status message---------------------------------------------
-            Velo.logger.info(
-                "{}[{}     SETUP     {}]{}  "
-                "tx_vol_agg_time_windowed".format(
-                    cs.RES,
-                    cs.PRGnBA,
-                    cs.RES,
-                    cs.PRGnBA,
-                )
-            )
-            day_date      = to_datetime(Velo.start_date_gen)
-            day_date_next = day_date
-
-            for day in range(Velo.cnt_days):
-                # update for-loop date variables--------------------------------
-                day_date       = day_date_next
-                day_date_next += timedelta(days=1)
-
-                # initialize for-scope variables: daily agg. tx_vol for---------
-                # given time_windows--------------------------------------------
-                tx_vol_agg_nxt_day = 0
-                Velo.f_tx_vol_agg_of_id_day.append([])
-
-                # get minimum and maximum block height according to actual day--
-                block_height_min = Velo.block_times[
-                    Velo.block_times.index >= day_date
-                ].iloc[0][0]
-
-                block_height_max = Velo.block_times[
-                    Velo.block_times.index >= day_date_next
-                ].iloc[0][0]
-
-                # retrieve values per block in daily blockrange-----------------
-                for i_bh in range(block_height_min, block_height_max):
-                    tx_vol_agg_nxt_day += Velo.chain[i_bh].output_value
-
-                Velo.f_tx_vol_agg_of_id_day[day].append(tx_vol_agg_nxt_day)
-
-                # aggregate txes volume for given time windows------------------
-                tx_vol_agg_time_windowed_per_day(tx_vol_agg_nxt_day)
-
-            Velo.logger.info(
-                "{}[{}     SETUP END {}]{}  "
-                "tx_vol_agg_time_windowed".format(
-                    cs.RES,
-                    cs.PRGnBA,
-                    cs.RES,
-                    cs.PRGnBA,
-                )
-            )
-            return
-
         #--setup of static variables on class level-----------------------------
         setup_chain_and_attributes(args)
 
@@ -772,9 +693,6 @@ class Velo:
 
         #--setup data for subprocessing-----------------------------------------
         setup_subprocessing_chunks()
-
-        #--setup aggregated transaction volume regarding given time_windows-----
-        #  setup_tx_vol_agg_time_windowed()
 
         return
 
