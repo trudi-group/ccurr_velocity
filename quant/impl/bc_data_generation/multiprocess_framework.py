@@ -543,7 +543,7 @@ class Multiprocess:
                             Multiprocess.process_cnt-1,
                             cs.RES,
                             cs.PRGnBE,
-                            "  --stage_id = {}-- ".format(stage_id),
+                            "--stage_id = {}-- ".format(stage_id),
                             "ds_nxt_id != Multiprocess.cat_nxt",
                         )
                     )
@@ -561,7 +561,7 @@ class Multiprocess:
                             Multiprocess.process_cnt-1,
                             cs.RES,
                             cs.PRGnBH,
-                            "  --stage_id = {}-- ".format(stage_id),
+                            "--stage_id = {}-- ".format(stage_id),
                             "data appended",
                         )
                     )
@@ -591,7 +591,7 @@ class Multiprocess:
                         Multiprocess.process_cnt-1,
                         cs.RES,
                         cs.PRGnBH,
-                        "  --stage_id = {}-- ".format(stage_id),
+                        "--stage_id = {}-- ".format(stage_id),
                         "data appended",
                     )
                 )
@@ -795,15 +795,16 @@ class Multiprocess:
 
         thread_concatenate = []
 
-        for stage_id in range(Multiprocess.stage_fin):
-            thread_concatenate.append(
-                Thread(
-                    target = concatenate,
-                    args   = (
-                        stage_id,
-                    ),
-                )
+        #for stage_id in range(Multiprocess.stage_fin):
+        thread_concatenate.append(
+            Thread(
+                target = concatenate,
+                args   = (
+                    #stage_id,
+                    1,
+                ),
             )
+        )
 
         thread_subprocess_manage.start()
 
