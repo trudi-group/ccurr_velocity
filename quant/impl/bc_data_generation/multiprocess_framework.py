@@ -472,13 +472,13 @@ class Multiprocess:
                 msg_stage_id       = msg_from_queue[0]
                 msg_process_id     = msg_from_queue[1]
                 msg_result         = msg_from_queue[2]
-                msg_process_id_str = "{}[{}process_{:03}/{:03}{}]{}".format(
+                msg_process_id_str = "{}[{}process_{:03}/{:03}{}]  {}".format(
                     cs.RES,
                     cs.PRGnBG,
                     msg_process_id,
                     Multiprocess.process_cnt-1,
                     cs.RES,
-                    "  --stage_id = {}--".format(msg_stage_id)
+                    "--stage_id = {}--".format(msg_stage_id)
                 )
                
                 Multiprocess.process_result[msg_process_id][
@@ -624,7 +624,7 @@ class Multiprocess:
                         process_name_nxt,
                         Multiprocess.process_cnt-1,
                         cs.RES,
-                        "  --stage_id = {}-- ".format(stage_id),
+                        "--stage_id = {}-- ".format(stage_id),
                     )
                 )
                 #-process that would produce the next results to be concatenated
