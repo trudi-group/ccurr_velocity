@@ -478,7 +478,7 @@ class Multiprocess:
                     msg_process_id,
                     Multiprocess.process_cnt-1,
                     cs.RES,
-                    "--stage_id = {}--".format(msg_stage_id)
+                    "[stage_id = {:2}]".format(msg_stage_id)
                 )
                
                 Multiprocess.process_result[msg_process_id][
@@ -543,7 +543,7 @@ class Multiprocess:
                             Multiprocess.process_cnt-1,
                             cs.RES,
                             cs.PRGnBE,
-                            "--stage_id = {}-- ".format(stage_id),
+                            "[stage_id = {:2}]".format(stage_id),
                             "ds_nxt_id != Multiprocess.cat_nxt",
                         )
                     )
@@ -554,14 +554,14 @@ class Multiprocess:
                 #initial setup
                 if ds_nxt_id == 0:
                     Multiprocess.logger.info(
-                        "{}[{}{}/{:03}{}]{}  {}{}".format(
+                        "{}[{}{}/{:03}{}]{}  {}  {}".format(
                             cs.RES,
                             cs.PRGnBH,
                             process_name,
                             Multiprocess.process_cnt-1,
                             cs.RES,
                             cs.PRGnBH,
-                            "--stage_id = {}-- ".format(stage_id),
+                            "[stage_id = {:2}]".format(stage_id),
                             "data appended",
                         )
                     )
@@ -584,14 +584,14 @@ class Multiprocess:
                         ])
 
                 Multiprocess.logger.info(
-                    "{}[{}{}/{:03}{}]{}  {}{}".format(
+                    "{}[{}{}/{:03}{}]{}  {}  {}".format(
                         cs.RES,
                         cs.PRGnBH,
                         process_name,
                         Multiprocess.process_cnt-1,
                         cs.RES,
                         cs.PRGnBH,
-                        "--stage_id = {}-- ".format(stage_id),
+                        "[stage_id = {:2}]".format(stage_id),
                         "data appended",
                     )
                 )
@@ -624,7 +624,7 @@ class Multiprocess:
                         process_name_nxt,
                         Multiprocess.process_cnt-1,
                         cs.RES,
-                        "--stage_id = {}-- ".format(stage_id),
+                        "[stage_id = {:2}]".format(stage_id),
                     )
                 )
                 #-process that would produce the next results to be concatenated
@@ -643,7 +643,7 @@ class Multiprocess:
 
                     if time_to_wait_if_alive > 3.2:
                         Multiprocess.logger.info(
-                            "{}{}   still running".format(
+                            "{}{}  still running".format(
                                 process_name_nxt_str,
                                 cs.PRGnBE,
                             )
@@ -935,7 +935,7 @@ class MultiprocessTest:
             MultiprocessTest.process_cnt-1,
             cs.RES,
             cs.RES,
-            "--stage_id = {}--".format(self.stage_id)
+            "[stage_id = {:2}]".format(self.stage_id)
         )
 
         # print some working message--------------------------------------------

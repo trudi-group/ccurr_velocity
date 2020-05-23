@@ -1046,6 +1046,154 @@ class Velo:
         """
         Run the thread.
         """
+        def print_liveliness_message(
+            i_day,
+            function_str,
+        ):
+            """
+            This function checks whether a liveliness message regaring
+            the number of txes and the respective day id should be
+            printed.
+            Note that this function is not very dynamic and totally
+            uggly!
+            """
+            print_still_alive = False
+            txes_num = self.__txes_count
+            date_period = self.__date_period
+
+            if date_period <= 25:
+                if txes_num <= 125000:
+                    if (i_day % 36) == 0:
+                        print_still_alive = True
+                elif txes_num <= 250000:
+                    if (i_day % 24) == 0:
+                        print_still_alive = True
+                elif txes_num <= 500000:
+                    if (i_day % 18) == 0:
+                        print_still_alive = True
+                elif txes_num <= 1000000:
+                    if (i_day % 12) == 0:
+                        print_still_alive = True
+                elif txes_num <= 2000000:
+                    if (i_day % 6) == 0:
+                        print_still_alive = True
+                elif txes_num <= 4000000:
+                    if (i_day % 4) == 0:
+                        print_still_alive = True
+                else:
+                    if (i_day % 2) == 0:
+                        print_still_alive = True
+
+            elif date_period <= 50:
+                if txes_num <= 125000:
+                    if (i_day % 72) == 0:
+                        print_still_alive = True
+                elif txes_num <= 250000:
+                    if (i_day % 48) == 0:
+                        print_still_alive = True
+                elif txes_num <= 500000:
+                    if (i_day % 36) == 0:
+                        print_still_alive = True
+                elif txes_num <= 1000000:
+                    if (i_day % 24) == 0:
+                        print_still_alive = True
+                elif txes_num <= 2000000:
+                    if (i_day % 12) == 0:
+                        print_still_alive = True
+                elif txes_num <= 4000000:
+                    if (i_day % 8) == 0:
+                        print_still_alive = True
+                else:
+                    if (i_day % 4) == 0:
+                        print_still_alive = True
+
+            elif date_period <= 100:
+                if txes_num <= 125000:
+                    if (i_day % 128) == 0:
+                        print_still_alive = True
+                elif txes_num <= 250000:
+                    if (i_day % 96) == 0:
+                        print_still_alive = True
+                elif txes_num <= 500000:
+                    if (i_day % 72) == 0:
+                        print_still_alive = True
+                elif txes_num <= 1000000:
+                    if (i_day % 48) == 0:
+                        print_still_alive = True
+                elif txes_num <= 2000000:
+                    if (i_day % 24) == 0:
+                        print_still_alive = True
+                elif txes_num <= 4000000:
+                    if (i_day % 16) == 0:
+                        print_still_alive = True
+                else:
+                    if (i_day % 8) == 0:
+                        print_still_alive = True
+
+            elif date_period <= 200:
+                if txes_num <= 125000:
+                    if (i_day % 256) == 0:
+                        print_still_alive = True
+                elif txes_num <= 250000:
+                    if (i_day % 192) == 0:
+                        print_still_alive = True
+                elif txes_num <= 500000:
+                    if (i_day % 144) == 0:
+                        print_still_alive = True
+                elif txes_num <= 1000000:
+                    if (i_day % 96) == 0:
+                        print_still_alive = True
+                elif txes_num <= 2000000:
+                    if (i_day % 48) == 0:
+                        print_still_alive = True
+                elif txes_num <= 4000000:
+                    if (i_day % 32) == 0:
+                        print_still_alive = True
+                else:
+                    if (i_day % 16) == 0:
+                        print_still_alive = True
+
+            elif date_period <= 1000:
+                if txes_num <= 3_500_000:
+                    if (i_day % 160) == 0:
+                        print_still_alive = True
+                else:
+                    if (i_day % 80) == 0:
+                        print_still_alive = True
+
+            else:
+                if txes_num <= 4_000_000:
+                    if (i_day % 240) == 0:
+                        print_still_alive = True
+                else:
+                    if (i_day % 120) == 0:
+                        print_still_alive = True
+
+            if i_day != 0 and print_still_alive == True:
+                colorChoice = cs.WHI
+                if date_period >= 100:
+                    colorChoice = cs.CYB
+
+
+                Velo.logger.info(
+                    "{}{}  [day_{:04d}/{:04d}]  {}".format(
+                        "{}[{}{}/{:03}{}]".format(
+                            cs.RES,
+                            colorChoice,
+                            self.process_name,
+                            Velo.process_cnt-1,
+                            cs.RES,
+                        ),
+                        cs.WHI,
+                        i_day,
+                        date_period,
+                        function_str,
+
+                    )
+                )
+
+            return
+
         def in_max_cluster(out):
             """
             This function checks whether a given output (out) belongs to the
@@ -1078,149 +1226,6 @@ class Velo:
                                    (check our paper or blocksci paper)
             - m_total:             aggregated money supply per day
             """
-            def print_liveliness_message(i_day):
-                """
-                This function checks whether a liveliness message regaring
-                the number of txes and the respective day id should be
-                printed.
-                Note that this function is not very dynamic and totally
-                uggly!
-                """
-                print_still_alive = False
-                txes_num = self.__txes_count
-                date_period = self.__date_period
-
-                if date_period <= 25:
-                    if txes_num <= 125000:
-                        if (i_day % 36) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 250000:
-                        if (i_day % 24) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 500000:
-                        if (i_day % 18) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 1000000:
-                        if (i_day % 12) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 2000000:
-                        if (i_day % 6) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 4000000:
-                        if (i_day % 4) == 0:
-                            print_still_alive = True
-                    else:
-                        if (i_day % 2) == 0:
-                            print_still_alive = True
-
-                elif date_period <= 50:
-                    if txes_num <= 125000:
-                        if (i_day % 72) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 250000:
-                        if (i_day % 48) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 500000:
-                        if (i_day % 36) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 1000000:
-                        if (i_day % 24) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 2000000:
-                        if (i_day % 12) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 4000000:
-                        if (i_day % 8) == 0:
-                            print_still_alive = True
-                    else:
-                        if (i_day % 4) == 0:
-                            print_still_alive = True
-
-                elif date_period <= 100:
-                    if txes_num <= 125000:
-                        if (i_day % 128) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 250000:
-                        if (i_day % 96) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 500000:
-                        if (i_day % 72) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 1000000:
-                        if (i_day % 48) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 2000000:
-                        if (i_day % 24) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 4000000:
-                        if (i_day % 16) == 0:
-                            print_still_alive = True
-                    else:
-                        if (i_day % 8) == 0:
-                            print_still_alive = True
-
-                elif date_period <= 200:
-                    if txes_num <= 125000:
-                        if (i_day % 256) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 250000:
-                        if (i_day % 192) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 500000:
-                        if (i_day % 144) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 1000000:
-                        if (i_day % 96) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 2000000:
-                        if (i_day % 48) == 0:
-                            print_still_alive = True
-                    elif txes_num <= 4000000:
-                        if (i_day % 32) == 0:
-                            print_still_alive = True
-                    else:
-                        if (i_day % 16) == 0:
-                            print_still_alive = True
-
-                elif date_period <= 1000:
-                    if txes_num <= 3_500_000:
-                        if (i_day % 160) == 0:
-                            print_still_alive = True
-                    else:
-                        if (i_day % 80) == 0:
-                            print_still_alive = True
-
-                else:
-                    if txes_num <= 4_000_000:
-                        if (i_day % 240) == 0:
-                            print_still_alive = True
-                    else:
-                        if (i_day % 120) == 0:
-                            print_still_alive = True
-
-                if i_day != 0 and print_still_alive == True:
-                    colorChoice = cs.WHI
-                    if date_period >= 100:
-                        colorChoice = cs.CYB
-
-
-                    Velo.logger.info(
-                        "{}{}  [day_{:04d}/{:04d}]  {}".format(
-                            "{}[{}{}/{:03}{}]".format(
-                                cs.RES,
-                                colorChoice,
-                                self.process_name,
-                                Velo.process_cnt-1,
-                                cs.RES,
-                            ),
-                            cs.WHI,
-                            i_day,
-                            date_period,
-                            "get_basic_tx_data()",
-                        )
-                    )
-
-                return
 
             def retrieve_per_tx_daily(
                 i_day,
@@ -1329,9 +1334,11 @@ class Velo:
             ).days
 
             for i_day in range(self.__date_period):
-
                 # print a liveliness message if criteria are matched------------
-                print_liveliness_message(i_day)
+                print_liveliness_message(
+                    i_day,
+                    "get_basic_tx_data()"
+                )
 
                 # initialize daily used data structures-------------------------
                 date     = self.__date_period_start + timedelta(i_day)
@@ -1393,310 +1400,10 @@ class Velo:
 
             return False
 
-        def get_m_circ(type = ""):
+        def get_measurements():
             """
-            "Whole bill"-approach:
+            "Coin Days Destroyed and Dormancy"-approach:------------------------
 
-            Get coin supply in circulation for a given period,
-            based on Tx inputs created in earlier periods and new
-            minted coins.
-
-            Here: Get circulating supply for each day
-            => extract the transactions for each day that satisfy certain
-            characteristics. We need tx inputs that where processed and
-            generated before the given period. Additionally we need newly
-            minted coins that where transacted during the given period.
-
-            "Moved coin"-approach:
-
-            Get coin supply in circulation for a given period, based on Tx
-            inputs created in earlier periods and new minted coins.
-            Inputs converting to change outputs are substracted based on
-            either "FIFO" or "LIFO". It is assumed, that inputs are first
-            filling up outputs controlled by third party public keys,
-            rather than change outputs.
-
-            Here: Get circulating supply for each day
-            """
-            def m_circ(type):
-                """
-                Wrapper for handle_tx(wb_bill|mc_xifo), x \in {l, f}.
-                """
-
-                def inp_spend_before_bh_first_or_coinbase(
-                    inp,
-                    bh_first,
-                ):
-                    """
-                    This function represents the condition for the handle_tx_mc
-                    functions to decide, whether to sum an input or not.
-                    """
-
-                    # check if the tx that spent this input is
-                    # older than bh_first
-                    if inp.spent_tx.block_height < bh_first:
-                        return True
-
-                    # check if the tx that spent this input is a coinbase tx
-                    if inp.spent_tx.is_coinbase:
-                        return True
-
-                    return False
-
-                def handle_tx_mc_xifo(
-                    tx,
-                    bh_first,
-                    sortswitch,
-                ):
-                    """
-                    Moved-Coin-Approach
-                    We will do:
-                    1) For the TX: get the sum of Changeouts,
-                       sum of all self-churning outputs
-                    2) For the TX: the amount of Satoshi *actually sent*,
-                       amount of money send to others/sum of self-churning
-                       outputs
-                    3) For the TX: the age-sorted list of inputs
-                    4) For each input, that is smaller than the accumulated sum
-                       of BTC sent to third party, extract it's value and to sum
-                       it up later. If only a part of the respective input is
-                       needed, it will be corrected. The complete input object
-                       is stored as well for later use in filtering out recycled
-                       TXOs.
-                    *) Only those inputs are summed up that either where
-                       generated before the respective first_block_height/period
-                       or where spent by a coinbase transaction
-                    **) Only as much as val_outs_sent_to_others will be summed
-                        up.
-                    """
-                    m_circ_mc       = 0
-                    val_inps_summed = 0
-                    val_outs_break  = 0
-                    inps            = tx.inputs
-                    inps_age        = inps.age
-                    outs            = tx.outputs
-                    val_outs        = tx.output_value
-
-                    if len(inps) == 0 or tx.input_value == 0 or tx.output_value == 0:
-                        return 0
-
-                    else:
-                        # 1)
-                        val_chouts = 0
-                        for out in Velo.heur_select.change(tx):
-                            if False == in_max_cluster(out):
-                                val_chouts += int(out.value)
-                                # out_addr   = out.address
-                                # out_cls    = Velo.cluster_mgr.cluster_with_address(out_addr)
-                                # out_cls_id = out_cls.index
-                                # Velo.logger.info("out_cls_id = {:9} added".format(out_cls_id))
-
-                        val_outs_sent_to_others = ( val_outs - val_chouts )
-
-                        # 2)
-                        if val_outs_sent_to_others < 0:
-                            raise ValueError(
-                                "val_outs_sent_to_others must not be less than 0!"
-                            )
-                        elif val_outs_sent_to_others == 0:
-                            return 0
-
-                        # 3)
-                        inps_sorted = sort_together(
-                            [
-                                inps_age,
-                                inps
-                            ],
-                            reverse = sortswitch
-                        )[1]
-                        # 4/)
-                        for inp_i in inps_sorted:
-                            val_inp_i = inp_i.value
-                            val_outs_break += val_inp_i
-
-                            # *)
-                            if inp_spend_before_bh_first_or_coinbase(
-                                inp_i,
-                                bh_first,
-                            ) == True:
-                                m_circ_mc += val_inp_i
-                                # **)
-                                if val_outs_break >= val_outs_sent_to_others:
-                                    if m_circ_mc >= val_outs_sent_to_others:
-                                        m_circ_mc = val_outs_sent_to_others
-                                    break
-
-                    if m_circ_mc < 0:
-                        Velo.logger.error(
-                            "{}{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}".format(
-                                "{}[{}{}/{:03}{}]".format(
-                                    cs.RES,
-                                    cs.WHI,
-                                    self.process_name,
-                                    Velo.process_cnt-1,
-                                    cs.RES,
-                                ),
-                                cs.WHI,
-                                "        block_time              = {}".format(tx.block_time),
-                                "        tx.hash                 = {}".format(tx.hash),
-                                "        is coinbase?            = {}".format(tx.is_coinbase),
-                                "        val_outs                = {}".format(val_outs),
-                                "        val_chouts              = {}".format(val_chouts),
-                                "        val_outs_sent_to_others = {}".format(val_outs_sent_to_others),
-                                "        inps_sorted             = {}".format(inps_sorted),
-                                "        val_inps_all            = {}".format(tx.input_value),
-                                "        val_inps_summed         = {}".format(val_inps_summed),
-                                "        m_circ_m                = {}".format(m_circ_mc),
-                            )
-                        )
-                        raise ValueError(
-                            "m_circ_m must not be less than 0!"
-                            )
-
-                    return m_circ_mc
-
-                def handle_tx_wh_bill(
-                    tx,
-                    bh_first,
-                ):
-                    """
-                    complete agg value of inputs
-                    """
-                    m_circ_mc = 0
-                    inps      = tx.inputs
-
-                    for inp_i in inps:
-                        if inp_spend_before_bh_first_or_coinbase(
-                            inp_i,
-                            bh_first,
-                        ) == True:
-                            m_circ_mc += inp_i.value
-
-                    return m_circ_mc
-
-                Velo.logger.info(
-                    "{}[{}{}/{:03}{}]{}  {} {}".format(
-                        cs.RES,
-                        cs.PRGnBC,
-                        self.process_name,
-                        Velo.process_cnt-1,
-                        cs.RES,
-                        cs.WHI,
-                        "get daily coin supply type",
-                        type,
-                    )
-                )
-
-                # check type specific characteristics---------------------------
-                if type == "mc_lifo":
-                    sortswitch = False
-                elif type == "mc_fifo":
-                    sortswitch = True
-                elif type == "wh_bill":
-                    pass
-                else:
-                    raise ValueError('Wrong input in LIFO/FIFO choice.')
-
-                # initialize data structures------------------------------------
-                start_date_gen   = to_datetime(Velo.start_date_gen)
-                time_windows     = Velo.time_windows
-                time_windows_len = len(time_windows)
-                m_circ           = [[] for i in range(time_windows_len)]
-
-                # retrieve data for each daychunk of txes-----------------------
-                for daychunk in self.__txes_daily:
-                    # if no transactions happened, append 0
-                    if daychunk == []:
-                        for i in range(time_windows_len):
-                            m_circ[i].append(0)
-                        continue
-
-                    # initialize data structures per daychunk-------------------
-                    m_circ_per_day = [0 for i in range(time_windows_len)]
-
-                    # initialize first block heights/day index of txes----------
-                    first_block_height = []
-                    # last_block_height  = daychunk[-1].block_height
-
-                    first_block_height.append(daychunk[0].block_height)
-                    day_index = Velo.f_index_day_of_block_height[first_block_height[0]]
-
-                    # initalize first block/height/day index for lookback window
-                    for i in range(1, time_windows_len):
-                        i_day = int(day_index - time_windows[i])
-
-                        if i_day < 0:
-                            i_day = 0
-
-                        first_block_height.append(Velo.f_block_height_of_id_day[i_day])
-
-                    # txes in daychunk------------------------------------------
-                    # Loop over daychunks of tx data
-                    # Note: Implicit assumption (made explicit): Inputs fill in
-                    # "truly" transacted first, changeoutputs are filled last.
-                    for tx in daychunk:
-                        # Here, dust transaction shouldn't be included
-                        # fee: output-input
-                        # fee = output => input = 0
-                        # fee > output => input < 0
-                        if tx.output_value <= tx.fee:
-                            continue
-
-                        for i in range(time_windows_len):
-                            if type == "mc_lifo" or type == "mc_fifo":
-                                m_circ_per_day[i] += handle_tx_mc_xifo(
-                                    tx,
-                                    first_block_height[i],
-                                    sortswitch,
-                                )
-
-                            elif type == "wh_bill":
-                                m_circ_per_day[i] += handle_tx_wh_bill(
-                                    tx,
-                                    first_block_height[i],
-                                )
-
-                            else:
-                                m_circ_per_day[i] += handle_tx_wh_bill(
-                                    tx,
-                                    first_block_height[i],
-                                )
-
-                    # append final values per day-------------------------------
-                    for i in range(time_windows_len):
-                        m_circ[i].append(m_circ_per_day[i])
-
-                # put results into __queue_dict---------------------------------
-                for i in range(time_windows_len):
-                    self.__queue_dict[
-                        "m_circ_{}_{}".format(
-                            type,
-                            time_windows[i], 
-                        )
-                    ] = m_circ[i]
-
-                # hande test_level cases----------------------------------------
-                if 10 <= Velo.test_level and Velo.test_level <= 12:
-                    self.__queue.put([self.process_id, self.__queue_dict])
-                    return True
-
-                return False
-
-            if type == "":
-                if m_circ("wh_bill") == True: return True
-
-                #Call both lifo and fifo as they belong to the same concat test
-                m_circ("mc_lifo")
-                if m_circ("mc_fifo") == True: return True
-                return False
-
-            else:
-                return m_circ(type)
-
-            return False
-
-        def get_comp_meas():
-            """
             We use this weighted average to calculate (1) the summands necessary
             to calculate SDD and (2) the (with the time window transaction
             volume) weighted summands for dormancy.
@@ -1717,6 +1424,29 @@ class Velo:
             no weighting with the tx value over the time window. It is helpful
             to look at the derivation of the equations in our paper.
 
+            "Whole bill"-approach:----------------------------------------------
+
+            Get coin supply in circulation for a given period,
+            based on Tx inputs created in earlier periods and new
+            minted coins.
+
+            Here: Get circulating supply for each day
+            => extract the transactions for each day that satisfy certain
+            characteristics. We need tx inputs that where processed and
+            generated before the given period. Additionally we need newly
+            minted coins that where transacted during the given period.
+
+            "Moved coin"-approach:----------------------------------------------
+
+            Get coin supply in circulation for a given period, based on Tx
+            inputs created in earlier periods and new minted coins.
+            Inputs converting to change outputs are substracted based on
+            either "FIFO" or "LIFO". It is assumed, that inputs are first
+            filling up outputs controlled by third party public keys,
+            rather than change outputs.
+
+            Here: Get circulating supply for each day
+
             *) Dust transaction shouldn't be included!
                If all inputs are zero, then the fee and the outputs are
                all zero. Thus, we ignore this transaction since only
@@ -1724,8 +1454,32 @@ class Velo:
                Eventually, the weight of this transaction is zero, which
                means that we would not include it in our computation
                anyway.
+               fee: output-input
+               fee = output => input = 0
+               fee > output => input < 0
             """
-            def get_sdd_per_tx(tx):
+
+            def inp_spend_before_bh_first_or_coinbase(
+                inp,
+                bh_first,
+            ):
+                """
+                This function represents the condition for the handle_tx_mc
+                functions to decide, whether to sum an input or not.
+                """
+
+                # check if the tx that spent this input is
+                # older than bh_first
+                if inp.spent_tx.block_height < bh_first:
+                    return True
+
+                # check if the tx that spent this input is a coinbase tx
+                if inp.spent_tx.is_coinbase:
+                    return True
+
+                return False
+
+            def handle_tx_sdd_raw(tx):
                 """
                 Compute and return satoshi days desdroyed (sdd) per tx.
                 """
@@ -1748,57 +1502,242 @@ class Velo:
 
                 return sdd_per_tx
 
+            def handle_tx_mc_xifo(
+                tx,
+                bh_first,
+                sortswitch,
+            ):
+                """
+                Moved-Coin-Approach
+                We will do:
+                1) For the TX: get the sum of Changeouts,
+                   sum of all self-churning outputs
+                2) For the TX: the amount of Satoshi *actually sent*,
+                   amount of money send to others/sum of self-churning
+                   outputs
+                3) For the TX: the age-sorted list of inputs
+                4) For each input, that is smaller than the accumulated sum
+                   of BTC sent to third party, extract it's value and to sum
+                   it up later. If only a part of the respective input is
+                   needed, it will be corrected. The complete input object
+                   is stored as well for later use in filtering out recycled
+                   TXOs.
+                *) Only those inputs are summed up that either where
+                   generated before the respective first_block_height/period
+                   or where spent by a coinbase transaction
+                **) Only as much as val_outs_sent_to_others will be summed
+                    up.
+                """
+                m_circ_mc       = 0
+                val_inps_summed = 0
+                val_outs_break  = 0
+                inps            = tx.inputs
+                inps_age        = inps.age
+                outs            = tx.outputs
+                val_outs        = tx.output_value
+
+                if len(inps) == 0 or tx.input_value == 0 or tx.output_value == 0:
+                    return 0
+
+                else:
+                    # 1)
+                    val_chouts = 0
+                    for out in Velo.heur_select.change(tx):
+                        if False == in_max_cluster(out):
+                            val_chouts += int(out.value)
+                            # out_addr   = out.address
+                            # out_cls    = Velo.cluster_mgr.cluster_with_address(out_addr)
+                            # out_cls_id = out_cls.index
+                            # Velo.logger.info("out_cls_id = {:9} added".format(out_cls_id))
+
+                    val_outs_sent_to_others = ( val_outs - val_chouts )
+
+                    # 2)
+                    if val_outs_sent_to_others < 0:
+                        raise ValueError(
+                            "val_outs_sent_to_others must not be less than 0!"
+                        )
+                    elif val_outs_sent_to_others == 0:
+                        return 0
+
+                    # 3)
+                    inps_sorted = sort_together(
+                        [
+                            inps_age,
+                            inps
+                        ],
+                        reverse = sortswitch
+                    )[1]
+                    # 4/)
+                    for inp_i in inps_sorted:
+                        val_inp_i = inp_i.value
+                        val_outs_break += val_inp_i
+
+                        # *)
+                        if inp_spend_before_bh_first_or_coinbase(
+                            inp_i,
+                            bh_first,
+                        ) == True:
+                            m_circ_mc += val_inp_i
+                            # **)
+                            if val_outs_break >= val_outs_sent_to_others:
+                                if m_circ_mc >= val_outs_sent_to_others:
+                                    m_circ_mc = val_outs_sent_to_others
+                                break
+
+                if m_circ_mc < 0:
+                    Velo.logger.error(
+                        "{}{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}".format(
+                            "{}[{}{}/{:03}{}]".format(
+                                cs.RES,
+                                cs.WHI,
+                                self.process_name,
+                                Velo.process_cnt-1,
+                                cs.RES,
+                            ),
+                            cs.WHI,
+                            "        block_time              = {}".format(tx.block_time),
+                            "        tx.hash                 = {}".format(tx.hash),
+                            "        is coinbase?            = {}".format(tx.is_coinbase),
+                            "        val_outs                = {}".format(val_outs),
+                            "        val_chouts              = {}".format(val_chouts),
+                            "        val_outs_sent_to_others = {}".format(val_outs_sent_to_others),
+                            "        inps_sorted             = {}".format(inps_sorted),
+                            "        val_inps_all            = {}".format(tx.input_value),
+                            "        val_inps_summed         = {}".format(val_inps_summed),
+                            "        m_circ_m                = {}".format(m_circ_mc),
+                        )
+                    )
+                    raise ValueError(
+                        "m_circ_m must not be less than 0!"
+                        )
+
+                return m_circ_mc
+
+            def handle_tx_wh_bill(
+                tx,
+                bh_first,
+            ):
+                """
+                Whole bill approach: complete agg value of inputs
+                """
+                m_circ_mc = 0
+                inps      = tx.inputs
+
+                for inp_i in inps:
+                    if inp_spend_before_bh_first_or_coinbase(
+                        inp_i,
+                        bh_first,
+                    ) == True:
+                        m_circ_mc += inp_i.value
+
+                return m_circ_mc
+
             # print starting message--------------------------------------------
             Velo.logger.info(
-                "{}[{}{}/{:03}{}]{}  get competing measures".format(
+                "{}[{}{}/{:03}{}]{}  {}".format(
                     cs.RES,
-                    cs.PRGnBD,
+                    cs.PRGnBC,
                     self.process_name,
                     Velo.process_cnt-1,
                     cs.RES,
                     cs.WHI,
+                    "get measurement results",
                 )
             )
 
-            # initialize basic variables----------------------------------------
+            # initialize basic variables/data structures------------------------
             time_windows     = Velo.time_windows
             time_windows_len = len(time_windows)
-            sdd_per_day      = []
-            dormancy_per_day = [[] for i in range(time_windows_len)]
+            satoshi_dd_raw   = []
+            dormancy_raw     = [[] for i in range(time_windows_len)]
+            m_circ_mc_lifo   = [[] for i in range(time_windows_len)]
+            m_circ_mc_fifo   = [[] for i in range(time_windows_len)]
+            m_circ_wh_bill   = [[] for i in range(time_windows_len)]
 
+            # get day_index of first block in self.__txes_daily-----------------
+            first_block_height = self.__txes_daily[0][0].block_height
+            day_index_first = Velo.f_index_day_of_block_height[
+                first_block_height
+            ]
 
-            # retrieve daily values---------------------------------------------
+            # retrieve data for each daychunk of txes---------------------------
             for daychunk in self.__txes_daily:
                 # initialize daily values---------------------------------------
-                sdd_per_day.append(0)
-                for t_w in range(time_windows_len):
-                    dormancy_per_day[t_w].append(0)
+                satoshi_dd_raw.append(0)
 
-                # if no transactions happened, append 0-------------------------
+                for t_w in range(time_windows_len):
+                    dormancy_raw[t_w]  .append(0)
+                    m_circ_mc_lifo[t_w].append(0)
+                    m_circ_mc_fifo[t_w].append(0)
+                    m_circ_wh_bill[t_w].append(0)
+
+                # if no transactions happened, continue-------------------------
                 if daychunk == []:
                     continue
 
-                # retrive tx-wise values for sdd and prepare dormancy-----------
+                # initialize first block heights/day index of txes--------------
+                first_block_height = daychunk[0].block_height
+                day_index = Velo.f_index_day_of_block_height[first_block_height]
+
+                # print some liveliness message---------------------------------
+                day_diff_to_start = day_index - day_index_first
+
+                print_liveliness_message(
+                    day_diff_to_start,
+                    "get_measurements()"
+                )
+                # retrieve tx-wise values for money in effective cirulation-----
                 for tx in daychunk:
-                    # Here, dust transaction shouldn't be included, see *)
+                    # Here, dust transaction shouldn't be included, see *)------
                     if tx.output_value <= tx.fee:
                         continue
 
+                    # get unwindowed values-------------------------------------
                     # (A1) (b_i \cdot delta t_i in dormancy paper)--------------
-                    sdd_per_tx = get_sdd_per_tx(tx)
-                    sdd_per_day[-1] += sdd_per_tx
-
-                    # (A2)------------------------------------------------------
+                    satoshi_dd_per_tx     = handle_tx_sdd_raw(tx)
+                    m_circ_mc_lifo_per_tx = handle_tx_mc_xifo(
+                        tx,
+                        first_block_height,
+                        False,
+                    )
+                    m_circ_mc_fifo_per_tx = handle_tx_mc_xifo(
+                        tx,
+                        first_block_height,
+                        True,
+                    )
+                    m_circ_wh_bill_per_tx = handle_tx_wh_bill(
+                        tx,
+                        first_block_height,
+                    )
+                    satoshi_dd_raw[-1]   += satoshi_dd_per_tx
+                    # prepare data structures for windowed values---------------
                     for t_w in range(time_windows_len):
-                        dormancy_per_day[t_w][-1] += sdd_per_tx
+                        dormancy_raw[t_w][-1]   += satoshi_dd_per_tx
+                        m_circ_mc_lifo[t_w][-1] += m_circ_mc_lifo_per_tx
+                        m_circ_mc_fifo[t_w][-1] += m_circ_mc_fifo_per_tx
+                        m_circ_wh_bill[t_w][-1] += m_circ_wh_bill_per_tx
 
             # put results into __queue_dict-------------------------------------
-            self.__queue_dict["sdd_raw"] = sdd_per_day
+            self.__queue_dict["sdd_raw"] = satoshi_dd_raw
 
-            for t_w in range(time_windows_len):
-                self.__queue_dict[
-                    "dormancy_raw_{}".format(time_windows[t_w])
-                ] = dormancy_per_day[t_w]
+            for t_w_i in range(time_windows_len):
+                t_w = time_windows[t_w_i]
+
+                dormancy_raw_str   = "dormancy_raw_{}"  .format(t_w)
+                m_circ_mc_lifo_str = "m_circ_mc_lifo_{}".format(t_w)
+                m_circ_mc_fifo_str = "m_circ_mc_fifo_{}".format(t_w)
+                m_circ_wh_bill_str = "m_circ_wh_bill_{}".format(t_w)
+
+                self.__queue_dict[dormancy_raw_str]   = dormancy_raw[t_w_i]
+                self.__queue_dict[m_circ_mc_lifo_str] = m_circ_mc_lifo[t_w_i]
+                self.__queue_dict[m_circ_mc_fifo_str] = m_circ_mc_fifo[t_w_i]
+                self.__queue_dict[m_circ_wh_bill_str] = m_circ_wh_bill[t_w_i]
+
+            # hande test_level cases--------------------------------------------
+            if 10 <= Velo.test_level and Velo.test_level <= 12:
+                self.__queue.put([self.process_id, self.__queue_dict])
+                return True
 
             return False
 
@@ -1828,7 +1767,7 @@ class Velo:
             ])
             self.__queue_evnt_dict = {}
 
-            if get_m_circ() == True: return
+            if get_measurements() == True: return
 
             while True:
                 msg_from_queue = self.__queue_evnt.get()
@@ -1842,7 +1781,7 @@ class Velo:
             self.stage_id += 1
 
         if self.stage_id == 1:
-            if get_comp_meas() == True: return
+            pass
 
         # put all necessary data to parent process through multiprocess queue---
         Velo.logger.debug(
