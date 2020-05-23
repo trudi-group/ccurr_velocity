@@ -135,6 +135,7 @@ class Velo:
                                                # analyzed-----------------------
     block_height_max  = 0                      # maximum block height regarding-
                                                # given end date for analysis----
+    tx_vol_agg        = []                     # daily aggr. tx volume----------
 
     #==[ CLASSLEVEL | SessionSetup & precaching of global data struct ]=========
     def setup(
@@ -656,7 +657,7 @@ class Velo:
 
             return
 
-        def tx_vol_agg_time_windowed():
+        def setup_tx_vol_agg_time_windowed():
             """
             Compute aggregates for given times in Velo.time_windows.
             """
@@ -683,6 +684,16 @@ class Velo:
 
                 return
 
+            #--print status message---------------------------------------------
+            Velo.logger.info(
+                "{}[{}     SETUP     {}]{}  "
+                "tx_vol_agg_time_windowed".format(
+                    cs.RES,
+                    cs.PRGnBA,
+                    cs.RES,
+                    cs.PRGnBA,
+                )
+            )
             day_date      = to_datetime(Velo.start_date_gen)
             day_date_next = day_date
 
@@ -714,6 +725,15 @@ class Velo:
                 # aggregate txes volume for given time windows------------------
                 tx_vol_agg_time_windowed_per_day(tx_vol_agg_nxt_day)
 
+            Velo.logger.info(
+                "{}[{}     SETUP END {}]{}  "
+                "tx_vol_agg_time_windowed".format(
+                    cs.RES,
+                    cs.PRGnBA,
+                    cs.RES,
+                    cs.PRGnBA,
+                )
+            )
             return
 
         #--setup of static variables on class level-----------------------------
@@ -738,7 +758,7 @@ class Velo:
         setup_subprocessing_chunks()
 
         #--setup aggregated transaction volume regarding given time_windows-----
-        tx_vol_agg_time_windowed()
+        #  setup_tx_vol_agg_time_windowed()
 
         return
 
@@ -750,6 +770,66 @@ class Velo:
         """
         Builds a pandas data frame and csv from pre-computed data.
         """
+
+        def tx_vol_agg_time_windowed(results_raw):
+            """
+            Compute aggregates for given times in Velo.time_windows.
+            """
+            def tx_vol_agg_time_windowed_per_day(tx_vol_agg_nxt_day):
+                """
+                Compute daily aggregates for given times in Velo.time_windows.
+                """
+                for t_w in range(1, len(Velo.time_windows)):
+                    tx_vol_agg_last = 0
+
+                    if day > 0:
+                        tx_vol_agg_last = Velo.tx_vol_agg[day-1][t_w]
+
+                    #-add the current daily calculations---------------------------
+                    tx_vol_agg_t_w = tx_vol_agg_last + tx_vol_agg_nxt_day
+
+                    #-substract the calculations right before the current window---
+                    if day >= Velo.time_windows[t_w]:
+                        tx_vol_agg_t_w -=  Velo.tx_vol_agg[
+                            day - Velo.time_windows[t_w]
+                        ][0]
+
+                    Velo.tx_vol_agg[day].append(tx_vol_agg_t_w)
+
+                return
+
+            #--print status message---------------------------------------------
+            Velo.logger.info(
+                "{}[{}   Calculate   {}]{}  "
+                "tx_vol_agg_time_windowed".format(
+                    cs.RES,
+                    cs.PRGnBA,
+                    cs.RES,
+                    cs.PRGnBA,
+                )
+            )
+            #-------------------------------------------------------------------
+            tx_vol = results_raw["tx_vol"]
+
+            for day in range(Velo.cnt_days):
+                tx_vol_day = tx_vol[day]
+
+                Velo.tx_vol_agg.append([])
+                Velo.tx_vol_agg[-1].append(tx_vol_day)
+
+                # aggregate txes volume for given time windows------------------
+                tx_vol_agg_time_windowed_per_day(tx_vol_day)
+
+            Velo.logger.info(
+                "{}[{}     SETUP END {}]{}  "
+                "tx_vol_agg_time_windowed".format(
+                    cs.RES,
+                    cs.PRGnBA,
+                    cs.RES,
+                    cs.PRGnBA,
+                )
+            )
+            return
 
         def get_comp_meas_finalized(
             results_raw,
@@ -802,6 +882,22 @@ class Velo:
             time_windows     = Velo.time_windows
             time_windows_len = len(time_windows)
 
+            # finalize dormancy per time window---------------------------------
+            for day_i in range(len(Velo.tx_vol_agg)):
+                # initialize transaction volume per time window up to this day--
+                tx_vol_per_day = Velo.tx_vol_agg[day_i]
+
+                for t_w in range(time_windows_len):
+                    dormancy_tw_str = "dormancy_raw_{}".format(
+                        time_windows[t_w]
+                    )
+
+                    if tx_vol_per_day[t_w] == 0:
+                        results_raw[dormancy_tw_str][day_i] = 0
+                        continue
+
+                    results_raw[dormancy_tw_str][day_i] /= tx_vol_per_day[t_w]
+
             #--C1---------------------------------------------------------------
             results_raw["sdd"] = cumsum_with_window_reverse(
                 l = list(results_raw["sdd_raw"]),
@@ -828,6 +924,9 @@ class Velo:
             cs.RES,
             cs.WHI,
         ))
+
+        #--prepare windows m_total for dormancy calculation---------------------
+        tx_vol_agg_time_windowed(results_raw)
 
         #--prepare measures to be compared with velocity------------------------
         get_comp_meas_finalized(
@@ -1679,15 +1778,7 @@ class Velo:
                 if daychunk == []:
                     continue
 
-                # initialize first block heights/day index of txes--------------
-                first_block_height = daychunk[0].block_height
-
-                day_index = Velo.f_index_day_of_block_height[first_block_height]
-                
-                # initialize transaction volume per time window up to this day--
-                tx_vol_per_day = Velo.f_tx_vol_agg_of_id_day[day_index]
-
-                # retrive tx-wise values----------------------------------------
+                # retrive tx-wise values for sdd and prepare dormancy-----------
                 for tx in daychunk:
                     # Here, dust transaction shouldn't be included, see *)
                     if tx.output_value <= tx.fee:
@@ -1699,12 +1790,7 @@ class Velo:
 
                     # (A2)------------------------------------------------------
                     for t_w in range(time_windows_len):
-                        if tx_vol_per_day[t_w] == 0:
-                            break
-
-                        dormancy_per_day[t_w][-1] += (
-                            sdd_per_tx / tx_vol_per_day[t_w]
-                        )
+                        dormancy_per_day[t_w][-1] += sdd_per_tx
 
             # put results into __queue_dict-------------------------------------
             self.__queue_dict["sdd_raw"] = sdd_per_day
@@ -1715,6 +1801,7 @@ class Velo:
                 ] = dormancy_per_day[t_w]
 
             return False
+
         # print starting message------------------------------------------------
         process_name_str = "{}[{}{}/{:03}{}]{}  {}".format(
             cs.RES,
