@@ -432,13 +432,13 @@ class Multiprocess:
 
                 if not Multiprocess.processes[i].is_alive():
                     Multiprocess.logger.error(
-                        "{}[{}process_{:03}/{:03}{}]  {}  Not running".format(
+                        "{}[{}process_{:03}/{:03}{}]   {}   Not running".format(
                             cs.RES,
                             cs.PRGnBA,
                             i,
                             Multiprocess.process_cnt-1,
                             cs.RES,
-                            "[stage_id =  0  ]"
+                            "[stage_id      0]"
                         )
                     )
 
@@ -483,7 +483,7 @@ class Multiprocess:
                     msg_process_id,
                     Multiprocess.process_cnt-1,
                     cs.RES,
-                    "{}[stage_id = {:2}  ]".format(
+                    "{}[stage_id     {:2}]".format(
                         cs.WHI,
                         msg_stage_id,
                     ),
@@ -551,7 +551,7 @@ class Multiprocess:
                             process_name,
                             Multiprocess.process_cnt-1,
                             cs.RES,
-                            "{}[stage_id = {:2}  ]".format(
+                            "{}[stage_id     {:2}]".format(
                                 cs.WHI,
                                 stage_id,
                             ),
@@ -571,7 +571,7 @@ class Multiprocess:
                             process_name,
                             Multiprocess.process_cnt-1,
                             cs.RES,
-                            "{}[stage_id = {:2}  ]".format(
+                            "{}[stage_id     {:2}]".format(
                                 cs.WHI,
                                 stage_id,
                             ),
@@ -603,7 +603,7 @@ class Multiprocess:
                         process_name,
                         Multiprocess.process_cnt-1,
                         cs.RES,
-                        "{}[stage_id = {:2}  ]".format(
+                        "{}[stage_id     {:2}]".format(
                             cs.WHI,
                             stage_id,
                         ),
@@ -640,7 +640,7 @@ class Multiprocess:
                         process_name_nxt,
                         Multiprocess.process_cnt-1,
                         cs.RES,
-                        "{}[stage_id = {:2}  ]".format(
+                        "{}[stage_id     {:2}]".format(
                             cs.WHI,
                             stage_id,
                         ),
@@ -959,7 +959,7 @@ class MultiprocessTest:
             MultiprocessTest.process_cnt-1,
             cs.RES,
             cs.RES,
-            "[stage_id = {:2}  ]".format(self.stage_id)
+            "[stage_id     {:2}]".format(self.stage_id)
         )
 
         # print some working message--------------------------------------------

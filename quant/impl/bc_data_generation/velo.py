@@ -2079,7 +2079,7 @@ class Velo:
                 self.process_name,
                 Velo.process_cnt-1,
                 cs.RES,
-                "{}[stage_id = {:2}  ]".format(
+                "{}[stage_id     {:2}]".format(
                     cs.WHI,
                     self.stage_id,
                 ),
@@ -2097,7 +2097,7 @@ class Velo:
                 Velo.process_cnt-1,
                 cs.RES,
                 cs.WHI,
-                "{}[stage_id = {:2}  ]".format(
+                "{}[stage_id     {:2}]".format(
                     cs.WHI,
                     self.stage_id,
                 ),
