@@ -29,7 +29,7 @@ def cls_worker(cls_range):
         cluster_id   = Velo.cluster_range[cluster_i].index
 
         if cluster_i % 1000000 == 0:
-            Velo.logger.info("{}[{}  clustering   {}]{}  {}".format(
+            Velo.logger.info("{}[{}clustering     {}]{}  {}".format(
                 cs.RES,
                 cs.PRGnBA,
                 cs.RES,
@@ -117,8 +117,6 @@ class Velo:
 
     #--lookup functions/mappings-(as lists)-------------------------------------
     f_index_day_of_block_height = []                 # f_index-day(block height)
-    f_block_height_of_id_day    = []                 # f_block-height(day-id)---
-    f_tx_vol_agg_of_id_day      = []                 # f_tx-vol-agg(day-id)-----
     f_dates_of_id_sub_proc      = []                 # f_dates(subprocess-id)---
     f_m_total_of_block_height   = None               # f_m-total(block height)--
 
@@ -178,10 +176,28 @@ class Velo:
 
             #--print basic data in debug mode-----------------------------------
             Velo.logger.debug(
-                "date(first block) = {}".format(Velo.chain[0].time)
+                "{}[{}value          {}]   {}   {}".format(
+                    cs.RES,
+                    cs.CYA,
+                    cs.RES,
+                    "{}[block_date 1st ]".format(cs.WHI),
+                    "{}{}".format(
+                        cs.WHI,
+                        Velo.chain[0].time,
+                    )
+                )
             )
             Velo.logger.debug(
-                "date(last block)  = {}".format(Velo.chain[-1].time)
+                "{}[{}value          {}]   {}   {}".format(
+                    cs.RES,
+                    cs.CYA,
+                    cs.RES,
+                    "{}[block_date last]".format(cs.WHI),
+                    "{}{}".format(
+                        cs.WHI,
+                        Velo.chain[-1].time,
+                    )
+                )
             )
 
             return
@@ -192,12 +208,12 @@ class Velo:
             """
             # print status message----------------------------------------------
             Velo.logger.info(
-                "{}[{}     SETUP     {}]{}  "
-                "choice of desired data".format(
+                "{}[{}SETUP          {}]   {}   {}".format(
                     cs.RES,
                     cs.PRGnBA,
                     cs.RES,
-                    cs.PRGnBA,
+                    "                 ",
+                    "{}choice of desired data".format(cs.PRGnBA),
                 )
             )
 
@@ -251,12 +267,12 @@ class Velo:
             """
             # print status message----------------------------------------------
             Velo.logger.info(
-                "{}[{}     SETUP     {}]{}  "
-                "change address heuristics".format(
+                "{}[{}SETUP          {}]   {}   {}".format(
                     cs.RES,
                     cs.PRGnBA,
                     cs.RES,
-                    cs.PRGnBA,
+                    "                 ",
+                    "{}change address heuristics".format(cs.PRGnBA),
                 )
             )
 
@@ -324,12 +340,12 @@ class Velo:
 
             # print status message----------------------------------------------
             Velo.logger.info(
-                "{}[{}     SETUP     {}]{}  "
-                "calculating cumulative coin supply".format(
+                "{}[{}SETUP          {}]   {}   {}".format(
                     cs.RES,
                     cs.PRGnBA,
                     cs.RES,
-                    cs.PRGnBA,
+                    "                 ",
+                    "{}calculating cumulative coin supply".format(cs.PRGnBA)
                 )
             )
 
@@ -360,12 +376,12 @@ class Velo:
             """
             #--print status message---------------------------------------------
             Velo.logger.info(
-                "{}[{}     SETUP     {}]{}  "
-                "clustering: get id of maximum cluster".format(
+                "{}[{}SETUP          {}]   {}   {}".format(
                     cs.RES,
                     cs.PRGnBA,
                     cs.RES,
-                    cs.PRGnBA,
+                    "                 ",
+                    "{}clustering: get id of maximum cluster".format(cs.PRGnBA),
                 )
             )
 
@@ -399,12 +415,13 @@ class Velo:
             # return assumingly largest cluster (id = 32), when skip is on------
             if True == Velo.cluster_skip:
                 Velo.cluster_max_id = 32
-                Velo.logger.info("{}[{}  clustering   {}]{}  {}".format(
+                Velo.logger.info("{}[{}clustering     {}]   {}   {}".format(
                     cs.RES,
                     cs.PRGnBA,
                     cs.RES,
-                    cs.PRGnBA,
-                    "Actually used max cluster: (with id/length {}/{})".format(
+                    "                 ",
+                    "{}Actually used max cluster: (with id/length {}/{})".format(
+                        cs.PRGnBA,
                         Velo.cluster_max_id,
                         Velo.cluster_max_size,
                     ),
@@ -524,14 +541,28 @@ class Velo:
                         sub_proc_txes_counter
                     ]
                     Velo.f_dates_of_id_sub_proc.append(sub_proc_date)
-                    Velo.logger.debug(
-                            "{:2}[{:4}]: ({})--({}), {:5}, {:10}".format(
+                    Velo.logger.info(
+                        "{}[{}process_{:03}    {}]   {}   {}".format(
+                            cs.RES,
+                            cs.PRGnBA,
                             sub_proc_printed,
-                            day,
-                            sub_proc_date_start,
-                            sub_proc_date_end,
-                            sub_proc_date_period,
-                            sub_proc_txes_counter,
+                            cs.RES,
+                            "{}{:6}     {:6}".format(
+                                cs.WHI,
+                                day+1-sub_proc_date_period,
+                                sub_proc_date_period,
+                            ),
+                            "{}--{}   {:10}".format(
+                                datetime.strftime(
+                                    sub_proc_date_start,
+                                    "%Y/%m/%d",
+                                ),
+                                datetime.strftime(
+                                    sub_proc_date_end,
+                                    "%Y/%m/%d",
+                                ),
+                                sub_proc_txes_counter,
+                            ),
                         )
                     )
                     sub_proc_printed     += 1
@@ -550,17 +581,31 @@ class Velo:
                         sub_proc_txes_counter
                     ]
                     Velo.f_dates_of_id_sub_proc.append(sub_proc_date)
-                    Velo.logger.debug(
-                        "{:2}[{:4}]: ({})--({}), {:5}, {:10} (last)".format(
+                    Velo.logger.info(
+                        "{}[{}process_{:03}    {}]   {}   {}".format(
+                            cs.RES,
+                            cs.PRGnBA,
                             sub_proc_printed,
-                            day,
-                            sub_proc_date_start,
-                            sub_proc_date_end,
-                            sub_proc_date_period,
-                            sub_proc_txes_counter,
+                            cs.RES,
+                            "{}{:6}     {:6}".format(
+                                cs.WHI,
+                                day+1-sub_proc_date_period,
+                                sub_proc_date_period,
+                            ),
+                            "{}--{}   {:10}".format(
+
+                                datetime.strftime(
+                                    sub_proc_date_start,
+                                    "%Y/%m/%d",
+                                ),
+                                datetime.strftime(
+                                    sub_proc_date_end,
+                                    "%Y/%m/%d",
+                                ),
+                                sub_proc_txes_counter,
+                            ),
                         )
                     )
-
 
                 return (
                     sub_proc_printed,
@@ -572,12 +617,12 @@ class Velo:
 
             #--print status message---------------------------------------------
             Velo.logger.info(
-                "{}[{}     SETUP     {}]{}  "
-                "subprocessing chunks of blockchain".format(
+                "{}[{}SETUP          {}]   {}   {}".format(
                     cs.RES,
                     cs.PRGnBA,
                     cs.RES,
-                    cs.PRGnBA,
+                    "                 ",
+                    "{}subprocessing chunks of blockchain".format(cs.PRGnBA),
                 )
             )
 
@@ -593,9 +638,22 @@ class Velo:
             Velo.cnt_days = (
                 to_datetime(Velo.end_date) - to_datetime(Velo.start_date_gen)
             ).days
-            Velo.logger.debug("cnt_days = {}".format(Velo.cnt_days))
 
-            #--get minimum and maximum block_height according to start/end_date-
+            # print number of days
+            Velo.logger.info(
+                "{}[{}value          {}]   {}   {}".format(
+                    cs.RES,
+                    cs.CYA,
+                    cs.RES,
+                    "{}[number of days ]".format(cs.WHI),
+                    "{}{:10}".format(
+                        cs.WHI,
+                        Velo.cnt_days,
+                    )
+                )
+            )
+
+            #--get minimum/maximum block_height according to start/end_date-----
             block_height_min = Velo.block_times[
                 Velo.block_times.index >= to_datetime(Velo.start_date_gen)
             ].iloc[0][0]
@@ -611,9 +669,35 @@ class Velo:
             for i_bh in range(block_height_min, block_height_max):
                 cnt_txes += Velo.chain[i_bh].tx_count
 
-            Velo.logger.debug("cnt_txes = {}".format(cnt_txes))
+            # print number of txes
+            Velo.logger.debug(
+                "{}[{}value          {}]   {}   {}".format(
+                    cs.RES,
+                    cs.CYA,
+                    cs.RES,
+                    "{}[number of txes ]".format(cs.WHI),
+                    "{}{:10}".format(
+                        cs.WHI,
+                        cnt_txes,
+                    )
+                )
+            )
 
-            #-initialie data for subprocessing----------------------------------
+            # print number of cpus----------------------------------------------
+            Velo.logger.debug(
+                "{}[{}value          {}]   {}   {}".format(
+                    cs.RES,
+                    cs.CYA,
+                    cs.RES,
+                    "{}[number of cpus ]".format(cs.WHI),
+                    "{}{:10}".format(
+                        cs.WHI,
+                        cpu_count(),
+                    )
+                )
+            )
+
+            #-initialize data for subprocessing---------------------------------
             day_date              = to_datetime(Velo.start_date_gen)
             day_date_next         = day_date
             sub_proc_tx_cnt_max   = ceil(cnt_txes/cpu_count())
@@ -622,6 +706,16 @@ class Velo:
             sub_proc_date_end     = day_date + timedelta(days=1)
             sub_proc_date_period  = 1
             sub_proc_printed      = 0
+
+            Velo.logger.info(
+                "{}[{}assign periods {}]   {}   {}".format(
+                    cs.RES,
+                    cs.PRGnBA,
+                    cs.RES,
+                    "{}day_id      #days".format(cs.PRGnBA),
+                    "        period                #txes"
+                )
+            )
 
             for day in range(Velo.cnt_days):
                 # update for-loop date variables--------------------------------
@@ -645,8 +739,6 @@ class Velo:
                     cnt_txes_per_day += Velo.chain[i_bh].tx_count
 
                     Velo.f_index_day_of_block_height.append(day)
-
-                Velo.f_block_height_of_id_day.append(block_height_min)
 
                 # calculate data for sub processing periods---------------------
                 if day == 0:
@@ -734,12 +826,12 @@ class Velo:
 
             #--print status message---------------------------------------------
             Velo.logger.info(
-                "{}[{}   Calculate   {}]{}  "
-                "tx_vol_agg_time_windowed".format(
+                "{}[{}Calculate      {}]   {}   {}".format(
                     cs.RES,
-                    cs.PRGnBA,
+                    cs.PRGnBI,
                     cs.RES,
-                    cs.PRGnBA,
+                    "                 ",
+                    "{}aggregated/windowed tx volume".format(cs.PRGnBI),
                 )
             )
             #-------------------------------------------------------------------
@@ -754,15 +846,6 @@ class Velo:
                 # aggregate txes volume for given time windows------------------
                 tx_vol_agg_time_windowed_per_day(tx_vol_day)
 
-            Velo.logger.info(
-                "{}[{}     SETUP END {}]{}  "
-                "tx_vol_agg_time_windowed".format(
-                    cs.RES,
-                    cs.PRGnBA,
-                    cs.RES,
-                    cs.PRGnBA,
-                )
-            )
             return
 
         def get_comp_meas_finalized(
@@ -813,6 +896,18 @@ class Velo:
 
                 return l
 
+            #--print status message---------------------------------------------
+            Velo.logger.info(
+                "{}[{}Finalize       {}]   {}   {}".format(
+                    cs.RES,
+                    cs.PRGnBI,
+                    cs.RES,
+                    "                 ",
+                    "{}dormancy".format(cs.PRGnBI),
+                )
+            )
+
+            #-------------------------------------------------------------------
             time_windows     = Velo.time_windows
             time_windows_len = len(time_windows)
 
@@ -851,13 +946,15 @@ class Velo:
             return
 
         #--Start of get_results_finalized()-------------------------------------
-        Velo.logger.info("{}{}[{}build&write csv{}{}]".format(
-            cs.RES,
-            cs.WHI,
-            cs.PRGnBI,
-            cs.RES,
-            cs.WHI,
-        ))
+        Velo.logger.debug(
+            "{}[{}function       {}]   {}   {}".format(
+                cs.RES,
+                cs.CYA,
+                cs.RES,
+                "{}[Started        ]".format(cs.WHI),
+                "Velo.get_results_finalized",
+            )
+        )
 
         #--prepare windows m_total for dormancy calculation---------------------
         tx_vol_agg_time_windowed(results_raw)
@@ -885,13 +982,12 @@ class Velo:
             df_final[comp_meas_type] = results_raw[comp_meas_type]
 
         #--print status message-------------------------------------------------
-        Velo.logger.info("{}{}[{}built dataframe{}{}]  {}".format(
+        Velo.logger.info("{}[{}built dataframe{}]   {}   {}".format(
             cs.RES,
-            cs.WHI,
             cs.PRGnBI,
             cs.RES,
-            cs.WHI,
-            "final dataframe"
+            "                 ",
+            "{}final dataframe".format(cs.PRGnBI),
         ))
 
         #--remove row from January 4th 2009 to January 8th 2009-----------------
@@ -922,12 +1018,19 @@ class Velo:
 
         #--print status message-------------------------------------------------
         Velo.logger.info(
-            "{}{}[{}   wrote csv   {}{}]".format(
+            "{}[{}wrote csv      {}]".format(
                 cs.RES,
-                cs.WHI,
                 cs.PRGnBI,
                 cs.RES,
-                cs.WHI,
+            )
+        )
+        Velo.logger.debug(
+            "{}[{}function       {}]   {}   {}".format(
+                cs.RES,
+                cs.CYA,
+                cs.RES,
+                "{}[Finished       ]".format(cs.WHI),
+                "Velo.get_results_finalized",
             )
         )
 
@@ -1108,22 +1211,20 @@ class Velo:
                 if date_period >= 100:
                     colorChoice = cs.CYB
 
-
                 Velo.logger.info(
-                    "{}{}  [day_{:04d}/{:04d}]  {}".format(
-                        "{}[{}{}/{:03}{}]".format(
-                            cs.RES,
-                            colorChoice,
-                            self.process_name,
-                            Velo.process_cnt-1,
-                            cs.RES,
+                    "{}[{}{}/{:03}{}]   {}   {}".format(
+                        cs.RES,
+                        colorChoice,
+                        self.process_name,
+                        Velo.process_cnt-1,
+                        cs.RES,
+                        "{}[day_{:05d}/{:05d}]".format(
+                            cs.WHI,
+                            i_day,
+                            date_period,
                         ),
-                        cs.WHI,
-                        i_day,
-                        date_period,
                         function_str,
-
-                    )
+                    ),
                 )
 
             return
@@ -1230,21 +1331,14 @@ class Velo:
 
             #--print process status message-------------------------------------
             Velo.logger.info(
-                "{}{}  {} [{}--{}, {:04d}], {}".format(
-                    "{}[{}{}/{:03}{}]{}".format(
-                        cs.RES,
-                        cs.PRGnBA,
-                        self.process_name,
-                        Velo.process_cnt-1,
-                        cs.RES,
-                        cs.RES,
-                    ),
-                    cs.WHI,
-                    "Loading basic tx data of period",
-                    self.__start_date,
-                    self.__end_date,
-                    self.__date_period,
-                    "txes_count = {:07d}".format(self.__txes_count),
+                "{}[{}{}/{:03}{}]   {}   {}".format(
+                    cs.RES,
+                    cs.PRGnBA,
+                    self.process_name,
+                    Velo.process_cnt-1,
+                    cs.RES,
+                    "                 ",
+                    "{}get_basic_tx_data".format(cs.PRGnBA),
                 )
             )
 
@@ -1338,7 +1432,7 @@ class Velo:
                 s_txes_vol_self_churn = str(txes_vol_self_churn)
                 self.__queue_dict["txes_vol_self_churn"] = s_txes_vol_self_churn
 
-            if 2 <= Velo.test_level and Velo.test_level <= 9:
+            if Velo.test_level == 1:
                 self.__queue.put([self.process_id, self.__queue_dict])
                 return True
 
@@ -1844,14 +1938,14 @@ class Velo:
 
             # print starting message--------------------------------------------
             Velo.logger.info(
-                "{}[{}{}/{:03}{}]{}  {}".format(
+                "{}[{}{}/{:03}{}]   {}   {}".format(
                     cs.RES,
                     cs.PRGnBC,
                     self.process_name,
                     Velo.process_cnt-1,
                     cs.RES,
-                    cs.WHI,
-                    "get measurement results",
+                    "                 ",
+                    "{}get measurement results".format(cs.PRGnBC),
                 )
             )
 
@@ -1944,27 +2038,12 @@ class Velo:
                 self.__queue_dict[m_circ_wh_bill_str] = m_circ_wh_bill[t_w_i]
 
             # hande test_level cases--------------------------------------------
-            if 10 <= Velo.test_level and Velo.test_level <= 12:
+            if Velo.test_level == 2:
                 self.__queue.put([self.process_id, self.__queue_dict])
                 return True
 
             return False
 
-        # print starting message------------------------------------------------
-        process_name_str = "{}[{}{}/{:03}{}]{}  {}".format(
-            cs.RES,
-            cs.PRGnBA,
-            self.process_name,
-            Velo.process_cnt-1,
-            cs.RES,
-            cs.WHI,
-            "--stage_id = {}--".format(self.stage_id)
-        )
-
-        Velo.logger.info("{}{}  Starting".format(
-            process_name_str,
-            cs.WHI,
-        ))
         #-----------------------------------------------------------------------
         if self.stage_id == 0:
             if get_basic_tx_data() == True: return
@@ -1993,29 +2072,36 @@ class Velo:
             pass
 
         # put all necessary data to parent process through multiprocess queue---
-        Velo.logger.debug(
-            "{}[{}{}/{:03}{}]{}  {} Sending results".format(
+        Velo.logger.info(
+            "{}[{}{}/{:03}{}]   {}   {}".format(
                 cs.RES,
                 cs.PRGnBE,
                 self.process_name,
                 Velo.process_cnt-1,
                 cs.RES,
-                cs.WHI,
-                "--stage_id = {}--".format(self.stage_id)
+                "{}[stage_id = {:2}  ]".format(
+                    cs.WHI,
+                    self.stage_id,
+                ),
+                "{}Sending results".format(cs.PRGnBE),
             )
         )
 
         self.__queue.put([self.stage_id, self.process_id, self.__queue_dict])
 
         Velo.logger.debug(
-            "{}[{}{}/{:03}{}]{}  {} terminating".format(
+            "{}[{}{}/{:03}{}]{}   {}   {}".format(
                 cs.RES,
                 cs.PRGnBE,
                 self.process_name,
                 Velo.process_cnt-1,
                 cs.RES,
                 cs.WHI,
-                "--stage_id = {}--".format(self.stage_id)
+                "{}[stage_id = {:2}  ]".format(
+                    cs.WHI,
+                    self.stage_id,
+                ),
+                "{}terminating".format(cs.WHI),
             )
         )
 
