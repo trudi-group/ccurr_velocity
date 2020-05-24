@@ -624,7 +624,7 @@ class Velo:
             ).days
 
             # print number of days
-            Velo.logger.info(
+            Velo.logger.debug(
                 "{}[{}value          {}]   {}   {}".format(
                     cs.RES,
                     cs.CYA,
