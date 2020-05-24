@@ -48,13 +48,14 @@ class Multiprocess:
         Multiprocess.logger    = logger
         Multiprocess.log_level = args.log_level
         Multiprocess.logger.debug(
-            "{}[{}   function    {}]  Started  {}".format(
+            "{}[{}function       {}]   {}   {}".format(
                 cs.RES,
-                cs.PRGnBA,
+                cs.CYA,
                 cs.RES,
+                "{}[Started        ]".format(cs.WHI),
                 "Multiprocess.setup()",
             )
-         )
+        )
 
         #-----------------------------------------------------------------------
         Multiprocess.test_level       = int(args.test_level)
@@ -72,10 +73,11 @@ class Multiprocess:
 
         #status message---------------------------------------------------------
         Multiprocess.logger.debug(
-            "{}[{}   function    {}]  Finished {}".format(
+            "{}[{}function       {}]   {}   {}".format(
                 cs.RES,
-                cs.PRGnBA,
+                cs.CYA,
                 cs.RES,
+                "{}[Finished       ]".format(cs.WHI),
                 "Multiprocess.setup()",
             )
          )
@@ -406,10 +408,11 @@ class Multiprocess:
             """
             #status message-----------------------------------------------------
             Multiprocess.logger.debug(
-                "{}[{}   function    {}]  Started  {}".format(
+                "{}[{}function       {}]   {}   {}".format(
                     cs.RES,
-                    cs.PRGnBA,
+                    cs.CYA,
                     cs.RES,
+                    "{}[Started        ]".format(cs.WHI),
                     "Multiprocess.run_subprocessed.subprocess_manage",
                 )
             )
@@ -429,20 +432,19 @@ class Multiprocess:
 
                 if not Multiprocess.processes[i].is_alive():
                     Multiprocess.logger.error(
-                        "{}[{}process_{:03}/{:03}{}]  {} Not running".format(
+                        "{}[{}process_{:03}/{:03}{}]  {}  Not running".format(
                             cs.RES,
                             cs.PRGnBA,
                             i,
                             Multiprocess.process_cnt-1,
                             cs.RES,
-                            "--stage_id = 0--"
+                            "[stage_id =  0  ]"
                         )
                     )
 
             process_id = Multiprocess.cpu_cnt - 1
             Multiprocess.logger.debug(
-                "{}[{}process_{:03}{}-{}{:03}{}]  "
-                "Started processes on first stage".format(
+                "{}[{}process_{:03}{}-{}{:03}{}]   {}   {} ".format(
                     cs.RES,
                     cs.PRGnBA,
                     0,
@@ -450,42 +452,48 @@ class Multiprocess:
                     cs.PRGnBA,
                     Multiprocess.cpu_cnt-1,
                     cs.RES,
+                    "                 ",
+                    "{}Started processes on first stage".format(cs.WHI),
                 )
             )
 
             #--retrieve subprocess results--------------------------------------
             while processes_fin > 0:
                 # print some status message-------------------------------------
-                process_xxx_str = "{}[{}process_xxx/{:03}{}]".format(
-                    cs.RES,
-                    cs.PRGnBG,
-                    Multiprocess.process_cnt-1,
-                    cs.RES,
+
+                Multiprocess.logger.debug(
+                    "{}[{}process_xxx/{:03}{}]   {}   {}".format(
+                        cs.RES,
+                        cs.PRGnBG,
+                        Multiprocess.process_cnt-1,
+                        cs.RES,
+                        "                 ",
+                        "{}retrieving results".format(cs.WHI),
+                    )
                 )
-                Multiprocess.logger.info("{}{}  retrieving results".format(
-                    process_xxx_str,
-                    cs.PRGnBG,
-                ))
 
                 # handle queue data---------------------------------------------
                 msg_from_queue     = queue.get()
                 msg_stage_id       = msg_from_queue[0]
                 msg_process_id     = msg_from_queue[1]
                 msg_result         = msg_from_queue[2]
-                msg_process_id_str = "{}[{}process_{:03}/{:03}{}]  {}".format(
+                msg_process_id_str = "{}[{}process_{:03}/{:03}{}]   {}".format(
                     cs.RES,
                     cs.PRGnBG,
                     msg_process_id,
                     Multiprocess.process_cnt-1,
                     cs.RES,
-                    "[stage_id = {:2}]".format(msg_stage_id)
+                    "{}[stage_id = {:2}  ]".format(
+                        cs.WHI,
+                        msg_stage_id,
+                    ),
                 )
                
                 Multiprocess.process_result[msg_process_id][
                     msg_stage_id
                 ] = msg_result 
 
-                Multiprocess.logger.info("{}{}  results retrieved".format(
+                Multiprocess.logger.info("{}   {}results retrieved".format(
                     msg_process_id_str,
                     cs.PRGnBG,
                 ))
@@ -502,17 +510,18 @@ class Multiprocess:
                     Multiprocess.processes[msg_process_id].join()
                     processes_fin -= 1
 
-                    Multiprocess.logger.info("{}{}  terminated/joined".format(
+                    Multiprocess.logger.info("{}   {}terminated/joined".format(
                         msg_process_id_str,
                         cs.PRGnBF,
                     ))
 
             #status message-----------------------------------------------------
             Multiprocess.logger.debug(
-                "{}[{}   function    {}]  Finished {}".format(
+                "{}[{}function       {}]   {}   {}".format(
                     cs.RES,
-                    cs.PRGnBA,
+                    cs.CYA,
                     cs.RES,
+                    "{}[Finished       ]".format(cs.WHI),
                     "Multiprocess.run_subprocessed.subprocess_manage",
                 )
             )
@@ -536,14 +545,16 @@ class Multiprocess:
                 """
                 if ds_nxt_id != Multiprocess.cat_nxt[stage_id]:
                     Multiprocess.logger.error(
-                        "{}[{}{}/{:03}{}]{}  {}{}".format(
+                        "{}[{}{}/{:03}{}]   {}   {}".format(
                             cs.RES,
                             cs.PRGnBE,
                             process_name,
                             Multiprocess.process_cnt-1,
                             cs.RES,
-                            cs.PRGnBE,
-                            "[stage_id = {:2}]".format(stage_id),
+                            "{}[stage_id = {:2}  ]".format(
+                                cs.WHI,
+                                stage_id,
+                            ),
                             "ds_nxt_id != Multiprocess.cat_nxt",
                         )
                     )
@@ -554,15 +565,17 @@ class Multiprocess:
                 #initial setup
                 if ds_nxt_id == 0:
                     Multiprocess.logger.info(
-                        "{}[{}{}/{:03}{}]{}  {}  {}".format(
+                        "{}[{}{}/{:03}{}]   {}   {}".format(
                             cs.RES,
                             cs.PRGnBH,
                             process_name,
                             Multiprocess.process_cnt-1,
                             cs.RES,
-                            cs.PRGnBH,
-                            "[stage_id = {:2}]".format(stage_id),
-                            "data appended",
+                            "{}[stage_id = {:2}  ]".format(
+                                cs.WHI,
+                                stage_id,
+                            ),
+                            "{}data appended".format(cs.PRGnBH),
                         )
                     )
 
@@ -584,15 +597,17 @@ class Multiprocess:
                         ])
 
                 Multiprocess.logger.info(
-                    "{}[{}{}/{:03}{}]{}  {}  {}".format(
+                    "{}[{}{}/{:03}{}]   {}   {}".format(
                         cs.RES,
                         cs.PRGnBH,
                         process_name,
                         Multiprocess.process_cnt-1,
                         cs.RES,
-                        cs.PRGnBH,
-                        "[stage_id = {:2}]".format(stage_id),
-                        "data appended",
+                        "{}[stage_id = {:2}  ]".format(
+                            cs.WHI,
+                            stage_id,
+                        ),
+                        "{}data appended".format(cs.PRGnBH),
                     )
                 )
 
@@ -600,10 +615,11 @@ class Multiprocess:
 
             #status message-----------------------------------------------------
             Multiprocess.logger.debug(
-                "{}[{}   function    {}]  Started  {}".format(
+                "{}[{}function       {}]   {}   {}".format(
                     cs.RES,
-                    cs.PRGnBA,
+                    cs.CYA,
                     cs.RES,
+                    "{}[Started        ]".format(cs.WHI),
                     "Multiprocess.run_subprocessed.concatenate",
                 )
             )
@@ -618,13 +634,16 @@ class Multiprocess:
                     cat_nxt
                 ].process_name
                 process_name_nxt_str = (
-                    "{}[{}{}/{:03}{}]  {}".format(
+                    "{}[{}{}/{:03}{}]   {}".format(
                         cs.RES,
                         cs.PRGnBE,
                         process_name_nxt,
                         Multiprocess.process_cnt-1,
                         cs.RES,
-                        "[stage_id = {:2}]".format(stage_id),
+                        "{}[stage_id = {:2}  ]".format(
+                            cs.WHI,
+                            stage_id,
+                        ),
                     )
                 )
                 #-process that would produce the next results to be concatenated
@@ -643,7 +662,7 @@ class Multiprocess:
 
                     if time_to_wait_if_alive > 3.2:
                         Multiprocess.logger.info(
-                            "{}{}  still running".format(
+                            "{}   {}still running".format(
                                 process_name_nxt_str,
                                 cs.PRGnBE,
                             )
@@ -658,12 +677,12 @@ class Multiprocess:
 
                     if time_to_wait_if_none > 3.2:
                         Multiprocess.logger.warning(
-                            "{}  no results yet!".format(
+                            "{}   {}no results yet!".format(
                                 process_name_nxt_str,
                             )
                         )
                     elif time_to_wait_if_none > 6.4:
-                        Multiprocess.logger.error("{}  no results!".format(
+                        Multiprocess.logger.error("{}   no results!".format(
                             process_name_nxt_str,
                         ))
                         Multiprocess.processes_kill_all()
@@ -700,10 +719,11 @@ class Multiprocess:
 
             #status message-----------------------------------------------------
             Multiprocess.logger.debug(
-                "{}[{}   function    {}]  Finished {}".format(
+                "{}[{}function       {}]   {}   {}".format(
                     cs.RES,
-                    cs.PRGnBA,
+                    cs.CYA,
                     cs.RES,
+                    "{}[Finished       ]".format(cs.WHI),
                     "Multiprocess.run_subprocessed.concatenate",
                 )
             )
@@ -712,10 +732,11 @@ class Multiprocess:
 
         #status message---------------------------------------------------------
         Multiprocess.logger.debug(
-            "{}[{}   function    {}]  Started  {}".format(
+            "{}[{}function       {}]   {}   {}".format(
                 cs.RES,
-                cs.PRGnBA,
+                cs.CYA,
                 cs.RES,
+                "{}[Started        ]".format(cs.WHI),
                 "Multiprocess.run_subprocessed",
             )
         )
@@ -822,10 +843,11 @@ class Multiprocess:
 
         #status message---------------------------------------------------------
         Multiprocess.logger.debug(
-            "{}[{}   function    {}]  Finished {}".format(
+            "{}[{}function       {}]   {}   {}".format(
                 cs.RES,
-                cs.PRGnBA,
+                cs.CYA,
                 cs.RES,
+                "{}[Started        ]".format(cs.WHI),
                 "Multiprocess.run_subprocessed",
             )
         )
@@ -837,10 +859,11 @@ class Multiprocess:
         """
         #status message---------------------------------------------------------
         Multiprocess.logger.debug(
-            "{}[{}   function    {}]  Started  {}".format(
+            "{}[{}function       {}]   {}   {}".format(
                 cs.RES,
-                cs.PRGnBA,
+                cs.CYA,
                 cs.RES,
+                "{}[Started        ]".format(cs.WHI),
                 "Multiprocess.run",
             )
          )
@@ -859,10 +882,11 @@ class Multiprocess:
 
         #status message---------------------------------------------------------
         Multiprocess.logger.debug(
-            "{}[{}   function    {}]  Finished {}".format(
+            "{}[{}function       {}]   {}   {}".format(
                 cs.RES,
-                cs.PRGnBA,
+                cs.CYA,
                 cs.RES,
+                "{}[Started        ]".format(cs.WHI),
                 "Multiprocess.run",
             )
          )
@@ -935,7 +959,7 @@ class MultiprocessTest:
             MultiprocessTest.process_cnt-1,
             cs.RES,
             cs.RES,
-            "[stage_id = {:2}]".format(self.stage_id)
+            "[stage_id = {:2}  ]".format(self.stage_id)
         )
 
         # print some working message--------------------------------------------
