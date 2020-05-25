@@ -1407,7 +1407,11 @@ class Velo:
                 self.__queue_dict["txes_vol_self_churn"] = s_txes_vol_self_churn
 
             if Velo.test_level == 1:
-                self.__queue.put([self.process_id, self.__queue_dict])
+                self.__queue.put([
+                    self.stage_id,
+                    self.process_id,
+                    self.__queue_dict,
+                ])
                 return True
 
             return False
@@ -1748,7 +1752,11 @@ class Velo:
 
             # hande test_level cases--------------------------------------------
             if Velo.test_level == 2:
-                self.__queue.put([self.process_id, self.__queue_dict])
+                self.__queue.put([
+                    self.stage_id,
+                    self.process_id,
+                    self.__queue_dict,
+                ])
                 return True
 
             return False
@@ -1796,7 +1804,11 @@ class Velo:
             )
         )
 
-        self.__queue.put([self.stage_id, self.process_id, self.__queue_dict])
+        self.__queue.put([
+            self.stage_id,
+            self.process_id,
+            self.__queue_dict,
+        ])
 
         Velo.logger.debug(
             "{}[{}{}/{:03}{}]{}   {}   {}".format(

@@ -110,13 +110,26 @@ class Multiprocess:
         def get_data_for_df_test(
             start_date,
             end_date,
-            test,
         ):
             """
             """
+            #status message-----------------------------------------------------
+            Multiprocess.logger.debug(
+                "{}[{}function       {}]   {}   {}".format(
+                    cs.RES,
+                    cs.CYA,
+                    cs.RES,
+                    "{}[Started        ]".format(cs.WHI),
+                    "Multiprocess.test_concat.get_data_for_df_test",
+                )
+            )
+
+            #-------------------------------------------------------------------
+            test                  = Multiprocess.test_level
             process_id            = 0
             process_instances_ret = []
             queue                 = JoinableQueue()
+            queue_evnt            = JoinableQueue()
             date_format           = "%m/%d/%Y"
 
             for date in range(3):
@@ -135,6 +148,7 @@ class Multiprocess:
                     process_id=process_id,
                     process_name=process_name,
                     queue=queue,
+                    queue_evnt=queue_evnt,
                     date_id=date,
                 )
 
@@ -160,6 +174,17 @@ class Multiprocess:
                     break
 
                 Multiprocess.processes[msg_process_id].join()
+
+            #status message-----------------------------------------------------
+            Multiprocess.logger.debug(
+                "{}[{}function       {}]   {}   {}".format(
+                    cs.RES,
+                    cs.CYA,
+                    cs.RES,
+                    "{}[Finished       ]".format(cs.WHI),
+                    "Multiprocess.test_concat.get_data_for_df_test",
+                )
+            )
 
             return process_instances_ret
 
@@ -307,8 +332,19 @@ class Multiprocess:
             Multiprocess.logger.info(ret_str)
             return
 
+        #status message---------------------------------------------------------
+        Multiprocess.logger.debug(
+            "{}[{}function       {}]   {}   {}".format(
+                cs.RES,
+                cs.CYA,
+                cs.RES,
+                "{}[Started        ]".format(cs.WHI),
+                "Multiprocess.test_concat",
+            )
+        )
+
+        #-----------------------------------------------------------------------
         path_data_output = Multiprocess.path_data_output
-        Multiprocess.logger.info("Starting mode: Test[Concatenation]")
         #start_date_a_a = "01/01/2010"
         #end_date_a_a   = "02/01/2011"
 
@@ -318,19 +354,18 @@ class Multiprocess:
         #start_date_b   = "01/01/2010"
         #end_date_b     = "03/01/2012"
 
-        start_date_a_a = "01/01/2010"
+        start_date_a_a = "01/03/2009"
         end_date_a_a   = "02/01/2010"
 
         start_date_a_b = "02/02/2010"
-        end_date_a_b   = "03/01/2010"
+        end_date_a_b   = "02/01/2011"
 
-        start_date_b   = "01/01/2010"
-        end_date_b     = "03/01/2010"
+        start_date_b   = start_date_a_a
+        end_date_b     = end_date_a_b
 
         ret = get_data_for_df_test(
             start_date=[start_date_a_a, start_date_a_b, start_date_b],
             end_date=[end_date_a_a, end_date_a_b, end_date_b],
-            test=Multiprocess.test_level,
         )
 
         processes_test = []
@@ -351,13 +386,46 @@ class Multiprocess:
 
             processes_test.append(process)
 
+        #status message---------------------------------------------------------
+        Multiprocess.logger.debug(
+            "{}[{}function       {}]   {}   {}".format(
+                cs.RES,
+                cs.CYA,
+                cs.RES,
+                "{}[Started        ]".format(cs.WHI),
+                "Multiprocess.test_concat.ds_cmp",
+            )
+        )
+        
+        #start ds_cmp subprocesses----------------------------------------------
         for i in range(ret_cnt):
             processes_test[i].start()
 
         for i in range(ret_cnt):
             processes_test[i].join()
 
+        #status message---------------------------------------------------------
+        Multiprocess.logger.debug(
+            "{}[{}function       {}]   {}   {}".format(
+                cs.RES,
+                cs.CYA,
+                cs.RES,
+                "{}[Finished       ]".format(cs.WHI),
+                "Multiprocess.test_concat.ds_cmp",
+            )
+        )
+
+        #status message---------------------------------------------------------
         print("Exiting Multiprocess test: concat")
+        Multiprocess.logger.debug(
+            "{}[{}function       {}]   {}   {}".format(
+                cs.RES,
+                cs.CYA,
+                cs.RES,
+                "{}[Finished       ]".format(cs.WHI),
+                "Multiprocess.test_concat",
+            )
+        )
 
         return
 
@@ -866,7 +934,7 @@ class Multiprocess:
                 "{}[Started        ]".format(cs.WHI),
                 "Multiprocess.run",
             )
-         )
+        )
         #-----------------------------------------------------------------------
         if Multiprocess.test_level > 0:
             Multiprocess.logger.info("Starting mode: Test[Concatening]")
@@ -889,7 +957,7 @@ class Multiprocess:
                 "{}[Started        ]".format(cs.WHI),
                 "Multiprocess.run",
             )
-         )
+        )
 
         return results_raw
 
