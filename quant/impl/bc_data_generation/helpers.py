@@ -30,7 +30,7 @@ def setup_parse_args (
           '-e'
         , '--end_date'
         , action='store'
-        , default="12/20/2018"
+        , default="06/01/2019"
         , help="Analysis ending date"
     )
     parser.add_argument(
