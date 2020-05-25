@@ -397,7 +397,8 @@ class Velo:
                     cs.RES,
                     cs.PRGnBA,
                     cs.RES,
-                    cs.PRGnBA,
+                    "                 ",
+                    "{}clustering: get id of maximum cluster".format(cs.PRGnBA),
                 )
             )
 
@@ -406,7 +407,7 @@ class Velo:
             Velo.cluster_max_size = 0
             Velo.cluster_max_id   = 0
 
-            # load blocksci clustering manager----------------------------------
+            # days blocksci clustering manager----------------------------------
             Velo.cluster_mgr = ClusterManager(
                 path_cluster,
                 Velo.chain,
@@ -2129,32 +2130,43 @@ class Velo:
             self.stage_id += 1
 
         if self.stage_id == 1:
-            if get_comp_meas() == True: return
+            pass
 
         # put all necessary data to parent process through multiprocess queue---
-        Velo.logger.debug(
-            "{}[{}{}/{:03}{}]{}  {} Sending results".format(
+        Velo.logger.info(
+            "{}[{}{}/{:03}{}]   {}   {}".format(
                 cs.RES,
                 cs.PRGnBE,
                 self.process_name,
                 Velo.process_cnt-1,
                 cs.RES,
-                cs.WHI,
-                "--stage_id = {}--".format(self.stage_id)
+                "{}[stage_id     {:2}]".format(
+                    cs.WHI,
+                    self.stage_id,
+                ),
+                "{}Sending results".format(cs.PRGnBE),
             )
         )
 
-        self.__queue.put([self.stage_id, self.process_id, self.__queue_dict])
+        self.__queue.put([
+            self.stage_id,
+            self.process_id,
+            self.__queue_dict,
+        ])
 
         Velo.logger.debug(
-            "{}[{}{}/{:03}{}]{}  {} terminating".format(
+            "{}[{}{}/{:03}{}]{}   {}   {}".format(
                 cs.RES,
                 cs.PRGnBE,
                 self.process_name,
                 Velo.process_cnt-1,
                 cs.RES,
                 cs.WHI,
-                "--stage_id = {}--".format(self.stage_id)
+                "{}[stage_id     {:2}]".format(
+                    cs.WHI,
+                    self.stage_id,
+                ),
+                "{}terminating".format(cs.WHI),
             )
         )
 
