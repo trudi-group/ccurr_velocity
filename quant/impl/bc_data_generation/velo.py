@@ -385,7 +385,12 @@ class Velo:
                 )
             )
 
-            # days blocksci clustering manager----------------------------------
+            #-------------------------------------------------------------------
+            path_cluster          = Velo.args.path_cluster
+            Velo.cluster_max_size = 0
+            Velo.cluster_max_id   = 0
+
+            # load blocksci clustering manager----------------------------------
             Velo.cluster_mgr = ClusterManager(
                 path_cluster,
                 Velo.chain,
@@ -426,7 +431,7 @@ class Velo:
             sub_proc_cls_range = ceil(Velo.cluster_cnt/cpu_count())
 
             Velo.logger.info(
-                "{}[{}  clustering   {}]"
+                "{}[{}clustering     {}]"
                 "{}  Number of clusters per subprocess/in total: {}/{}".format(
                     cs.RES,
                     cs.PRGnBA,
@@ -462,7 +467,7 @@ class Velo:
             # Hardcoded result. Only change if parsing/clustering changes
             # Velo.cluster_max_id = 32
 
-            Velo.logger.info("{}[{}  clustering   {}]{}  {}".format(
+            Velo.logger.info("{}[{}clustering     {}]{}  {}".format(
                 cs.RES,
                 cs.PRGnBA,
                 cs.RES,
